@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Card, Row, Col, Badge, Button, Table, Spinner, Alert, Modal, Nav, Tab } from 'react-bootstrap';
 import staffService from '../../services/staffService';
+import ScheduleCalendarView from './ScheduleCalendarView';
 
 const StaffDetail = () => {
   const { id } = useParams();
@@ -14,6 +15,7 @@ const StaffDetail = () => {
   const [error, setError] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [activeTab, setActiveTab] = useState('general');
+  const [scheduleViewMode, setScheduleViewMode] = useState('calendar');
 
   useEffect(() => {
     const fetchStaffData = async () => {
@@ -265,7 +267,23 @@ const StaffDetail = () => {
           <Tab.Pane eventKey="schedule">
             <Card>
               <Card.Header className="d-flex justify-content-between align-items-center">
-                <h5 className="mb-0">Availability Schedule</h5>
+                <div className="d-flex align-items-center">
+                  <h5 className="mb-0 me-3">Availability Schedule</h5>
+                  <div className="btn-group btn-group-sm">
+                    <button 
+                      className={`btn ${scheduleViewMode === 'list' ? 'btn-primary' : 'btn-outline-primary'}`}
+                      onClick={() => setScheduleViewMode('list')}
+                    >
+                      List View
+                    </button>
+                    <button 
+                      className={`btn ${scheduleViewMode === 'calendar' ? 'btn-primary' : 'btn-outline-primary'}`}
+                      onClick={() => setScheduleViewMode('calendar')}
+                    >
+                      Calendar View
+                    </button>
+                  </div>
+                </div>
                 <Button
                   variant="success"
                   size="sm"
@@ -279,7 +297,7 @@ const StaffDetail = () => {
                   <Alert variant="info">
                     No availability schedules defined yet. Click the button above to add a schedule.
                   </Alert>
-                ) : (
+                ) : scheduleViewMode === 'list' ? (
                   <Table responsive hover>
                     <thead>
                       <tr>
@@ -326,6 +344,8 @@ const StaffDetail = () => {
                       ))}
                     </tbody>
                   </Table>
+                ) : (
+                  <ScheduleCalendarView schedules={schedules} />
                 )}
               </Card.Body>
             </Card>
