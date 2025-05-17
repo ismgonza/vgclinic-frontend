@@ -27,7 +27,7 @@ const StaffDetail = () => {
         setLocations(locationsData);
         
         // Fetch availability schedules
-        const schedulesData = await staffService.getAvailabilitySchedules(id);
+        const schedulesData = await staffService.getStaffSchedules(id);
         setSchedules(schedulesData);
         
         setError(null);

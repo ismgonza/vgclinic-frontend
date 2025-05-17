@@ -50,13 +50,18 @@ const staffService = {
     return true;
   },
 
+  // Staff Locations
   getStaffLocations: async (staffId) => {
-    const params = staffId ? { staff_id: staffId } : {};
-    const response = await api.get('clinic/staff/locations/', { params });
+    const response = await api.get(`clinic/staff/members/${staffId}/locations/`);
     return response.data;
   },
 
-  addStaffLocation: async (locationData) => {
+  getStaffLocation: async (id) => {
+    const response = await api.get(`clinic/staff/locations/${id}/`);
+    return response.data;
+  },
+
+  createStaffLocation: async (locationData) => {
     const response = await api.post('clinic/staff/locations/', locationData);
     return response.data;
   },
@@ -71,12 +76,14 @@ const staffService = {
     return true;
   },
 
-  getAvailabilitySchedules: async (staffId, locationId) => {
-    const params = {};
-    if (staffId) params.staff_id = staffId;
-    if (locationId) params.location_id = locationId;
-    
-    const response = await api.get('clinic/staff/schedules/', { params });
+  // Availability Schedules
+  getStaffSchedules: async (staffId) => {
+    const response = await api.get(`clinic/staff/members/${staffId}/schedules/`);
+    return response.data;
+  },
+
+  getSchedule: async (id) => {
+    const response = await api.get(`clinic/staff/schedules/${id}/`);
     return response.data;
   },
 
