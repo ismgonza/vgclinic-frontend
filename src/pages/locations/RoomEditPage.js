@@ -1,3 +1,4 @@
+// src/pages/locations/RoomEditPage.js (updated)
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Alert, Spinner } from 'react-bootstrap';
@@ -6,7 +7,7 @@ import RoomEditForm from '../../components/locations/RoomEditForm';
 import locationService from '../../services/locationService';
 
 const RoomEditPage = () => {
-  const { id, roomId } = useParams();
+  const { id, roomId } = useParams();  // roomId is used in RoomEditForm via useParams
   const [location, setLocation] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -27,7 +28,7 @@ const RoomEditPage = () => {
     };
 
     fetchLocation();
-  }, [id]);
+  }, [id]);  // We don't need roomId in the dependency array since it's not used in this effect
 
   if (loading) {
     return (
@@ -61,7 +62,7 @@ const RoomEditPage = () => {
     <MainLayout>
       <h1>Edit Room - {location.name}</h1>
       <p>Update room details for this location.</p>
-      <RoomEditForm />
+      <RoomEditForm />  {/* RoomEditForm internally uses useParams to get roomId */}
     </MainLayout>
   );
 };
