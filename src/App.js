@@ -64,6 +64,7 @@ function App() {
                 <Route path="/locations/:id" element={<LocationDetailPage />} />
                 <Route path="/locations/:id/rooms/create" element={<RoomCreatePage />} />
                 <Route path="/locations/:id/rooms/edit/:roomId" element={<RoomEditPage />} />
+                
                 {/* Staff routes */}
                 <Route path="/staff" element={<StaffListPage />} />
                 <Route path="/staff/create" element={<StaffCreatePage />} />
@@ -72,7 +73,7 @@ function App() {
                 <Route path="/staff/:id/locations/add" element={<StaffLocationCreatePage />} />
                 <Route path="/staff/:id/locations/edit/:locationId" element={<StaffLocationEditPage />} />
                 <Route path="/staff/:id/schedule/add" element={<ScheduleCreatePage />} />
-                <Route path="/staff/:id/schedule/edit/:scheduleId" element={<ScheduleEditPage />} />
+                <Route path="/staff/:id/schedule/edit/:scheduleId" element={<ScheduleEditPage />} />                
 
                 {/* Catch-all route */}
                 <Route path="*" element={<Navigate to="/" replace />} />

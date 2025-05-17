@@ -53,11 +53,35 @@ const StaffDetail = () => {
     }
   };
 
-  // // Format day name
-  // const formatDay = (day) => {
-  //   const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-  //   return days[day];
-  // };
+  // Handle deleting a staff location assignment
+  const handleDeleteStaffLocation = async (locationId) => {
+    if (window.confirm('Are you sure you want to remove this location assignment? This action cannot be undone.')) {
+      try {
+        await staffService.deleteStaffLocation(locationId);
+        // Update locations list after deletion
+        const updatedLocations = locations.filter(loc => loc.id !== locationId);
+        setLocations(updatedLocations);
+      } catch (err) {
+        console.error('Failed to delete location assignment:', err);
+        setError('Failed to remove location. Please try again.');
+      }
+    }
+  };
+
+  // Handle deleting a schedule
+  const handleDeleteSchedule = async (scheduleId) => {
+    if (window.confirm('Are you sure you want to delete this schedule? This action cannot be undone.')) {
+      try {
+        await staffService.deleteSchedule(scheduleId);
+        // Update schedules list after deletion
+        const updatedSchedules = schedules.filter(schedule => schedule.id !== scheduleId);
+        setSchedules(updatedSchedules);
+      } catch (err) {
+        console.error('Failed to delete schedule:', err);
+        setError('Failed to delete schedule. Please try again.');
+      }
+    }
+  };
 
   // Format time
   const formatTime = (timeString) => {
@@ -217,14 +241,14 @@ const StaffDetail = () => {
                               variant="info"
                               size="sm"
                               className="me-2"
-                              onClick={() => navigate(`/staff/${id}/locations/${location.id}`)}
+                              onClick={() => navigate(`/staff/${id}/locations/edit/${location.id}`)}
                             >
                               Edit
                             </Button>
                             <Button
                               variant="danger"
                               size="sm"
-                              onClick={() => {/* Handle delete location */}}
+                              onClick={() => handleDeleteStaffLocation(location.id)}
                             >
                               Remove
                             </Button>
@@ -286,14 +310,14 @@ const StaffDetail = () => {
                               variant="info"
                               size="sm"
                               className="me-2"
-                              onClick={() => navigate(`/staff/${id}/schedule/${schedule.id}`)}
+                              onClick={() => navigate(`/staff/${id}/schedule/edit/${schedule.id}`)}
                             >
                               Edit
                             </Button>
                             <Button
                               variant="danger"
                               size="sm"
-                              onClick={() => {/* Handle delete schedule */}}
+                              onClick={() => handleDeleteSchedule(schedule.id)}
                             >
                               Remove
                             </Button>

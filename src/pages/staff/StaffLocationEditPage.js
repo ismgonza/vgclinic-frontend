@@ -7,7 +7,7 @@ const StaffLocationEditPage = () => {
   return (
     <MainLayout>
       <h1>Edit Location Assignment</h1>
-      <p>Update this location assignment.</p>
+      <p>Update the location assignment settings.</p>
       <StaffLocationForm isEdit={true} />
     </MainLayout>
   );
