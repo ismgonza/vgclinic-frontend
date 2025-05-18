@@ -22,6 +22,8 @@ import ScheduleCreatePage from './pages/staff/ScheduleCreatePage';
 import ScheduleEditPage from './pages/staff/ScheduleEditPage';
 import StaffLocationCreatePage from './pages/staff/StaffLocationCreatePage';
 import StaffLocationEditPage from './pages/staff/StaffLocationEditPage';
+import InviteStaffForm from './components/staff/InviteStaffForm';
+import AcceptInvitePage from './pages/staff/AcceptInvitePage';
 
 // Layouts
 import MainLayout from './components/layout/MainLayout';
@@ -73,7 +75,9 @@ function App() {
                 <Route path="/staff/:id/locations/add" element={<StaffLocationCreatePage />} />
                 <Route path="/staff/:id/locations/edit/:locationId" element={<StaffLocationEditPage />} />
                 <Route path="/staff/:id/schedule/add" element={<ScheduleCreatePage />} />
-                <Route path="/staff/:id/schedule/edit/:scheduleId" element={<ScheduleEditPage />} />                
+                <Route path="/staff/:id/schedule/edit/:scheduleId" element={<ScheduleEditPage />} />   
+                <Route path="/staff/invite" element={<InviteStaffForm />} />
+                <Route path="/staff/accept-invite/:token" element={<AcceptInvitePage />} />             
 
                 {/* Catch-all route */}
                 <Route path="*" element={<Navigate to="/" replace />} />

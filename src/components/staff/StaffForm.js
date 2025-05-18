@@ -11,6 +11,8 @@ import { useAccount } from '../../context/AccountContext';
 // Validation schema
 const StaffSchema = Yup.object().shape({
   // Account user information
+  id_number: Yup.string()
+    .matches(/^([1-9]-\d{4}-\d{4}|\d{12})$/, 'Enter a valid ID number (1-1234-1234 for citizens, 12 digits for residents)'),
   email: Yup.string()
     .email('Invalid email address')
     .required('Email is required'),
@@ -45,6 +47,7 @@ const StaffForm = ({ isEdit = false }) => {
   
   const [initialValues, setInitialValues] = useState({
     // Account user information
+    id_number: '',
     email: '',
     first_name: '',
     last_name: '',
@@ -219,6 +222,24 @@ const StaffForm = ({ isEdit = false }) => {
               <h5 className="mb-3">User Information</h5>
               <Row>
                 <Col md={6}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>ID Number (Cédula)</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="id_number"
+                      value={values.id_number}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      isInvalid={touched.id_number && errors.id_number}
+                      placeholder="1-1234-1234 or 123456789012"
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.id_number}
+                    </Form.Control.Feedback>
+                    <Form.Text className="text-muted">
+                      Enter the national ID (cédula) or resident ID. This helps avoid duplicate users.
+                    </Form.Text>
+                  </Form.Group>
                   <Form.Group className="mb-3">
                     <Form.Label>Email</Form.Label>
                     <Form.Control

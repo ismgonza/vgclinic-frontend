@@ -7,6 +7,11 @@ const staffService = {
     const response = await api.get('clinic/staff/members/', { params });
     return response.data;
   },
+  
+  inviteStaffMember: async (inviteData) => {
+    const response = await api.post('clinic/staff/invite/', inviteData);
+    return response.data;
+  },
 
   getStaffMember: async (id) => {
     const response = await api.get(`clinic/staff/members/${id}/`);
