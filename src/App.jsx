@@ -1,16 +1,18 @@
-// src/App.jsx (updated with Services route)
+// src/App.jsx (update the import for ServicesList)
 import React, { useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, AuthContext } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout/Layout';
+import Navbar from './components/Layout/Navbar';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Accounts from './pages/platform/Accounts';
 import Users from './pages/platform/Users';
 import Services from './pages/platform/services/Services';
 import Features from './pages/platform/services/Features';
-import Plans from './pages/platform/services/Plans';
+import Plans from './pages/platform/services/Plan';
+import ServicesList from './pages/platform/services/ServicesList';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -64,22 +66,22 @@ function App() {
             </ProtectedRoute>
           } />
           
+          {/* Services routes */}
+          <Route path="/platform/services" element={
+            <ProtectedRoute>
+              <StaffRouteCheck>
+                <Layout>
+                  <Services />
+                </Layout>
+              </StaffRouteCheck>
+            </ProtectedRoute>
+          } />
+          
           <Route path="/platform/services/services" element={
             <ProtectedRoute>
               <StaffRouteCheck>
                 <Layout>
                   <ServicesList />
-                </Layout>
-              </StaffRouteCheck>
-            </ProtectedRoute>
-          } />
-
-          {/* Services routes */}
-          <Route path="/platform/services/services" element={
-            <ProtectedRoute>
-              <StaffRouteCheck>
-                <Layout>
-                  <Services />
                 </Layout>
               </StaffRouteCheck>
             </ProtectedRoute>

@@ -1,3 +1,4 @@
+// src/services/auth.service.js
 import api from './api';
 import { jwtDecode } from 'jwt-decode';
 
@@ -10,12 +11,17 @@ class AuthService {
       });
       
       if (response.data.access) {
-        localStorage.setItem('token', response.data.access);
+        const token = response.data.access;
+        
+        // Store tokens in localStorage
+        localStorage.setItem('token', token);
         localStorage.setItem('refreshToken', response.data.refresh);
         
+        // Set the Authorization header for all future API calls
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        
         // Decode token to get user info
-        const decoded = jwtDecode(response.data.access);
-        console.log('Decoded token:', decoded); // Debug log
+        const decoded = jwtDecode(token);
         
         // Create a user object with the token payload
         const user = {
@@ -36,37 +42,47 @@ class AuthService {
   }
 
   logout() {
+    // Clear all auth data
     localStorage.removeItem('token');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('user');
+    
+    // Clear Authorization header
+    delete api.defaults.headers.common['Authorization'];
   }
 
   getCurrentUser() {
     const userStr = localStorage.getItem('user');
-    if (userStr) return JSON.parse(userStr);
+    if (userStr) {
+      // Make sure the token is set in the API header
+      const token = localStorage.getItem('token');
+      if (token) {
+        api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      }
+      return JSON.parse(userStr);
+    }
     return null;
   }
 
   isAuthenticated() {
-    return !!localStorage.getItem('token');
-  }
-
-  async refreshToken() {
+    const token = localStorage.getItem('token');
+    if (!token) return false;
+    
+    // Set the token in the header
+    api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    
     try {
-      const refreshToken = localStorage.getItem('refreshToken');
-      if (!refreshToken) throw new Error('No refresh token available');
-
-      const response = await api.post('token/refresh/', {
-        refresh: refreshToken,
-      });
-
-      if (response.data.access) {
-        localStorage.setItem('token', response.data.access);
-        return true;
+      // Check if token is expired
+      const decoded = jwtDecode(token);
+      const currentTime = Date.now() / 1000;
+      
+      if (decoded.exp < currentTime) {
+        // Token is expired
+        return false;
       }
-      return false;
+      
+      return true;
     } catch (error) {
-      this.logout();
       return false;
     }
   }
