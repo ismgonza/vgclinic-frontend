@@ -13,12 +13,8 @@ function App() {
     <Router>
       <AuthProvider>
         <Routes>
-          {/* Public routes */}
-          <Route path="/login" element={
-            <Layout>
-              <Login />
-            </Layout>
-          } />
+          {/* Public routes - no layout */}
+          <Route path="/login" element={<Login />} />
           
           {/* Protected routes */}
           <Route path="/dashboard" element={

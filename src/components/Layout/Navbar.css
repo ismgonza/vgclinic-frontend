@@ -1,0 +1,76 @@
+.vgclinic-navbar {
+    background-color: #00bfff !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .vgclinic-navbar .navbar-brand {
+    font-weight: 700;
+    color: white !important;
+    font-size: 1.6rem;
+  }
+  
+  .vgclinic-navbar .nav-link {
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-weight: 500;
+    transition: color 0.2s ease;
+    padding: 0.5rem 1rem;
+    margin: 0 0.2rem;
+  }
+  
+  .vgclinic-navbar .nav-link:hover {
+    color: white !important;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+  }
+  
+  .language-dropdown .dropdown-toggle,
+  .user-dropdown .dropdown-toggle {
+    color: white !important;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    margin-left: 0.5rem;
+    display: flex;
+    align-items: center;
+  }
+  
+  .language-dropdown .dropdown-toggle::after,
+  .user-dropdown .dropdown-toggle::after {
+    margin-left: 0.5rem;
+  }
+  
+  .language-dropdown .dropdown-toggle:hover,
+  .user-dropdown .dropdown-toggle:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+  }
+  
+  .dropdown-menu {
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    padding: 0.5rem 0;
+  }
+  
+  .dropdown-item {
+    padding: 0.5rem 1.5rem;
+    color: #495057;
+    transition: background-color 0.2s;
+  }
+  
+  .dropdown-item:hover {
+    background-color: #f8f9fa;
+  }
+  
+  .dropdown-item.active {
+    background-color: #e3f2fd;
+    color: #0066cc;
+    font-weight: 500;
+  }
+  
+  @media (max-width: 991px) {
+    .language-dropdown .dropdown-toggle,
+    .user-dropdown .dropdown-toggle {
+      margin-left: 0;
+      margin-top: 0.5rem;
+    }
+  }

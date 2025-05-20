@@ -1,5 +1,5 @@
 import api from './api';
-import jwtDecode from 'jwt-decode';
+import { jwtDecode } from 'jwt-decode';
 
 class AuthService {
   async login(email, password) {

@@ -1,0 +1,52 @@
+{
+  "login": {
+    "title": "Ingreso",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "loginButton": "INGRESAR",
+    "rememberMe": "Recordarme",
+    "forgotPassword": "¿Olvidó su contraseña?",
+    "invalidEmail": "Dirección de correo inválida",
+    "required": "Requerido",
+    "failedSignIn": "Error al iniciar sesión. Por favor verifique sus credenciales."
+  },
+  "navigation": {
+    "dashboard": "Tablero",
+    "patients": "Pacientes",
+    "treatments": "Tratamientos",
+    "catalog": "Catálogo",
+    "profile": "Mi Perfil",
+    "logout": "Cerrar Sesión",
+    "user": "Usuario"
+  },
+  "footer": {
+    "allRightsReserved": "Todos los derechos reservados.",
+    "tagline": "Un sistema moderno de gestión de clínicas"
+  },
+  "dashboard": {
+    "title": "Tablero",
+    "welcome": "¡Bienvenido de nuevo, {{name}}!",
+    "patients": "Pacientes",
+    "totalPatients": "Total de pacientes",
+    "treatments": "Tratamientos",
+    "activeTreatments": "Tratamientos activos",
+    "appointments": "Citas",
+    "upcomingAppointments": "Próximas citas",
+    "payments": "Pagos",
+    "pendingPayments": "Pagos pendientes",
+    "recentPatients": "Pacientes Recientes",
+    "viewAll": "Ver todos"
+  },
+  "common": {
+    "loading": "Cargando",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "view": "Ver",
+    "add": "Agregar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "sort": "Ordenar"
+  }
+}

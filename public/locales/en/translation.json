@@ -1,0 +1,52 @@
+{
+  "login": {
+    "title": "Login",
+    "email": "Email",
+    "password": "Password",
+    "loginButton": "LOGIN",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot Password?",
+    "invalidEmail": "Invalid email address",
+    "required": "Required",
+    "failedSignIn": "Failed to sign in. Please check your credentials."
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "patients": "Patients",
+    "treatments": "Treatments",
+    "catalog": "Catalog",
+    "profile": "My Profile",
+    "logout": "Logout",
+    "user": "User"
+  },
+  "footer": {
+    "allRightsReserved": "All rights reserved.",
+    "tagline": "A modern clinic management system"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back, {{name}}!",
+    "patients": "Patients",
+    "totalPatients": "Total patients",
+    "treatments": "Treatments",
+    "activeTreatments": "Active treatments",
+    "appointments": "Appointments",
+    "upcomingAppointments": "Upcoming appointments",
+    "payments": "Payments",
+    "pendingPayments": "Pending payments",
+    "recentPatients": "Recent Patients",
+    "viewAll": "View all"
+  },
+  "common": {
+    "loading": "Loading",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "add": "Add",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort"
+  }
+}

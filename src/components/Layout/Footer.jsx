@@ -1,13 +1,18 @@
 import React from 'react';
 import { Container } from 'react-bootstrap';
+import { useTranslation } from 'react-i18next';
+import './Footer.css';
 
 const Footer = () => {
+  const { t } = useTranslation();
+  const currentYear = new Date().getFullYear();
+  
   return (
-    <footer className="bg-light py-3 mt-auto">
+    <footer className="footer">
       <Container>
-        <div className="text-center">
-          <p className="mb-0">© {new Date().getFullYear()} VGClinic. All rights reserved.</p>
-          <p className="mb-0 text-muted">A modern clinic management system</p>
+        <div className="footer-content">
+          <p className="mb-0">© {currentYear} VGClinic. {t('footer.allRightsReserved')}</p>
+          <p className="mb-0 text-muted">{t('footer.tagline')}</p>
         </div>
       </Container>
     </footer>
