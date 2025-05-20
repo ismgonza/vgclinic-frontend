@@ -1,35 +1,35 @@
-// src/pages/platform/Accounts.jsx
+// src/pages/platform/Users.jsx
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Table, Button, Badge, Spinner, Alert, Modal } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus, faEdit, faTrash, faCheck, faTimes, faPhone, faEnvelope } from '@fortawesome/free-solid-svg-icons';
+import { faPlus, faEdit, faTrash, faCheck, faTimes, faEnvelope, faUser, faUserTie, faUserShield } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
-import accountsService from '../../services/accounts.service';
-import AccountForm from '../../components/platform/AccountForm';
+import usersService from '../../services/users.service';
+import UserForm from '../../components/platform/UserForm';
 
-const Accounts = () => {
+const Users = () => {
   const { t } = useTranslation();
-  const [accounts, setAccounts] = useState([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showForm, setShowForm] = useState(false);
-  const [currentAccount, setCurrentAccount] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [accountToDelete, setAccountToDelete] = useState(null);
+  const [userToDelete, setUserToDelete] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
-    fetchAccounts();
+    fetchUsers();
   }, []);
 
-  const fetchAccounts = async () => {
+  const fetchUsers = async () => {
     try {
       setLoading(true);
-      const data = await accountsService.getAccounts();
-      setAccounts(data);
+      const data = await usersService.getUsers();
+      setUsers(data);
       setError(null);
     } catch (err) {
-      console.error('Error fetching accounts:', err);
+      console.error('Error fetching users:', err);
       setError(t('common.errorLoading'));
     } finally {
       setLoading(false);
@@ -37,40 +37,40 @@ const Accounts = () => {
   };
 
   const handleAddClick = () => {
-    setCurrentAccount(null);
+    setCurrentUser(null);
     setShowForm(true);
   };
 
-  const handleEditClick = (account) => {
-    setCurrentAccount(account);
+  const handleEditClick = (user) => {
+    setCurrentUser(user);
     setShowForm(true);
   };
 
-  const handleDeleteClick = (account) => {
-    setAccountToDelete(account);
+  const handleDeleteClick = (user) => {
+    setUserToDelete(user);
     setShowDeleteModal(true);
   };
 
   const handleDeleteConfirm = async () => {
     try {
-      await accountsService.deleteAccount(accountToDelete.account_id);
-      setAccounts(accounts.filter(a => a.account_id !== accountToDelete.account_id));
+      await usersService.deleteUser(userToDelete.id);
+      setUsers(users.filter(u => u.id !== userToDelete.id));
       setShowDeleteModal(false);
-      setAccountToDelete(null);
-      setSuccessMessage(t('accounts.accountDeleted'));
+      setUserToDelete(null);
+      setSuccessMessage(t('users.userDeleted'));
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
-      console.error('Error deleting account:', err);
+      console.error('Error deleting user:', err);
       setError(t('common.errorDeleting'));
     }
   };
 
   const handleFormSave = async () => {
-    await fetchAccounts();
+    await fetchUsers();
     setShowForm(false);
-    setSuccessMessage(currentAccount 
-      ? t('accounts.accountUpdated') 
-      : t('accounts.accountCreated'));
+    setSuccessMessage(currentUser 
+      ? t('users.userUpdated') 
+      : t('users.userCreated'));
     setTimeout(() => setSuccessMessage(''), 3000);
   };
 
@@ -78,26 +78,40 @@ const Accounts = () => {
     setShowForm(false);
   };
 
-  const getStatusBadge = (status) => {
+  const getIdTypeBadge = (idType) => {
     const variants = {
-      'active': 'success',
-      'pending': 'warning',
-      'suspended': 'danger'
+      '01': 'info',
+      '02': 'secondary',
     };
+    
+    const labels = {
+      '01': t('users.idTypeCedulaShort'),
+      '02': t('users.idTypeDimexShort'),
+    };
+    
     return (
-      <Badge bg={variants[status] || 'secondary'}>
-        {status.charAt(0).toUpperCase() + status.slice(1)}
+      <Badge bg={variants[idType] || 'secondary'}>
+        {labels[idType] || idType}
       </Badge>
     );
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString(undefined, {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
+  const getActiveBadge = (isActive) => {
+    return isActive ? (
+      <Badge bg="success">{t('users.active')}</Badge>
+    ) : (
+      <Badge bg="danger">{t('users.inactive')}</Badge>
+    );
+  };
+
+  const getUserRoleIcon = (user) => {
+    if (user.is_superuser) {
+      return <FontAwesomeIcon icon={faUserShield} title={t('users.superuser')} className="text-danger" />;
+    } else if (user.is_staff) {
+      return <FontAwesomeIcon icon={faUserTie} title={t('users.staff')} className="text-primary" />;
+    } else {
+      return <FontAwesomeIcon icon={faUser} title={t('users.regularUser')} className="text-secondary" />;
+    }
   };
 
   return (
@@ -109,10 +123,10 @@ const Accounts = () => {
             className="mb-3"
             onClick={handleFormCancel}
           >
-            {t('accounts.back')}
+            {t('users.back')}
           </Button>
-          <AccountForm 
-            account={currentAccount} 
+          <UserForm 
+            user={currentUser} 
             onSave={handleFormSave}
             onCancel={handleFormCancel}
           />
@@ -121,13 +135,13 @@ const Accounts = () => {
         <>
           <Row className="mb-4">
             <Col>
-              <h1 className="h3">{t('accounts.title')}</h1>
-              <p className="text-muted">{t('accounts.description')}</p>
+              <h1 className="h3">{t('users.title')}</h1>
+              <p className="text-muted">{t('users.description')}</p>
             </Col>
             <Col xs="auto">
               <Button variant="primary" onClick={handleAddClick}>
                 <FontAwesomeIcon icon={faPlus} className="me-2" />
-                {t('accounts.newAccount')}
+                {t('users.newUser')}
               </Button>
             </Col>
           </Row>
@@ -147,7 +161,7 @@ const Accounts = () => {
           <Card>
             <Card.Header>
               <div className="d-flex justify-content-between align-items-center">
-                <span>{t('accounts.title')}</span>
+                <span>{t('users.title')}</span>
                 <div>
                   {/* Add filter/search controls here in the future */}
                 </div>
@@ -159,63 +173,53 @@ const Accounts = () => {
                   <Spinner animation="border" role="status" variant="primary" />
                   <p className="mt-3">{t('common.loading')}...</p>
                 </div>
-              ) : accounts.length === 0 ? (
-                <Alert variant="info">{t('accounts.noAccounts')}</Alert>
+              ) : users.length === 0 ? (
+                <Alert variant="info">{t('users.noUsers')}</Alert>
               ) : (
                 <Table responsive hover>
                   <thead>
                     <tr>
-                      <th>{t('accounts.accountName')}</th>
-                      <th>{t('accounts.email')}</th>
-                      <th>{t('accounts.phone')}</th>
-                      <th>{t('accounts.status')}</th>
-                      <th>{t('accounts.platAcc')}</th>
-                      <th>{t('accounts.created')}</th>
-                      <th>{t('accounts.actions')}</th>
+                      <th>{t('users.name')}</th>
+                      <th>{t('users.email')}</th>
+                      <th>{t('users.role')}</th>
+                      <th>{t('users.idType')}</th>
+                      <th>{t('users.idNumber')}</th>
+                      <th>{t('users.status')}</th>
+                      <th>{t('users.actions')}</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {accounts.map(account => (
-                      <tr key={account.account_id}>
-                        <td>{account.account_name}</td>
+                    {users.map(user => (
+                      <tr key={user.id}>
+                        <td>{user.first_name} {user.last_name}</td>
                         <td>
-                          <a href={`mailto:${account.account_email}`} title={t('accounts.sendEmail')}>
+                          <a href={`mailto:${user.email}`} title={t('users.sendEmail')}>
                             <FontAwesomeIcon icon={faEnvelope} className="me-1" />
-                            {account.account_email}
+                            {user.email}
                           </a>
                         </td>
-                        <td>
-                          {account.account_phone && (
-                            <a href={`tel:${account.account_phone}`} title={t('accounts.call')}>
-                              <FontAwesomeIcon icon={faPhone} className="me-1" />
-                              {account.account_phone}
-                            </a>
-                          )}
-                        </td>
-                        <td>{getStatusBadge(account.account_status)}</td>
                         <td className="text-center">
-                          {account.is_platform_account ? (
-                            <FontAwesomeIcon icon={faCheck} className="text-success" />
-                          ) : (
-                            <FontAwesomeIcon icon={faTimes} className="text-danger" />
-                          )}
+                          {getUserRoleIcon(user)}
                         </td>
-                        <td>{formatDate(account.account_created_at)}</td>
+                        <td>{getIdTypeBadge(user.id_type)}</td>
+                        <td>{user.id_number}</td>
+                        <td>{getActiveBadge(user.is_active)}</td>
                         <td>
                           <Button 
                             variant="outline-secondary" 
                             size="sm" 
                             className="me-1"
-                            title={t('accounts.edit')}
-                            onClick={() => handleEditClick(account)}
+                            title={t('users.edit')}
+                            onClick={() => handleEditClick(user)}
                           >
                             <FontAwesomeIcon icon={faEdit} />
                           </Button>
                           <Button 
                             variant="outline-danger" 
                             size="sm"
-                            title={t('accounts.delete')}
-                            onClick={() => handleDeleteClick(account)}
+                            title={t('users.delete')}
+                            onClick={() => handleDeleteClick(user)}
+                            disabled={user.is_superuser} // Prevent deleting superusers
                           >
                             <FontAwesomeIcon icon={faTrash} />
                           </Button>
@@ -231,12 +235,12 @@ const Accounts = () => {
           {/* Delete Confirmation Modal */}
           <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
             <Modal.Header closeButton>
-              <Modal.Title>{t('accounts.delete')}</Modal.Title>
+              <Modal.Title>{t('users.delete')}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              {t('accounts.confirmDelete')}
-              {accountToDelete && (
-                <p className="mt-2 fw-bold">{accountToDelete.account_name}</p>
+              {t('users.confirmDelete')}
+              {userToDelete && (
+                <p className="mt-2 fw-bold">{userToDelete.first_name} {userToDelete.last_name} ({userToDelete.email})</p>
               )}
             </Modal.Body>
             <Modal.Footer>
@@ -254,4 +258,4 @@ const Accounts = () => {
   );
 };
 
-export default Accounts;
+export default Users;

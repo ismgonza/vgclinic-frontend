@@ -8,6 +8,7 @@ import Layout from './components/Layout/Layout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Accounts from './pages/platform/Accounts';
+import Users from './pages/platform/Users';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -42,6 +43,15 @@ function App() {
             <ProtectedRoute>
               <StaffRouteCheck>
                 <Accounts />
+              </StaffRouteCheck>
+            </ProtectedRoute>
+          } />
+          
+          {/* Add Users route */}
+          <Route path="/platform/users" element={
+            <ProtectedRoute>
+              <StaffRouteCheck>
+                <Users />
               </StaffRouteCheck>
             </ProtectedRoute>
           } />
