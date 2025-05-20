@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserInjured, faTooth, faCalendarAlt, faMoneyBillWave, faChartLine, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { AuthContext } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
-import api from '../services/api';
+import dashboardService from '../services/dashboard.service';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -19,37 +19,46 @@ const Dashboard = () => {
   const [recentPatients, setRecentPatients] = useState([]);
   const [upcomingAppointments, setUpcomingAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // This would be replaced with actual API calls in a production environment
-    setLoading(true);
-    
-    // Simulate API call delay
-    setTimeout(() => {
-      // Dummy data for demonstration
-      setStats({
-        patients: 120,
-        treatments: 45,
-        upcomingAppointments: 8,
-        pendingPayments: 15
-      });
-      
-      setRecentPatients([
-        { id: 1, name: 'Maria González', procedure: 'Dental Cleaning', date: '2025-05-15' },
-        { id: 2, name: 'Carlos Rodríguez', procedure: 'Root Canal', date: '2025-05-14' },
-        { id: 3, name: 'Ana Martínez', procedure: 'Consultation', date: '2025-05-13' }
-      ]);
-      
-      setUpcomingAppointments([
-        { id: 1, name: 'Juan Pérez', time: '09:00', date: '2025-05-20' },
-        { id: 2, name: 'Laura Sanchez', time: '11:30', date: '2025-05-20' },
-        { id: 3, name: 'Roberto Diaz', time: '14:00', date: '2025-05-20' }
-      ]);
-      
-      setLoading(false);
-    }, 1000);
-  }, []);
+    const fetchDashboardData = async () => {
+      setLoading(true);
+      setError(null);
 
+      try {
+        // Fetch dashboard stats
+        const statsData = await dashboardService.getDashboardStats();
+        setStats(statsData);
+
+        // Fetch recent patients
+        const patientsData = await dashboardService.getRecentPatients();
+        setRecentPatients(patientsData.results || []);
+
+        // Fetch upcoming appointments
+        const appointmentsData = await dashboardService.getUpcomingAppointments();
+        setUpcomingAppointments(appointmentsData.results || []);
+      } catch (err) {
+        console.error('Error fetching dashboard data:', err);
+        setError('Failed to load dashboard data. Please try again later.');
+        
+        // Fallback to dummy data in case of error
+        setStats({
+          patients: 0,
+          treatments: 0,
+          upcomingAppointments: 0,
+          pendingPayments: 0
+        });
+        setRecentPatients([]);
+        setUpcomingAppointments([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
+  
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString();
