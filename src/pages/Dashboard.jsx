@@ -1,21 +1,21 @@
+// src/pages/Dashboard.jsx (modify to handle staff view)
 import React, { useContext, useEffect, useState } from 'react';
-import { Card, Row, Col, ListGroup, Button } from 'react-bootstrap';
+import { Card, Row, Col, ListGroup, Button, Form, Alert } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserInjured, faTooth, faCalendarAlt, faMoneyBillWave, faChartLine, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faUserInjured, faTooth, faCalendarAlt, faMoneyBillWave, 
+         faChartLine, faUsers, faBuilding, faUsersCog, faFileContract } from '@fortawesome/free-solid-svg-icons';
 import { AuthContext } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import dashboardService from '../services/dashboard.service';
+import { Link } from 'react-router-dom';
 import './Dashboard.css';
 
 const Dashboard = () => {
   const { currentUser } = useContext(AuthContext);
   const { t } = useTranslation();
-  const [stats, setStats] = useState({
-    patients: 0,
-    treatments: 0,
-    upcomingAppointments: 0,
-    pendingPayments: 0
-  });
+  const [isStaff, setIsStaff] = useState(false);
+  const [stats, setStats] = useState({});
+  const [accounts, setAccounts] = useState([]);
   const [recentPatients, setRecentPatients] = useState([]);
   const [upcomingAppointments, setUpcomingAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -29,26 +29,26 @@ const Dashboard = () => {
       try {
         // Fetch dashboard stats
         const statsData = await dashboardService.getDashboardStats();
+        console.log('Dashboard stats data:', statsData);
         setStats(statsData);
+        setIsStaff(statsData.isStaff);
+        
+        // If user is staff, fetch accounts list
+        if (statsData.isStaff) {
+          const accountsData = await dashboardService.getAccountsList();
+          setAccounts(accountsData);
+        } else {
+          // Regular user - fetch patient and appointment data
+          const patientsData = await dashboardService.getRecentPatients();
+          setRecentPatients(patientsData.results || []);
 
-        // Fetch recent patients
-        const patientsData = await dashboardService.getRecentPatients();
-        setRecentPatients(patientsData.results || []);
-
-        // Fetch upcoming appointments
-        const appointmentsData = await dashboardService.getUpcomingAppointments();
-        setUpcomingAppointments(appointmentsData.results || []);
+          const appointmentsData = await dashboardService.getUpcomingAppointments();
+          setUpcomingAppointments(appointmentsData.results || []);
+        }
       } catch (err) {
         console.error('Error fetching dashboard data:', err);
         setError('Failed to load dashboard data. Please try again later.');
-        
-        // Fallback to dummy data in case of error
-        setStats({
-          patients: 0,
-          treatments: 0,
-          upcomingAppointments: 0,
-          pendingPayments: 0
-        });
+        setStats({});
         setRecentPatients([]);
         setUpcomingAppointments([]);
       } finally {
@@ -64,8 +64,108 @@ const Dashboard = () => {
     return date.toLocaleDateString();
   };
 
-  return (
-    <div className="dashboard-container">
+  // Render staff dashboard
+  const renderStaffDashboard = () => (
+    <>
+      <div className="dashboard-header">
+        <h1>Platform Administration Dashboard</h1>
+        <p className="welcome-message">Welcome, {currentUser?.first_name || 'Administrator'}! Here's your platform overview.</p>
+      </div>
+      
+      <Row className="mb-4 stat-cards">
+        <Col lg={3} md={6} className="mb-3">
+          <Card className="stat-card accounts-card">
+            <Card.Body>
+              <div className="stat-icon">
+                <FontAwesomeIcon icon={faBuilding} />
+              </div>
+              <div className="stat-content">
+                <h4>Accounts</h4>
+                <div className="stat-value">{stats.activeAccounts}</div>
+                <div className="stat-label">Active of {stats.totalAccounts} total</div>
+              </div>
+            </Card.Body>
+          </Card>
+        </Col>
+        
+        <Col lg={3} md={6} className="mb-3">
+          <Card className="stat-card users-card">
+            <Card.Body>
+              <div className="stat-icon">
+                <FontAwesomeIcon icon={faUsersCog} />
+              </div>
+              <div className="stat-content">
+                <h4>Users</h4>
+                <div className="stat-value">{stats.activeUsers}</div>
+                <div className="stat-label">Active of {stats.totalUsers} total</div>
+              </div>
+            </Card.Body>
+          </Card>
+        </Col>
+        
+        <Col lg={3} md={6} className="mb-3">
+          <Card className="stat-card contracts-card">
+            <Card.Body>
+              <div className="stat-icon">
+                <FontAwesomeIcon icon={faFileContract} />
+              </div>
+              <div className="stat-content">
+                <h4>Contracts</h4>
+                <div className="stat-value">{stats.activeContracts}</div>
+                <div className="stat-label">Active of {stats.totalContracts} total</div>
+              </div>
+            </Card.Body>
+          </Card>
+        </Col>
+        
+        <Col lg={3} md={6} className="mb-3">
+          <Card className="stat-card patients-card">
+            <Card.Body>
+              <div className="stat-icon">
+                <FontAwesomeIcon icon={faUsers} />
+              </div>
+              <div className="stat-content">
+                <h4>Patients</h4>
+                <div className="stat-value">{stats.totalPatients}</div>
+                <div className="stat-label">Total patients in platform</div>
+              </div>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+
+      <Row className="mb-4">
+        <Col>
+          <Card className="dashboard-card">
+            <Card.Header>
+              <div className="d-flex justify-content-between align-items-center">
+                <span>Platform Activity</span>
+                <Button variant="link" size="sm" className="view-all-link">
+                  View Details
+                </Button>
+              </div>
+            </Card.Header>
+            <Card.Body>
+              <p>From here you can manage all platform accounts and resources. Use the dropdown above to select a specific account to view or manage its details.</p>
+              <Row>
+                <Col md={6}>
+                  <Button variant="primary" className="me-2">Manage Accounts</Button>
+                  <Button variant="outline-primary">Manage Contracts</Button>
+                </Col>
+                <Col md={6} className="text-end">
+                  <Button variant="success">View Reports</Button>
+                </Col>
+              </Row>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
+    </>
+  );
+
+  // Render regular user dashboard
+  const renderUserDashboard = () => (
+    <>
       <div className="dashboard-header">
         <h1>{t('dashboard.title')}</h1>
         <p className="welcome-message">{t('dashboard.welcome', { name: currentUser?.first_name || t('navigation.user') })}</p>
@@ -190,6 +290,23 @@ const Dashboard = () => {
           </Card>
         </Col>
       </Row>
+    </>
+  );
+
+  return (
+    <div className="dashboard-container">
+      {loading ? (
+        <div className="text-center my-5">
+          <div className="spinner-border" role="status">
+            <span className="visually-hidden">{t('common.loading')}...</span>
+          </div>
+          <p className="mt-3">{t('common.loading')}...</p>
+        </div>
+      ) : error ? (
+        <Alert variant="danger">{error}</Alert>
+      ) : (
+        isStaff ? renderStaffDashboard() : renderUserDashboard()
+      )}
     </div>
   );
 };

@@ -22,6 +22,9 @@ const AppNavbar = () => {
     localStorage.setItem('preferredLanguage', language);
   };
 
+  // Check if user is staff
+  const isStaff = currentUser?.is_staff;
+
   return (
     <Navbar expand="lg" className="vgclinic-navbar">
       <Container fluid>
@@ -36,15 +39,39 @@ const AppNavbar = () => {
                 <Nav.Link as={Link} to="/dashboard">
                   {t('navigation.dashboard')}
                 </Nav.Link>
-                <Nav.Link as={Link} to="/patients">
-                  {t('navigation.patients')}
-                </Nav.Link>
-                <Nav.Link as={Link} to="/treatments">
-                  {t('navigation.treatments')}
-                </Nav.Link>
-                <Nav.Link as={Link} to="/catalog">
-                  {t('navigation.catalog')}
-                </Nav.Link>
+                
+                {/* Regular clinic menu items */}
+                {!isStaff && (
+                  <>
+                    <Nav.Link as={Link} to="/patients">
+                      {t('navigation.patients')}
+                    </Nav.Link>
+                    <Nav.Link as={Link} to="/treatments">
+                      {t('navigation.treatments')}
+                    </Nav.Link>
+                    <Nav.Link as={Link} to="/catalog">
+                      {t('navigation.catalog')}
+                    </Nav.Link>
+                  </>
+                )}
+                
+                {/* Platform admin menu items - only for staff */}
+                {isStaff && (
+                  <>
+                    <Nav.Link as={Link} to="/platform/accounts">
+                      Accounts
+                    </Nav.Link>
+                    <Nav.Link as={Link} to="/platform/services">
+                      Services
+                    </Nav.Link>
+                    <Nav.Link as={Link} to="/platform/contracts">
+                      Contracts
+                    </Nav.Link>
+                    <Nav.Link as={Link} to="/platform/users">
+                      Users
+                    </Nav.Link>
+                  </>
+                )}
               </>
             )}
           </Nav>

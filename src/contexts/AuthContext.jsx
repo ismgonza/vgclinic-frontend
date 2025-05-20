@@ -10,6 +10,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     // Check if user is already logged in
     const user = authService.getCurrentUser();
+    console.log('Current user from storage:', user); // Debug log
     setCurrentUser(user);
     setLoading(false);
   }, []);

@@ -12,8 +12,21 @@ class AuthService {
       if (response.data.access) {
         localStorage.setItem('token', response.data.access);
         localStorage.setItem('refreshToken', response.data.refresh);
+        
         // Decode token to get user info
-        const user = jwtDecode(response.data.access);
+        const decoded = jwtDecode(response.data.access);
+        console.log('Decoded token:', decoded); // Debug log
+        
+        // Create a user object with the token payload
+        const user = {
+          id: decoded.user_id,
+          email: decoded.email,
+          first_name: decoded.first_name, 
+          last_name: decoded.last_name,
+          is_staff: decoded.is_staff,
+          is_superuser: decoded.is_superuser
+        };
+        
         localStorage.setItem('user', JSON.stringify(user));
         return user;
       }
