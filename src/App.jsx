@@ -1,14 +1,16 @@
-// src/App.jsx (updated with platform routes)
+// src/App.jsx (updated with Services route)
 import React, { useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, AuthContext } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
-import StaffRoute from './components/StaffRoute'; // We'll create this next
 import Layout from './components/Layout/Layout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Accounts from './pages/platform/Accounts';
 import Users from './pages/platform/Users';
+import Services from './pages/platform/services/Services';
+import Features from './pages/platform/services/Features';
+import Plans from './pages/platform/services/Plans';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -34,7 +36,9 @@ function App() {
           {/* Protected routes - for all authenticated users */}
           <Route path="/dashboard" element={
             <ProtectedRoute>
-              <Dashboard />
+              <Layout>
+                <Dashboard />
+              </Layout>
             </ProtectedRoute>
           } />
           
@@ -42,16 +46,61 @@ function App() {
           <Route path="/platform/accounts" element={
             <ProtectedRoute>
               <StaffRouteCheck>
-                <Accounts />
+                <Layout>
+                  <Accounts />
+                </Layout>
               </StaffRouteCheck>
             </ProtectedRoute>
           } />
           
-          {/* Add Users route */}
+          {/* Users route */}
           <Route path="/platform/users" element={
             <ProtectedRoute>
               <StaffRouteCheck>
-                <Users />
+                <Layout>
+                  <Users />
+                </Layout>
+              </StaffRouteCheck>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/platform/services/services" element={
+            <ProtectedRoute>
+              <StaffRouteCheck>
+                <Layout>
+                  <ServicesList />
+                </Layout>
+              </StaffRouteCheck>
+            </ProtectedRoute>
+          } />
+
+          {/* Services routes */}
+          <Route path="/platform/services/services" element={
+            <ProtectedRoute>
+              <StaffRouteCheck>
+                <Layout>
+                  <Services />
+                </Layout>
+              </StaffRouteCheck>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/platform/services/features" element={
+            <ProtectedRoute>
+              <StaffRouteCheck>
+                <Layout>
+                  <Features />
+                </Layout>
+              </StaffRouteCheck>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/platform/services/plans" element={
+            <ProtectedRoute>
+              <StaffRouteCheck>
+                <Layout>
+                  <Plans />
+                </Layout>
               </StaffRouteCheck>
             </ProtectedRoute>
           } />
