@@ -3,7 +3,7 @@ import api from './api';
 class ContractsService {
   async getContracts() {
     try {
-      const response = await api.get('/contracts/');
+      const response = await api.get('/contracts/contracts/');  // Updated URL
       return response.data;
     } catch (error) {
       throw error;
@@ -12,7 +12,7 @@ class ContractsService {
 
   async getContract(contractNumber) {
     try {
-      const response = await api.get(`/contracts/${contractNumber}/`);
+      const response = await api.get(`/contracts/contracts/${contractNumber}/`);  // Updated URL
       return response.data;
     } catch (error) {
       throw error;
@@ -46,7 +46,7 @@ class ContractsService {
       
       console.log("Cleaned data to send:", dataToSend);
       
-      const response = await api.post('/contracts/', dataToSend);
+      const response = await api.post('/contracts/contracts/', dataToSend);  // Updated URL
       console.log("Contract created successfully:", response.data);
       return response.data;
     } catch (error) {
@@ -80,7 +80,7 @@ class ContractsService {
         dataToSend.end_date = null;
       }
       
-      const response = await api.put(`/contracts/${contractNumber}/`, dataToSend);
+      const response = await api.put(`/contracts/contracts/${contractNumber}/`, dataToSend);  // Updated URL
       return response.data;
     } catch (error) {
       throw error;
@@ -89,7 +89,7 @@ class ContractsService {
 
   async deleteContract(contractNumber) {
     try {
-      await api.delete(`/contracts/${contractNumber}/`);
+      await api.delete(`/contracts/contracts/${contractNumber}/`);  // Updated URL
       return true;
     } catch (error) {
       throw error;
@@ -98,7 +98,7 @@ class ContractsService {
 
   async cancelContract(contractNumber, reason) {
     try {
-      const response = await api.post(`/contracts/${contractNumber}/cancel/`, { reason });
+      const response = await api.post(`/contracts/contracts/${contractNumber}/cancel/`, { reason });  // Updated URL
       return response.data;
     } catch (error) {
       throw error;
@@ -107,7 +107,7 @@ class ContractsService {
 
   async renewContract(contractNumber) {
     try {
-      const response = await api.post(`/contracts/${contractNumber}/renew/`);
+      const response = await api.post(`/contracts/contracts/${contractNumber}/renew/`);  // Updated URL
       return response.data;
     } catch (error) {
       throw error;

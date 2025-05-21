@@ -5,6 +5,7 @@ import { faPlus, faEdit, faTrash, faEye, faRedo } from '@fortawesome/free-solid-
 import { useTranslation } from 'react-i18next';
 import contractsService from '../../services/contracts.service';
 import ContractForm from '../../components/platform/contracts/ContractForm';
+import ContractDetails from '../../components/platform/contracts/ContractDetails';
 
 const Contracts = () => {
   const { t } = useTranslation();
@@ -16,6 +17,8 @@ const Contracts = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [contractToDelete, setContractToDelete] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
+  const [showDetails, setShowDetails] = useState(false);
+  const [selectedContract, setSelectedContract] = useState(null);
 
   useEffect(() => {
     fetchContracts();
@@ -45,6 +48,11 @@ const Contracts = () => {
     setShowForm(true);
   };
 
+  const handleViewClick = (contract) => {
+    setSelectedContract(contract);
+    setShowDetails(true);
+  };
+
   const handleDeleteClick = (contract) => {
     setContractToDelete(contract);
     setShowDeleteModal(true);
@@ -69,11 +77,9 @@ const Contracts = () => {
       setError(null);
       
       if (currentContract) {
-        // Update existing contract
         await contractsService.updateContract(currentContract.contract_number, contractData);
         setSuccessMessage(t('Contract updated successfully'));
       } else {
-        // Create new contract
         const result = await contractsService.createContract(contractData);
         setSuccessMessage(t('Contract created successfully'));
       }
@@ -84,7 +90,6 @@ const Contracts = () => {
     } catch (err) {
       console.error('Error saving contract:', err);
       
-      // Check if there's a specific error message from the server
       if (err.response?.data) {
         const errorData = err.response.data;
         let errorMessage = 'Error saving contract: ';
@@ -92,7 +97,6 @@ const Contracts = () => {
         if (typeof errorData === 'string') {
           errorMessage += errorData;
         } else if (typeof errorData === 'object') {
-          // Handle field-specific errors
           const errors = Object.entries(errorData)
             .map(([field, messages]) => {
               if (Array.isArray(messages)) {
@@ -111,7 +115,6 @@ const Contracts = () => {
         setError(t('Error saving contract. Please try again.'));
       }
       
-      // Scroll to top to show error
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
@@ -150,6 +153,20 @@ const Contracts = () => {
       </Badge>
     );
   };
+
+  if (showDetails && selectedContract) {
+    return (
+      <Container fluid className="py-4">
+        <ContractDetails 
+          contract={selectedContract} 
+          onClose={() => {
+            setShowDetails(false);
+            setSelectedContract(null);
+          }}
+        />
+      </Container>
+    );
+  }
 
   return (
     <Container fluid className="py-4">
@@ -237,14 +254,15 @@ const Contracts = () => {
                         <td>{formatDate(contract.end_date)}</td>
                         <td>{getStatusBadge(contract.status)}</td>
                         <td>
-                          {/* <Button 
+                          <Button 
                             variant="outline-info" 
                             size="sm" 
                             className="me-1"
                             title={t('View Details')}
+                            onClick={() => handleViewClick(contract)}
                           >
                             <FontAwesomeIcon icon={faEye} />
-                          </Button> */}
+                          </Button>
                           <Button 
                             variant="outline-secondary" 
                             size="sm" 
