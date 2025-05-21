@@ -1,3 +1,4 @@
+// src/components/ProtectedRoute.jsx
 import React, { useContext } from 'react';
 import { Navigate } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
@@ -16,7 +17,7 @@ const ProtectedRoute = ({ children }) => {
     return <Navigate to="/login" />;
   }
   
-  // Wrap with layout and render children if authenticated
+  // Just return children directly, since Layout is already included in each component 
   return <Layout>{children}</Layout>;
 };
 

@@ -1,3 +1,4 @@
+// src/components/Layout/Layout.jsx - Let's keep this as it was originally
 import React from 'react';
 import { Container } from 'react-bootstrap';
 import Navbar from './Navbar';

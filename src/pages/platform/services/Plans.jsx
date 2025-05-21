@@ -1,31 +1,31 @@
-// src/pages/platform/services/Features.jsx
+// src/pages/platform/services/Plans.jsx
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Table, Button, Badge, Spinner, Alert, Modal } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import featuresService from '../../../services/features.service';
+import plansService from '../../../services/plans.service';
 
-const Features = () => {
+const Plans = () => {
   const { t } = useTranslation();
-  const [features, setFeatures] = useState([]);
+  const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showForm, setShowForm] = useState(false);
-  const [currentFeature, setCurrentFeature] = useState(null);
+  const [currentPlan, setCurrentPlan] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [featureToDelete, setFeatureToDelete] = useState(null);
+  const [planToDelete, setPlanToDelete] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
 
-  const fetchFeatures = async () => {
+  const fetchPlans = async () => {
     try {
       setLoading(true);
-      const data = await featuresService.getFeatures();
-      setFeatures(data);
+      const data = await plansService.getPlans();
+      setPlans(data);
       setError(null);
     } catch (err) {
-      console.error('Error fetching features:', err);
+      console.error('Error fetching plans:', err);
       setError(t('common.errorLoading'));
     } finally {
       setLoading(false);
@@ -33,56 +33,56 @@ const Features = () => {
   };
 
   useEffect(() => {
-    fetchFeatures();
+    fetchPlans();
   }, []);
 
   const handleAddClick = () => {
-    setCurrentFeature(null);
+    setCurrentPlan(null);
     setShowForm(true);
   };
 
-  const handleEditClick = (feature) => {
-    setCurrentFeature(feature);
+  const handleEditClick = (plan) => {
+    setCurrentPlan(plan);
     setShowForm(true);
   };
 
-  const handleDeleteClick = (feature) => {
-    setFeatureToDelete(feature);
+  const handleDeleteClick = (plan) => {
+    setPlanToDelete(plan);
     setShowDeleteModal(true);
   };
 
   const handleDeleteConfirm = async () => {
     try {
-      await featuresService.deleteFeature(featureToDelete.id);
-      setFeatures(features.filter(f => f.id !== featureToDelete.id));
+      await plansService.deletePlan(planToDelete.id);
+      setPlans(plans.filter(p => p.id !== planToDelete.id));
       setShowDeleteModal(false);
-      setFeatureToDelete(null);
-      setSuccessMessage(t('features.featureDeleted'));
+      setPlanToDelete(null);
+      setSuccessMessage(t('plans.planDeleted'));
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
-      console.error('Error deleting feature:', err);
+      console.error('Error deleting plan:', err);
       setError(t('common.errorDeleting'));
     }
   };
 
-  const handleFormSave = async (featureData) => {
+  const handleFormSave = async (planData) => {
     try {
-      if (currentFeature) {
-        // Update existing feature
-        await featuresService.updateFeature(currentFeature.id, featureData);
+      if (currentPlan) {
+        // Update existing plan
+        await plansService.updatePlan(currentPlan.id, planData);
       } else {
-        // Create new feature
-        await featuresService.createFeature(featureData);
+        // Create new plan
+        await plansService.createPlan(planData);
       }
       
-      await fetchFeatures();
+      await fetchPlans();
       setShowForm(false);
-      setSuccessMessage(currentFeature 
-        ? t('features.featureUpdated') 
-        : t('features.featureCreated'));
+      setSuccessMessage(currentPlan 
+        ? t('plans.planUpdated') 
+        : t('plans.planCreated'));
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
-      console.error('Error saving feature:', err);
+      console.error('Error saving plan:', err);
       setError(t('common.errorSaving'));
     }
   };
@@ -100,20 +100,20 @@ const Features = () => {
             className="mb-3"
             onClick={handleFormCancel}
           >
-            {t('features.back')}
+            {t('plans.back')}
           </Button>
           <Card>
             <Card.Header>
-              {currentFeature ? t('features.editFeature') : t('features.newFeature')}
+              {currentPlan ? t('plans.editPlan') : t('plans.newPlan')}
             </Card.Header>
             <Card.Body>
-              {/* This would be your FeatureForm component - for now we're just showing a placeholder */}
-              <p>Feature form will go here</p>
+              {/* This would be your PlanForm component - for now we're just showing a placeholder */}
+              <p>Plan form will go here</p>
               <div className="d-flex justify-content-end">
                 <Button variant="secondary" className="me-2" onClick={handleFormCancel}>
                   {t('common.cancel')}
                 </Button>
-                <Button variant="primary" onClick={() => handleFormSave({name: 'Sample Feature', code: 'sample_feature'})}>
+                <Button variant="primary" onClick={() => handleFormSave({name: 'Sample Plan', code: 'sample_plan'})}>
                   {t('common.save')}
                 </Button>
               </div>
@@ -124,23 +124,23 @@ const Features = () => {
         <>
           <Row className="mb-4">
             <Col>
-              <h1 className="h3">{t('features.title')}</h1>
+              <h1 className="h3">{t('plans.title')}</h1>
               <nav aria-label="breadcrumb">
                 <ol className="breadcrumb">
                   <li className="breadcrumb-item">
                     <Link to="/platform/services">{t('services.title')}</Link>
                   </li>
                   <li className="breadcrumb-item active" aria-current="page">
-                    {t('features.title')}
+                    {t('plans.title')}
                   </li>
                 </ol>
               </nav>
-              <p className="text-muted">{t('features.description')}</p>
+              <p className="text-muted">{t('plans.description')}</p>
             </Col>
             <Col xs="auto">
               <Button variant="primary" onClick={handleAddClick}>
                 <FontAwesomeIcon icon={faPlus} className="me-2" />
-                {t('features.addFeature')}
+                {t('plans.addPlan')}
               </Button>
             </Col>
           </Row>
@@ -160,7 +160,7 @@ const Features = () => {
           <Card>
             <Card.Header>
               <div className="d-flex justify-content-between align-items-center">
-                <span>{t('features.title')}</span>
+                <span>{t('plans.title')}</span>
                 <div>
                   {/* Add filter/search controls here in the future */}
                 </div>
@@ -172,28 +172,32 @@ const Features = () => {
                   <Spinner animation="border" role="status" variant="primary" />
                   <p className="mt-3">{t('common.loading')}...</p>
                 </div>
-              ) : features.length === 0 ? (
-                <Alert variant="info">{t('features.noFeatures')}</Alert>
+              ) : plans.length === 0 ? (
+                <Alert variant="info">{t('plans.noPlans')}</Alert>
               ) : (
                 <Table responsive hover>
                   <thead>
                     <tr>
-                      <th>{t('features.name')}</th>
-                      <th>{t('features.code')}</th>
-                      <th>{t('features.category')}</th>
-                      <th>{t('features.status')}</th>
+                      <th>{t('plans.name')}</th>
+                      <th>{t('plans.code')}</th>
+                      <th>{t('plans.planType')}</th>
+                      <th>{t('plans.price')}</th>
+                      <th>{t('plans.billingPeriod')}</th>
+                      <th>{t('plans.status')}</th>
                       <th>{t('common.actions')}</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {features.map(feature => (
-                      <tr key={feature.id}>
-                        <td>{feature.name}</td>
-                        <td>{feature.code}</td>
-                        <td>{t(`features.categories.${feature.category}`)}</td>
+                    {plans.map(plan => (
+                      <tr key={plan.id}>
+                        <td>{plan.name}</td>
+                        <td>{plan.code}</td>
+                        <td>{t(`plans.planTypes.${plan.plan_type}`)}</td>
+                        <td>${plan.base_price}</td>
+                        <td>{t(`plans.billingPeriods.${plan.billing_period}`)}</td>
                         <td>
-                          <Badge bg={feature.is_active ? 'success' : 'secondary'}>
-                            {feature.is_active ? t('common.active') : t('common.inactive')}
+                          <Badge bg={plan.is_active ? 'success' : 'secondary'}>
+                            {plan.is_active ? t('common.active') : t('common.inactive')}
                           </Badge>
                         </td>
                         <td>
@@ -202,7 +206,7 @@ const Features = () => {
                             size="sm" 
                             className="me-1"
                             title={t('common.edit')}
-                            onClick={() => handleEditClick(feature)}
+                            onClick={() => handleEditClick(plan)}
                           >
                             <FontAwesomeIcon icon={faEdit} />
                           </Button>
@@ -210,7 +214,7 @@ const Features = () => {
                             variant="outline-danger" 
                             size="sm"
                             title={t('common.delete')}
-                            onClick={() => handleDeleteClick(feature)}
+                            onClick={() => handleDeleteClick(plan)}
                           >
                             <FontAwesomeIcon icon={faTrash} />
                           </Button>
@@ -226,12 +230,12 @@ const Features = () => {
           {/* Delete Confirmation Modal */}
           <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
             <Modal.Header closeButton>
-              <Modal.Title>{t('features.delete')}</Modal.Title>
+              <Modal.Title>{t('plans.delete')}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-              {t('features.confirmDelete')}
-              {featureToDelete && (
-                <p className="mt-2 fw-bold">{featureToDelete.name}</p>
+              {t('plans.confirmDelete')}
+              {planToDelete && (
+                <p className="mt-2 fw-bold">{planToDelete.name}</p>
               )}
             </Modal.Body>
             <Modal.Footer>
@@ -249,4 +253,4 @@ const Features = () => {
   );
 };
 
-export default Features;
+export default Plans;

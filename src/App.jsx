@@ -1,17 +1,16 @@
-// src/App.jsx (update the import for ServicesList)
+// src/App.jsx - Back to simpler structure
 import React, { useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, AuthContext } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout/Layout';
-import Navbar from './components/Layout/Navbar';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Accounts from './pages/platform/Accounts';
 import Users from './pages/platform/Users';
 import Services from './pages/platform/services/Services';
 import Features from './pages/platform/services/Features';
-import Plans from './pages/platform/services/Plan';
+import Plans from './pages/platform/services/Plans';
 import ServicesList from './pages/platform/services/ServicesList';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
@@ -38,9 +37,7 @@ function App() {
           {/* Protected routes - for all authenticated users */}
           <Route path="/dashboard" element={
             <ProtectedRoute>
-              <Layout>
-                <Dashboard />
-              </Layout>
+              <Dashboard />
             </ProtectedRoute>
           } />
           
@@ -48,9 +45,7 @@ function App() {
           <Route path="/platform/accounts" element={
             <ProtectedRoute>
               <StaffRouteCheck>
-                <Layout>
-                  <Accounts />
-                </Layout>
+                <Accounts />
               </StaffRouteCheck>
             </ProtectedRoute>
           } />
@@ -59,9 +54,7 @@ function App() {
           <Route path="/platform/users" element={
             <ProtectedRoute>
               <StaffRouteCheck>
-                <Layout>
-                  <Users />
-                </Layout>
+                <Users />
               </StaffRouteCheck>
             </ProtectedRoute>
           } />
@@ -70,9 +63,7 @@ function App() {
           <Route path="/platform/services" element={
             <ProtectedRoute>
               <StaffRouteCheck>
-                <Layout>
-                  <Services />
-                </Layout>
+                <Services />
               </StaffRouteCheck>
             </ProtectedRoute>
           } />
@@ -80,9 +71,7 @@ function App() {
           <Route path="/platform/services/services" element={
             <ProtectedRoute>
               <StaffRouteCheck>
-                <Layout>
-                  <ServicesList />
-                </Layout>
+                <ServicesList />
               </StaffRouteCheck>
             </ProtectedRoute>
           } />
@@ -90,9 +79,7 @@ function App() {
           <Route path="/platform/services/features" element={
             <ProtectedRoute>
               <StaffRouteCheck>
-                <Layout>
-                  <Features />
-                </Layout>
+                <Features />
               </StaffRouteCheck>
             </ProtectedRoute>
           } />
@@ -100,9 +87,7 @@ function App() {
           <Route path="/platform/services/plans" element={
             <ProtectedRoute>
               <StaffRouteCheck>
-                <Layout>
-                  <Plans />
-                </Layout>
+                <Plans />
               </StaffRouteCheck>
             </ProtectedRoute>
           } />
@@ -112,12 +97,10 @@ function App() {
           
           {/* 404 route */}
           <Route path="*" element={
-            <Layout>
-              <div className="text-center mt-5">
-                <h1>404 - Page Not Found</h1>
-                <p>The page you're looking for doesn't exist.</p>
-              </div>
-            </Layout>
+            <div className="text-center mt-5">
+              <h1>404 - Page Not Found</h1>
+              <p>The page you're looking for doesn't exist.</p>
+            </div>
           } />
         </Routes>
       </AuthProvider>
