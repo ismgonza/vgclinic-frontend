@@ -13,6 +13,7 @@ import Features from './pages/platform/services/Features';
 import Plans from './pages/platform/services/Plans';
 import ServicesList from './pages/platform/services/ServicesList';
 import Contracts from './pages/platform/Contracts';
+import Locations from './pages/clinic/Locations';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -101,6 +102,12 @@ function App() {
             </ProtectedRoute>
           } />
           
+          <Route path="/clinic/locations" element={
+            <ProtectedRoute>
+                <Locations />
+            </ProtectedRoute>
+          } />
+
           {/* Redirect root to dashboard or login */}
           <Route path="/" element={<Navigate to="/dashboard" />} />
           

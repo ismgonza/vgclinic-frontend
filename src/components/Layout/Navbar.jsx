@@ -40,17 +40,20 @@ const AppNavbar = () => {
                   {t('navigation.dashboard')}
                 </Nav.Link>
                 
-                {/* Regular clinic menu items */}
-                {!isStaff && (
+               {/* Regular clinic menu items */}
+               {!isStaff && (
                   <>
+                    <Nav.Link as={Link} to="/clinic/locations">
+                      {t('navigation.locations')}
+                    </Nav.Link>
+                    <Nav.Link as={Link} to="/clinic/catalog">
+                      {t('navigation.catalog')}
+                    </Nav.Link>
                     <Nav.Link as={Link} to="/patients">
                       {t('navigation.patients')}
                     </Nav.Link>
                     <Nav.Link as={Link} to="/treatments">
                       {t('navigation.treatments')}
-                    </Nav.Link>
-                    <Nav.Link as={Link} to="/catalog">
-                      {t('navigation.catalog')}
                     </Nav.Link>
                   </>
                 )}
