@@ -1,11 +1,13 @@
-// src/pages/platform/services/Features.jsx
+// src/pages/platform/services/Features.jsx - Update to use the FeatureForm component
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Table, Button, Badge, Spinner, Alert, Modal } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Badge, Spinner, Alert, Modal } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import featuresService from '../../../services/features.service';
+import FeatureForm from '../../../components/platform/services/FeatureForm';
+import FeaturesList from '../../../components/platform/services/FeaturesList';
 
 const Features = () => {
   const { t } = useTranslation();
@@ -87,164 +89,97 @@ const Features = () => {
     }
   };
 
-  const handleFormCancel = () => {
+  const handleFormClose = () => {
     setShowForm(false);
   };
 
   return (
     <Container fluid className="py-4">
-      {showForm ? (
-        <div>
-          <Button 
-            variant="outline-secondary" 
-            className="mb-3"
-            onClick={handleFormCancel}
-          >
-            {t('features.back')}
+      <Row className="mb-4">
+        <Col>
+          <h1 className="h3">{t('features.title')}</h1>
+          <nav aria-label="breadcrumb">
+            <ol className="breadcrumb">
+              <li className="breadcrumb-item">
+                <Link to="/platform/services">{t('services.title')}</Link>
+              </li>
+              <li className="breadcrumb-item active" aria-current="page">
+                {t('features.title')}
+              </li>
+            </ol>
+          </nav>
+          <p className="text-muted">{t('features.description')}</p>
+        </Col>
+        <Col xs="auto">
+          <Button variant="primary" onClick={handleAddClick}>
+            <FontAwesomeIcon icon={faPlus} className="me-2" />
+            {t('features.addFeature')}
           </Button>
-          <Card>
-            <Card.Header>
-              {currentFeature ? t('features.editFeature') : t('features.newFeature')}
-            </Card.Header>
-            <Card.Body>
-              {/* This would be your FeatureForm component - for now we're just showing a placeholder */}
-              <p>Feature form will go here</p>
-              <div className="d-flex justify-content-end">
-                <Button variant="secondary" className="me-2" onClick={handleFormCancel}>
-                  {t('common.cancel')}
-                </Button>
-                <Button variant="primary" onClick={() => handleFormSave({name: 'Sample Feature', code: 'sample_feature'})}>
-                  {t('common.save')}
-                </Button>
-              </div>
-            </Card.Body>
-          </Card>
-        </div>
-      ) : (
-        <>
-          <Row className="mb-4">
-            <Col>
-              <h1 className="h3">{t('features.title')}</h1>
-              <nav aria-label="breadcrumb">
-                <ol className="breadcrumb">
-                  <li className="breadcrumb-item">
-                    <Link to="/platform/services">{t('services.title')}</Link>
-                  </li>
-                  <li className="breadcrumb-item active" aria-current="page">
-                    {t('features.title')}
-                  </li>
-                </ol>
-              </nav>
-              <p className="text-muted">{t('features.description')}</p>
-            </Col>
-            <Col xs="auto">
-              <Button variant="primary" onClick={handleAddClick}>
-                <FontAwesomeIcon icon={faPlus} className="me-2" />
-                {t('features.addFeature')}
-              </Button>
-            </Col>
-          </Row>
+        </Col>
+      </Row>
 
-          {successMessage && (
-            <Alert variant="success" onClose={() => setSuccessMessage('')} dismissible>
-              {successMessage}
-            </Alert>
-          )}
-
-          {error && (
-            <Alert variant="danger" onClose={() => setError(null)} dismissible>
-              {error}
-            </Alert>
-          )}
-
-          <Card>
-            <Card.Header>
-              <div className="d-flex justify-content-between align-items-center">
-                <span>{t('features.title')}</span>
-                <div>
-                  {/* Add filter/search controls here in the future */}
-                </div>
-              </div>
-            </Card.Header>
-            <Card.Body>
-              {loading ? (
-                <div className="text-center py-5">
-                  <Spinner animation="border" role="status" variant="primary" />
-                  <p className="mt-3">{t('common.loading')}...</p>
-                </div>
-              ) : features.length === 0 ? (
-                <Alert variant="info">{t('features.noFeatures')}</Alert>
-              ) : (
-                <Table responsive hover>
-                  <thead>
-                    <tr>
-                      <th>{t('features.name')}</th>
-                      <th>{t('features.code')}</th>
-                      <th>{t('features.category')}</th>
-                      <th>{t('features.status')}</th>
-                      <th>{t('common.actions')}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {features.map(feature => (
-                      <tr key={feature.id}>
-                        <td>{feature.name}</td>
-                        <td>{feature.code}</td>
-                        <td>{t(`features.categories.${feature.category}`)}</td>
-                        <td>
-                          <Badge bg={feature.is_active ? 'success' : 'secondary'}>
-                            {feature.is_active ? t('common.active') : t('common.inactive')}
-                          </Badge>
-                        </td>
-                        <td>
-                          <Button 
-                            variant="outline-secondary" 
-                            size="sm" 
-                            className="me-1"
-                            title={t('common.edit')}
-                            onClick={() => handleEditClick(feature)}
-                          >
-                            <FontAwesomeIcon icon={faEdit} />
-                          </Button>
-                          <Button 
-                            variant="outline-danger" 
-                            size="sm"
-                            title={t('common.delete')}
-                            onClick={() => handleDeleteClick(feature)}
-                          >
-                            <FontAwesomeIcon icon={faTrash} />
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
-              )}
-            </Card.Body>
-          </Card>
-          
-          {/* Delete Confirmation Modal */}
-          <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
-            <Modal.Header closeButton>
-              <Modal.Title>{t('features.delete')}</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              {t('features.confirmDelete')}
-              {featureToDelete && (
-                <p className="mt-2 fw-bold">{featureToDelete.name}</p>
-              )}
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-                {t('common.cancel')}
-              </Button>
-              <Button variant="danger" onClick={handleDeleteConfirm}>
-                {t('common.confirm')}
-              </Button>
-            </Modal.Footer>
-          </Modal>
-        </>
+      {successMessage && (
+        <Alert variant="success" onClose={() => setSuccessMessage('')} dismissible>
+          {successMessage}
+        </Alert>
       )}
+
+      {error && (
+        <Alert variant="danger" onClose={() => setError(null)} dismissible>
+          {error}
+        </Alert>
+      )}
+
+      <Card>
+        <Card.Header>
+          <div className="d-flex justify-content-between align-items-center">
+            <span>{t('features.title')}</span>
+          </div>
+        </Card.Header>
+        <Card.Body>
+          {loading ? (
+            <div className="text-center py-5">
+              <Spinner animation="border" role="status" variant="primary" />
+              <p className="mt-3">{t('common.loading')}...</p>
+            </div>
+          ) : (
+            <FeaturesList 
+              features={features} 
+              onEdit={handleEditClick} 
+              onDelete={handleDeleteClick}
+            />
+          )}
+        </Card.Body>
+      </Card>
+      
+      {/* Feature Form Modal */}
+      <FeatureForm
+        show={showForm}
+        feature={currentFeature}
+        onSave={handleFormSave}
+        onClose={handleFormClose}
+      />
+      
+      {/* Delete Confirmation Modal */}
+      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>{t('common.delete')}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {t('features.confirmDelete')}
+          {featureToDelete && (
+            <p className="mt-2 fw-bold">{featureToDelete.name}</p>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+            {t('common.cancel')}
+          </Button>
+          <Button variant="danger" onClick={handleDeleteConfirm}>
+            {t('common.confirm')}
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };

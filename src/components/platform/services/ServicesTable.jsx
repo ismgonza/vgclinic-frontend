@@ -1,5 +1,9 @@
+// src/components/platform/services/ServicesTable.jsx
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { Button, Table } from 'react-bootstrap';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 const ServicesTable = ({ services, onEdit, onDelete }) => {
   const { t } = useTranslation();
@@ -13,58 +17,61 @@ const ServicesTable = ({ services, onEdit, onDelete }) => {
   }
 
   return (
-    <div className="table-responsive">
-      <table className="table table-striped table-hover">
-        <thead>
-          <tr>
-            <th>{t('services.name')}</th>
-            <th>{t('services.code')}</th>
-            <th>{t('services.features')}</th>
-            <th>{t('services.status')}</th>
-            <th>{t('common.actions')}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {services.map((service) => (
-            <tr key={service.id}>
-              <td>{service.name}</td>
-              <td>{service.code}</td>
-              <td>
-                {service.features_list && service.features_list.map(feature => (
-                  <span 
-                    key={feature.id}
-                    className="badge bg-secondary me-1 mb-1"
-                  >
-                    {feature.name}
-                  </span>
-                ))}
-              </td>
-              <td>
+    <Table responsive hover>
+      <thead>
+        <tr>
+          <th>{t('services.name')}</th>
+          <th>{t('services.code')}</th>
+          <th>{t('services.features')}</th>
+          <th>{t('services.status')}</th>
+          <th>{t('common.actions')}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {services.map((service) => (
+          <tr key={service.id}>
+            <td>{service.name}</td>
+            <td>{service.code}</td>
+            <td>
+              {service.features_list && service.features_list.map(feature => (
                 <span 
-                  className={`badge ${service.is_active ? 'bg-success' : 'bg-secondary'}`}
+                  key={feature.id}
+                  className="badge bg-secondary me-1 mb-1"
                 >
-                  {service.is_active ? t('common.active') : t('common.inactive')}
+                  {feature.name}
                 </span>
-              </td>
-              <td>
-                <button 
-                  className="btn btn-sm btn-outline-primary me-1" 
-                  onClick={() => onEdit(service)}
-                >
-                  <i className="bi bi-pencil"></i>
-                </button>
-                <button 
-                  className="btn btn-sm btn-outline-danger" 
-                  onClick={() => onDelete(service.id)}
-                >
-                  <i className="bi bi-trash"></i>
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+              ))}
+            </td>
+            <td>
+              <span 
+                className={`badge ${service.is_active ? 'bg-success' : 'bg-secondary'}`}
+              >
+                {service.is_active ? t('common.active') : t('common.inactive')}
+              </span>
+            </td>
+            <td>
+              <Button 
+                variant="outline-secondary" 
+                size="sm" 
+                className="me-1"
+                title={t('common.edit')}
+                onClick={() => onEdit(service)}
+              >
+                <FontAwesomeIcon icon={faEdit} />
+              </Button>
+              <Button 
+                variant="outline-danger" 
+                size="sm"
+                title={t('common.delete')}
+                onClick={() => onDelete(service)}
+              >
+                <FontAwesomeIcon icon={faTrash} />
+              </Button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </Table>
   );
 };
 

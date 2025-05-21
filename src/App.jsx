@@ -12,6 +12,7 @@ import Services from './pages/platform/services/Services';
 import Features from './pages/platform/services/Features';
 import Plans from './pages/platform/services/Plans';
 import ServicesList from './pages/platform/services/ServicesList';
+import Contracts from './pages/platform/Contracts';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -88,6 +89,14 @@ function App() {
             <ProtectedRoute>
               <StaffRouteCheck>
                 <Plans />
+              </StaffRouteCheck>
+            </ProtectedRoute>
+          } />
+
+          <Route path="/platform/contracts" element={
+            <ProtectedRoute>
+              <StaffRouteCheck>
+                <Contracts />
               </StaffRouteCheck>
             </ProtectedRoute>
           } />

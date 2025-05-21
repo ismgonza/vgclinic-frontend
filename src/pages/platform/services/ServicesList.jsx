@@ -1,15 +1,19 @@
 // src/pages/platform/services/ServicesList.jsx
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Table, Button, Badge, Spinner, Alert, Modal } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Spinner, Alert, Modal } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import servicesService from '../../../services/services.service';
+import featuresService from '../../../services/features.service';
+import ServiceForm from '../../../components/platform/services/ServiceForm';
+import ServicesTable from '../../../components/platform/services/ServicesTable';
 
 const ServicesList = () => {
   const { t } = useTranslation();
   const [services, setServices] = useState([]);
+  const [features, setFeatures] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showForm, setShowForm] = useState(false);
@@ -18,14 +22,18 @@ const ServicesList = () => {
   const [serviceToDelete, setServiceToDelete] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
 
-  const fetchServices = async () => {
+  const fetchData = async () => {
     try {
       setLoading(true);
-      const data = await servicesService.getServices();
-      setServices(data);
+      const [servicesData, featuresData] = await Promise.all([
+        servicesService.getServices(),
+        featuresService.getFeatures()
+      ]);
+      setServices(servicesData);
+      setFeatures(featuresData);
       setError(null);
     } catch (err) {
-      console.error('Error fetching services:', err);
+      console.error('Error fetching data:', err);
       setError(t('common.errorLoading'));
     } finally {
       setLoading(false);
@@ -33,7 +41,7 @@ const ServicesList = () => {
   };
 
   useEffect(() => {
-    fetchServices();
+    fetchData();
   }, []);
 
   const handleAddClick = () => {
@@ -75,7 +83,7 @@ const ServicesList = () => {
         await servicesService.createService(serviceData);
       }
       
-      await fetchServices();
+      await fetchData();
       setShowForm(false);
       setSuccessMessage(currentService 
         ? t('services.serviceUpdated') 
@@ -87,173 +95,98 @@ const ServicesList = () => {
     }
   };
 
-  const handleFormCancel = () => {
+  const handleFormClose = () => {
     setShowForm(false);
   };
 
   return (
     <Container fluid className="py-4">
-      {showForm ? (
-        <div>
-          <Button 
-            variant="outline-secondary" 
-            className="mb-3"
-            onClick={handleFormCancel}
-          >
-            {t('services.back')}
+      <Row className="mb-4">
+        <Col>
+          <h1 className="h3">{t('services.servicesTitle')}</h1>
+          <nav aria-label="breadcrumb">
+            <ol className="breadcrumb">
+              <li className="breadcrumb-item">
+                <Link to="/platform/services">{t('services.title')}</Link>
+              </li>
+              <li className="breadcrumb-item active" aria-current="page">
+                {t('services.servicesTitle')}
+              </li>
+            </ol>
+          </nav>
+          <p className="text-muted">{t('services.serviceDescription')}</p>
+        </Col>
+        <Col xs="auto">
+          <Button variant="primary" onClick={handleAddClick}>
+            <FontAwesomeIcon icon={faPlus} className="me-2" />
+            {t('services.addService')}
           </Button>
-          <Card>
-            <Card.Header>
-              {currentService ? t('services.editService') : t('services.newService')}
-            </Card.Header>
-            <Card.Body>
-              {/* This would be your ServiceForm component - for now we're just showing a placeholder */}
-              <p>Service form will go here</p>
-              <div className="d-flex justify-content-end">
-                <Button variant="secondary" className="me-2" onClick={handleFormCancel}>
-                  {t('common.cancel')}
-                </Button>
-                <Button variant="primary" onClick={() => handleFormSave({name: 'Sample Service', code: 'sample_service'})}>
-                  {t('common.save')}
-                </Button>
-              </div>
-            </Card.Body>
-          </Card>
-        </div>
-      ) : (
-        <>
-          <Row className="mb-4">
-            <Col>
-              <h1 className="h3">{t('services.servicesTitle')}</h1>
-              <nav aria-label="breadcrumb">
-                <ol className="breadcrumb">
-                  <li className="breadcrumb-item">
-                    <Link to="/platform/services">{t('services.title')}</Link>
-                  </li>
-                  <li className="breadcrumb-item active" aria-current="page">
-                    {t('services.servicesTitle')}
-                  </li>
-                </ol>
-              </nav>
-              <p className="text-muted">{t('services.serviceDescription')}</p>
-            </Col>
-            <Col xs="auto">
-              <Button variant="primary" onClick={handleAddClick}>
-                <FontAwesomeIcon icon={faPlus} className="me-2" />
-                {t('services.addService')}
-              </Button>
-            </Col>
-          </Row>
+        </Col>
+      </Row>
 
-          {successMessage && (
-            <Alert variant="success" onClose={() => setSuccessMessage('')} dismissible>
-              {successMessage}
-            </Alert>
-          )}
-
-          {error && (
-            <Alert variant="danger" onClose={() => setError(null)} dismissible>
-              {error}
-            </Alert>
-          )}
-
-          <Card>
-            <Card.Header>
-              <div className="d-flex justify-content-between align-items-center">
-                <span>{t('services.servicesTitle')}</span>
-                <div>
-                  {/* Add filter/search controls here in the future */}
-                </div>
-              </div>
-            </Card.Header>
-            <Card.Body>
-              {loading ? (
-                <div className="text-center py-5">
-                  <Spinner animation="border" role="status" variant="primary" />
-                  <p className="mt-3">{t('common.loading')}...</p>
-                </div>
-              ) : services.length === 0 ? (
-                <Alert variant="info">{t('services.noServices')}</Alert>
-              ) : (
-                <Table responsive hover>
-                  <thead>
-                    <tr>
-                      <th>{t('services.name')}</th>
-                      <th>{t('services.code')}</th>
-                      <th>{t('services.features')}</th>
-                      <th>{t('services.status')}</th>
-                      <th>{t('common.actions')}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {services.map(service => (
-                      <tr key={service.id}>
-                        <td>{service.name}</td>
-                        <td>{service.code}</td>
-                        <td>
-                          {service.features_list && service.features_list.map(feature => (
-                            <span 
-                              key={feature.id}
-                              className="badge bg-secondary me-1 mb-1"
-                            >
-                              {feature.name}
-                            </span>
-                          ))}
-                        </td>
-                        <td>
-                          <Badge bg={service.is_active ? 'success' : 'secondary'}>
-                            {service.is_active ? t('common.active') : t('common.inactive')}
-                          </Badge>
-                        </td>
-                        <td>
-                          <Button 
-                            variant="outline-secondary" 
-                            size="sm" 
-                            className="me-1"
-                            title={t('common.edit')}
-                            onClick={() => handleEditClick(service)}
-                          >
-                            <FontAwesomeIcon icon={faEdit} />
-                          </Button>
-                          <Button 
-                            variant="outline-danger" 
-                            size="sm"
-                            title={t('common.delete')}
-                            onClick={() => handleDeleteClick(service)}
-                          >
-                            <FontAwesomeIcon icon={faTrash} />
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
-              )}
-            </Card.Body>
-          </Card>
-          
-          {/* Delete Confirmation Modal */}
-          <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
-            <Modal.Header closeButton>
-              <Modal.Title>{t('services.delete')}</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              {t('services.confirmDelete')}
-              {serviceToDelete && (
-                <p className="mt-2 fw-bold">{serviceToDelete.name}</p>
-              )}
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-                {t('common.cancel')}
-              </Button>
-              <Button variant="danger" onClick={handleDeleteConfirm}>
-                {t('common.confirm')}
-              </Button>
-            </Modal.Footer>
-          </Modal>
-        </>
+      {successMessage && (
+        <Alert variant="success" onClose={() => setSuccessMessage('')} dismissible>
+          {successMessage}
+        </Alert>
       )}
+
+      {error && (
+        <Alert variant="danger" onClose={() => setError(null)} dismissible>
+          {error}
+        </Alert>
+      )}
+
+      <Card>
+        <Card.Header>
+          <div className="d-flex justify-content-between align-items-center">
+            <span>{t('services.servicesTitle')}</span>
+          </div>
+        </Card.Header>
+        <Card.Body>
+          {loading ? (
+            <div className="text-center py-5">
+              <Spinner animation="border" role="status" variant="primary" />
+              <p className="mt-3">{t('common.loading')}...</p>
+            </div>
+          ) : (
+            <ServicesTable 
+              services={services} 
+              onEdit={handleEditClick} 
+              onDelete={handleDeleteClick}
+            />
+          )}
+        </Card.Body>
+      </Card>
+      
+      {/* Service Form Modal */}
+      <ServiceForm
+        show={showForm}
+        service={currentService}
+        features={features}
+        onSave={handleFormSave}
+        onClose={handleFormClose}
+      />
+      
+      {/* Delete Confirmation Modal */}
+      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>{t('common.delete')}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {t('services.confirmDelete')}
+          {serviceToDelete && (
+            <p className="mt-2 fw-bold">{serviceToDelete.name}</p>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+            {t('common.cancel')}
+          </Button>
+          <Button variant="danger" onClick={handleDeleteConfirm}>
+            {t('common.confirm')}
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };
