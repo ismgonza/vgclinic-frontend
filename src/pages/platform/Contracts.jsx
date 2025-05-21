@@ -75,7 +75,6 @@ const Contracts = () => {
       } else {
         // Create new contract
         const result = await contractsService.createContract(contractData);
-        console.log('Contract created successfully:', result);
         setSuccessMessage(t('Contract created successfully'));
       }
       

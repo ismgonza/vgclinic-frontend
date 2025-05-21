@@ -29,7 +29,6 @@ const Dashboard = () => {
       try {
         // Fetch dashboard stats
         const statsData = await dashboardService.getDashboardStats();
-        console.log('Dashboard stats data:', statsData);
         setStats(statsData);
         setIsStaff(statsData.isStaff);
         
