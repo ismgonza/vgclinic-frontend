@@ -60,6 +60,7 @@ const TreatmentFilters = ({ filters, onFiltersChange, onClearFilters }) => {
       setBranches(branchesData.filter(branch => branch.is_active));
       
       console.log('Loaded filter options for account:', selectedAccount.account_name);
+      console.log('Patients:', (patientsData.results || patientsData).length);
       console.log('Doctors:', formOptionsData.doctors?.length || 0);
       console.log('Branches:', branchesData.filter(branch => branch.is_active).length);
       

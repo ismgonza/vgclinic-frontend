@@ -1,13 +1,14 @@
 // src/components/clinic/PatientForm.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Form, Button, Row, Col, Card, Alert, Table } from 'react-bootstrap';
+import { AccountContext } from '../../contexts/AccountContext';
 import CostaRicaGeoSelector from '../common/CostaRicaGeoSelector';
-import accountsService from '../../services/accounts.service';
 
 const PatientForm = ({ patient, onSave, onCancel }) => {
   const { t } = useTranslation();
-  const [accounts, setAccounts] = useState([]);
+  const { selectedAccount } = useContext(AccountContext);
+  
   const [formData, setFormData] = useState({
     first_name: '',
     last_name1: '',
@@ -46,23 +47,10 @@ const PatientForm = ({ patient, onSave, onCancel }) => {
     relationship: '' 
   });
 
-  // Fetch accounts for the dropdown
-  useEffect(() => {
-    const fetchAccounts = async () => {
-      try {
-        const data = await accountsService.getAccounts();
-        setAccounts(data);
-      } catch (err) {
-        console.error('Error fetching accounts:', err);
-      }
-    };
-    fetchAccounts();
-  }, []);
-
-  // Initialize form with patient data if editing
+  // Initialize form data - auto-select current account for CREATE
   useEffect(() => {
     if (patient) {
-      // Set main patient data
+      // EDIT mode - populate with existing patient data
       setFormData({
         first_name: patient.first_name || '',
         last_name1: patient.last_name1 || '',
@@ -80,7 +68,7 @@ const PatientForm = ({ patient, onSave, onCancel }) => {
         // If a patient account is available, use its values
         account: patient.clinic_memberships && patient.clinic_memberships.length > 0 
           ? patient.clinic_memberships[0].account 
-          : '',
+          : (selectedAccount ? selectedAccount.account_id : ''),
         referral_source: patient.clinic_memberships && patient.clinic_memberships.length > 0 
           ? patient.clinic_memberships[0].referral_source 
           : '',
@@ -100,8 +88,14 @@ const PatientForm = ({ patient, onSave, onCancel }) => {
       if (patient.emergency_contacts) {
         setEmergencyContactsList(patient.emergency_contacts);
       }
+    } else if (selectedAccount) {
+      // CREATE mode - auto-select current account
+      setFormData(prev => ({
+        ...prev,
+        account: selectedAccount.account_id
+      }));
     }
-  }, [patient]);
+  }, [patient, selectedAccount]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -183,7 +177,12 @@ const PatientForm = ({ patient, onSave, onCancel }) => {
     if (!formData.canton) newErrors.canton = t('validation.required');
     if (!formData.district) newErrors.district = t('validation.required');
     if (!formData.address) newErrors.address = t('validation.required');
-    if (!formData.account) newErrors.account = t('validation.required');
+    
+    // Account is required but should be auto-selected
+    if (!formData.account) {
+      newErrors.account = t('validation.required');
+      setError(t('patients.selectAccountFirst') || 'Please select a clinic first');
+    }
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -224,10 +223,31 @@ const PatientForm = ({ patient, onSave, onCancel }) => {
     }
   };
 
+  // Show message if no account selected
+  if (!selectedAccount) {
+    return (
+      <Card>
+        <Card.Header>
+          {patient ? t('patients.editPatient') : t('patients.newPatient')}
+        </Card.Header>
+        <Card.Body>
+          <div className="text-center py-4 text-muted">
+            <p>{t('patients.selectAccountFirst') || 'Please select a clinic first'}</p>
+          </div>
+        </Card.Body>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <Card.Header>
-        {patient ? t('patients.editPatient') : t('patients.newPatient')}
+        <div className="d-flex justify-content-between align-items-center">
+          <span>{patient ? t('patients.editPatient') : t('patients.newPatient')}</span>
+          <small className="text-muted">
+            {t('patients.clinic')}: <strong>{selectedAccount.account_name}</strong>
+          </small>
+        </div>
       </Card.Header>
       <Card.Body>
         {error && <Alert variant="danger">{error}</Alert>}
@@ -571,32 +591,10 @@ const PatientForm = ({ patient, onSave, onCancel }) => {
             </Table>
           )}
           
-          {/* Clinic Information */}
-          <h5 className="mb-3 mt-4">{t('patients.clinicInfo')}</h5>
+          {/* Clinic Information - Hidden clinic field, just show additional info */}
+          <h5 className="mb-3 mt-4">{t('patients.additionalInfo')}</h5>
           
           <Row className="mb-3">
-            <Col md={6}>
-              <Form.Group>
-                <Form.Label>{t('patients.clinic')}</Form.Label>
-                <Form.Select
-                  name="account"
-                  value={formData.account}
-                  onChange={handleChange}
-                  isInvalid={!!errors.account}
-                  required
-                >
-                  <option value="">{t('patients.selectClinic')}</option>
-                  {accounts.map(account => (
-                    <option key={account.account_id} value={account.account_id}>
-                      {account.account_name}
-                    </option>
-                  ))}
-                </Form.Select>
-                <Form.Control.Feedback type="invalid">
-                  {errors.account}
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
             <Col md={6}>
               <Form.Group>
                 <Form.Label>{t('patients.referralSource')}</Form.Label>
@@ -615,6 +613,18 @@ const PatientForm = ({ patient, onSave, onCancel }) => {
                 </Form.Select>
               </Form.Group>
             </Col>
+            <Col md={6}>
+              <Form.Group className="mt-4">
+                <Form.Check
+                  type="checkbox"
+                  id="receive_notifications"
+                  name="receive_notifications"
+                  label={t('patients.receiveNotifications')}
+                  checked={formData.receive_notifications}
+                  onChange={handleChange}
+                />
+              </Form.Group>
+            </Col>
           </Row>
           
           <Row className="mb-3">
@@ -631,17 +641,6 @@ const PatientForm = ({ patient, onSave, onCancel }) => {
               </Form.Group>
             </Col>
           </Row>
-          
-          <Form.Group className="mb-3">
-            <Form.Check
-              type="checkbox"
-              id="receive_notifications"
-              name="receive_notifications"
-              label={t('patients.receiveNotifications')}
-              checked={formData.receive_notifications}
-              onChange={handleChange}
-            />
-          </Form.Group>
           
           <Row className="mt-4">
             <Col className="d-flex justify-content-end">

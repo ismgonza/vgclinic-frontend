@@ -2,45 +2,56 @@
 import api from './api';
 
 class TreatmentsService {
-  async getTreatments(params = {}) {
+  async getTreatments(params = {}, headers = {}) {
     try {
-      const response = await api.get('/clinic/treatments/treatments/', { params });
+      const response = await api.get('/clinic/treatments/treatments/', { 
+        params,
+        headers 
+      });
       return response.data;
     } catch (error) {
       throw error;
     }
   }
 
-  async getTreatment(id) {
+  async getTreatment(id, headers = {}) {
     try {
-      const response = await api.get(`/clinic/treatments/treatments/${id}/`);
+      const response = await api.get(`/clinic/treatments/treatments/${id}/`, {
+        headers
+      });
       return response.data;
     } catch (error) {
       throw error;
     }
   }
 
-  async createTreatment(treatmentData) {
+  async createTreatment(treatmentData, headers = {}) {
     try {
-      const response = await api.post('/clinic/treatments/treatments/', treatmentData);
+      const response = await api.post('/clinic/treatments/treatments/', treatmentData, {
+        headers
+      });
       return response.data;
     } catch (error) {
       throw error;
     }
   }
 
-  async updateTreatment(id, treatmentData) {
+  async updateTreatment(id, treatmentData, headers = {}) {
     try {
-      const response = await api.put(`/clinic/treatments/treatments/${id}/`, treatmentData);
+      const response = await api.put(`/clinic/treatments/treatments/${id}/`, treatmentData, {
+        headers
+      });
       return response.data;
     } catch (error) {
       throw error;
     }
   }
 
-  async deleteTreatment(id) {
+  async deleteTreatment(id, headers = {}) {
     try {
-      await api.delete(`/clinic/treatments/treatments/${id}/`);
+      await api.delete(`/clinic/treatments/treatments/${id}/`, {
+        headers
+      });
       return true;
     } catch (error) {
       throw error;
@@ -48,9 +59,11 @@ class TreatmentsService {
   }
 
   // Quick status update
-  async updateTreatmentStatus(id, status) {
+  async updateTreatmentStatus(id, status, headers = {}) {
     try {
-      const response = await api.patch(`/clinic/treatments/treatments/${id}/`, { status });
+      const response = await api.patch(`/clinic/treatments/treatments/${id}/`, { status }, {
+        headers
+      });
       return response.data;
     } catch (error) {
       throw error;
@@ -58,9 +71,11 @@ class TreatmentsService {
   }
 
   // Complete treatment action
-  async completeTreatment(id) {
+  async completeTreatment(id, headers = {}) {
     try {
-      const response = await api.post(`/clinic/treatments/treatments/${id}/complete/`);
+      const response = await api.post(`/clinic/treatments/treatments/${id}/complete/`, {}, {
+        headers
+      });
       return response.data;
     } catch (error) {
       throw error;
@@ -68,18 +83,22 @@ class TreatmentsService {
   }
 
   // Cancel treatment action  
-  async cancelTreatment(id) {
+  async cancelTreatment(id, headers = {}) {
     try {
-      const response = await api.post(`/clinic/treatments/treatments/${id}/cancel/`);
+      const response = await api.post(`/clinic/treatments/treatments/${id}/cancel/`, {}, {
+        headers
+      });
       return response.data;
     } catch (error) {
       throw error;
     }
   }
 
-  async getFormOptions() {
+  async getFormOptions(headers = {}) {
     try {
-      const response = await api.get('/clinic/treatments/treatments/form_options/');
+      const response = await api.get('/clinic/treatments/treatments/form_options/', {
+        headers
+      });
       return response.data;
     } catch (error) {
       throw error;
@@ -87,9 +106,11 @@ class TreatmentsService {
   }
 
   // Add note to treatment
-  async addTreatmentNote(treatmentId, noteData) {
+  async addTreatmentNote(treatmentId, noteData, headers = {}) {
     try {
-      const response = await api.post(`/clinic/treatments/treatments/${treatmentId}/add_note/`, noteData);
+      const response = await api.post(`/clinic/treatments/treatments/${treatmentId}/add_note/`, noteData, {
+        headers
+      });
       return response.data;
     } catch (error) {
       throw error;
@@ -97,9 +118,11 @@ class TreatmentsService {
   }
 
   // Get treatment notes
-  async getTreatmentNotes(treatmentId) {
+  async getTreatmentNotes(treatmentId, headers = {}) {
     try {
-      const response = await api.get(`/clinic/treatments/treatment-notes/?treatment=${treatmentId}`);
+      const response = await api.get(`/clinic/treatments/treatment-notes/?treatment=${treatmentId}`, {
+        headers
+      });
       return response.data;
     } catch (error) {
       throw error;

@@ -1,10 +1,11 @@
 // src/pages/clinic/Patients.jsx - Updated version
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { Container, Row, Col, Card, Table, Button, Badge, Spinner, Alert, Modal } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faEdit, faTrash, faEye, faUserInjured, faPhone, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
+import { AccountContext } from '../../contexts/AccountContext';
 import patientsService from '../../services/patients.service';
 import PatientForm from '../../components/clinic/PatientForm';
 
@@ -12,6 +13,8 @@ const Patients = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
+  const { selectedAccount } = useContext(AccountContext);
+  
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -21,9 +24,16 @@ const Patients = () => {
   const [patientToDelete, setPatientToDelete] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
 
+  // Reload patients when account changes
   useEffect(() => {
-    fetchPatients();
-  }, []);
+    if (selectedAccount) {
+      fetchPatients();
+    } else {
+      // Clear patients if no account selected
+      setPatients([]);
+      setLoading(false);
+    }
+  }, [selectedAccount]);
 
   useEffect(() => {
     if (location.state?.editMode && location.state?.editPatient) {
@@ -34,11 +44,23 @@ const Patients = () => {
   }, [location.state]);
 
   const fetchPatients = async () => {
+    if (!selectedAccount) return;
+    
     try {
       setLoading(true);
-      const data = await patientsService.getPatients();
+      
+      // Set account context for API calls
+      const accountHeaders = {
+        'X-Account-Context': selectedAccount.account_id
+      };
+      
+      const data = await patientsService.getPatients({}, accountHeaders);
       setPatients(data.results || data);
       setError(null);
+      
+      console.log('Loaded patients for account:', selectedAccount.account_name);
+      console.log('Patients count:', (data.results || data).length);
+      
     } catch (err) {
       console.error('Error fetching patients:', err);
       setError(t('patients.errorLoading'));
@@ -48,11 +70,19 @@ const Patients = () => {
   };
 
   const handleAddClick = () => {
+    if (!selectedAccount) {
+      setError(t('patients.selectAccountFirst') || 'Please select a clinic first');
+      return;
+    }
     setCurrentPatient(null);
     setShowForm(true);
   };
 
   const handleEditClick = (patient) => {
+    if (!selectedAccount) {
+      setError(t('patients.selectAccountFirst') || 'Please select a clinic first');
+      return;
+    }
     setCurrentPatient(patient);
     setShowForm(true);
   };
@@ -62,13 +92,23 @@ const Patients = () => {
   };
 
   const handleDeleteClick = (patient) => {
+    if (!selectedAccount) {
+      setError(t('patients.selectAccountFirst') || 'Please select a clinic first');
+      return;
+    }
     setPatientToDelete(patient);
     setShowDeleteModal(true);
   };
 
   const handleDeleteConfirm = async () => {
+    if (!selectedAccount) return;
+    
     try {
-      await patientsService.deletePatient(patientToDelete.id);
+      const accountHeaders = {
+        'X-Account-Context': selectedAccount.account_id
+      };
+      
+      await patientsService.deletePatient(patientToDelete.id, accountHeaders);
       setPatients(patients.filter(p => p.id !== patientToDelete.id));
       setShowDeleteModal(false);
       setPatientToDelete(null);
@@ -81,14 +121,22 @@ const Patients = () => {
   };
 
   const handleFormSave = async (patientData) => {
+    if (!selectedAccount) {
+      throw new Error(t('patients.selectAccountFirst') || 'Please select a clinic first');
+    }
+    
     try {
+      const accountHeaders = {
+        'X-Account-Context': selectedAccount.account_id
+      };
+      
       if (currentPatient) {
         // Update patient
-        await patientsService.updatePatient(currentPatient.id, patientData);
+        await patientsService.updatePatient(currentPatient.id, patientData, accountHeaders);
         setSuccessMessage(t('patients.updateSuccess'));
       } else {
         // Create new patient
-        await patientsService.createPatient(patientData);
+        await patientsService.createPatient(patientData, accountHeaders);
         setSuccessMessage(t('patients.createSuccess'));
       }
       
@@ -112,6 +160,29 @@ const Patients = () => {
     if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleDateString();
   };
+
+  // Show message if no account selected
+  if (!selectedAccount) {
+    return (
+      <Container fluid className="py-4">
+        <Row className="mb-4">
+          <Col>
+            <h1 className="h3">{t('patients.title')}</h1>
+            <p className="text-muted">{t('patients.description')}</p>
+          </Col>
+        </Row>
+        
+        <Card>
+          <Card.Body>
+            <div className="text-center py-4 text-muted">
+              <FontAwesomeIcon icon={faUserInjured} size="3x" className="mb-3" />
+              <p>{t('patients.selectAccountFirst') || 'Please select a clinic first to view patients'}</p>
+            </div>
+          </Card.Body>
+        </Card>
+      </Container>
+    );
+  }
 
   // If the form is shown, render it
   if (showForm) {
@@ -141,6 +212,9 @@ const Patients = () => {
         <Col>
           <h1 className="h3">{t('patients.title')}</h1>
           <p className="text-muted">{t('patients.description')}</p>
+          <small className="text-muted">
+            {t('patients.currentClinic')}: <strong>{selectedAccount.account_name}</strong>
+          </small>
         </Col>
         <Col xs="auto">
           <Button variant="primary" onClick={handleAddClick}>
