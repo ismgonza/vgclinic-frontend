@@ -14,6 +14,11 @@ import Plans from './pages/platform/services/Plans';
 import ServicesList from './pages/platform/services/ServicesList';
 import Contracts from './pages/platform/Contracts';
 import Locations from './pages/clinic/Locations';
+import Catalog from './pages/clinic/catalog/Catalog';
+import Specialties from './pages/clinic/catalog/Specialties';
+import CatalogItems from './pages/clinic/catalog/CatalogItems';
+import Patients from './pages/clinic/Patients';
+import PatientDetail from './pages/clinic/PatientDetail';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -105,6 +110,42 @@ function App() {
           <Route path="/clinic/locations" element={
             <ProtectedRoute>
                 <Locations />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/clinic/catalog" element={
+            <ProtectedRoute>
+              <Catalog />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/clinic/catalog/specialties" element={
+            <ProtectedRoute>
+              <Specialties />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/clinic/catalog/items" element={
+            <ProtectedRoute>
+              <CatalogItems />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/clinic/patients/edit/:id" element={
+            <ProtectedRoute>
+              <Patients />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/clinic/patients/:id" element={
+            <ProtectedRoute>
+              <PatientDetail />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/clinic/patients" element={
+            <ProtectedRoute>
+              <Patients />
             </ProtectedRoute>
           } />
 

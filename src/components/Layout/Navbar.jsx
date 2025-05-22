@@ -49,7 +49,7 @@ const AppNavbar = () => {
                     <Nav.Link as={Link} to="/clinic/catalog">
                       {t('navigation.catalog')}
                     </Nav.Link>
-                    <Nav.Link as={Link} to="/patients">
+                    <Nav.Link as={Link} to="/clinic/patients">
                       {t('navigation.patients')}
                     </Nav.Link>
                     <Nav.Link as={Link} to="/treatments">

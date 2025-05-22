@@ -6,6 +6,8 @@ import { faPlus, faEdit, faTrash, faMapMarkerAlt, faPhone, faEnvelope, faDoorOpe
 import { useTranslation } from 'react-i18next';
 import locationsService from '../../services/locations.service';
 import LocationForm from '../../components/clinic/LocationForm';
+import RoomsModal from '../../components/clinic/RoomsModal';
+
 
 const Locations = () => {
   const { t } = useTranslation();
@@ -17,6 +19,8 @@ const Locations = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [branchToDelete, setBranchToDelete] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
+  const [showRoomsModal, setShowRoomsModal] = useState(false);
+  const [selectedBranch, setSelectedBranch] = useState(null);
 
   useEffect(() => {
     fetchBranches();
@@ -86,6 +90,11 @@ const Locations = () => {
     );
   };
 
+  const handleManageRoomsClick = (branch) => {
+    setSelectedBranch(branch);
+    setShowRoomsModal(true);
+  };
+
   return (
     <Container fluid className="py-4">
       {showForm ? (
@@ -95,10 +104,10 @@ const Locations = () => {
             className="mb-3"
             onClick={handleFormCancel}
           >
-            {t('locations.backs')}
+            {t('locations.back')}
           </Button>
           <LocationForm 
-            branch={currentBranch} 
+            location={currentBranch} 
             onSave={handleFormSave}
             onCancel={handleFormCancel}
           />
@@ -202,6 +211,15 @@ const Locations = () => {
                         <td>{getStatusBadge(branch.is_active)}</td>
                         <td>
                           <Button 
+                            variant="outline-primary" 
+                            size="sm" 
+                            className="me-1"
+                            title={t('locations.manageRooms')}
+                            onClick={() => handleManageRoomsClick(branch)}
+                          >
+                            <FontAwesomeIcon icon={faDoorOpen} />
+                          </Button>
+                          <Button 
                             variant="outline-secondary" 
                             size="sm" 
                             className="me-1"
@@ -228,6 +246,11 @@ const Locations = () => {
           </Card>
           
           {/* Delete Confirmation Modal */}
+          <RoomsModal
+            show={showRoomsModal}
+            branch={selectedBranch}
+            onClose={() => setShowRoomsModal(false)}
+          />
           <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
             <Modal.Header closeButton>
               <Modal.Title>{t('locations.delete')}</Modal.Title>
