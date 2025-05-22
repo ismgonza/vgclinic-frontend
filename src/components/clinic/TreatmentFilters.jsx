@@ -5,8 +5,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
 import patientsService from '../../services/patients.service';
-import usersService from '../../services/users.service';
 import locationsService from '../../services/locations.service';
+import treatmentsService from '../../services/treatments.service';
+
 
 const TreatmentFilters = ({ filters, onFiltersChange, onClearFilters }) => {
   const { t } = useTranslation();
@@ -27,15 +28,15 @@ const TreatmentFilters = ({ filters, onFiltersChange, onClearFilters }) => {
     const loadOptions = async () => {
       try {
         setLoadingOptions(true);
-        const [patientsData, usersData, branchesData] = await Promise.all([
-          patientsService.getPatients({ limit: 100 }), // Get first 100 for search
-          usersService.getUsers(),
+        const [patientsData, formOptionsData, branchesData] = await Promise.all([
+          patientsService.getPatients({ limit: 100 }),
+          treatmentsService.getFormOptions(), // Use same endpoint as form
           locationsService.getBranches()
         ]);
         
         setPatients(patientsData.results || patientsData);
-        setDoctors(usersData.filter(user => user.is_active)); // Only active users as doctors
-        setBranches(branchesData.filter(branch => branch.is_active)); // Only active branches
+        setDoctors(formOptionsData.doctors || []); // Use doctors from form options
+        setBranches(branchesData.filter(branch => branch.is_active));
       } catch (err) {
         console.error('Error loading filter options:', err);
       } finally {

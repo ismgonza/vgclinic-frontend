@@ -1,22 +1,18 @@
-// src/services/api.js
+// src/services/api.js - UPDATE the request interceptor
 import axios from 'axios';
 
 // Define base URL for API requests
 const API_URL = 'http://localhost:8000/api/';
-
-// Get token from localStorage if available
-const token = localStorage.getItem('token');
 
 // Create axios instance with default config
 const api = axios.create({
   baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
-    'Authorization': token ? `Bearer ${token}` : '',
   },
 });
 
-// Add a request interceptor to include auth token in all requests
+// Add a request interceptor to include auth token AND account context
 api.interceptors.request.use(
   (config) => {
     // Always get the latest token from localStorage for each request
@@ -27,6 +23,14 @@ api.interceptors.request.use(
     } else {
       console.warn(`API Request to ${config.url} with NO TOKEN`);
     }
+
+    // ADD ACCOUNT CONTEXT - Get selected account ID
+    const selectedAccountId = localStorage.getItem('selectedAccountId');
+    if (selectedAccountId) {
+      config.headers['X-Account-Context'] = selectedAccountId;
+      console.log(`API Request with Account Context: ${selectedAccountId}`);
+    }
+
     return config;
   },
   (error) => {

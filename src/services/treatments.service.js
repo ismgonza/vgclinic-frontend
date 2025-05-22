@@ -77,6 +77,15 @@ class TreatmentsService {
     }
   }
 
+  async getFormOptions() {
+    try {
+      const response = await api.get('/clinic/treatments/treatments/form_options/');
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   // Add note to treatment
   async addTreatmentNote(treatmentId, noteData) {
     try {

@@ -2,6 +2,7 @@
 import React, { useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, AuthContext } from './contexts/AuthContext';
+import { AccountProvider } from './contexts/AccountContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout/Layout';
 import Login from './pages/Login';
@@ -39,141 +40,60 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <Routes>
-          {/* Public routes - no layout */}
-          <Route path="/login" element={<Login />} />
-          
-          {/* Protected routes - for all authenticated users */}
-          <Route path="/dashboard" element={
-            <ProtectedRoute>
-              <Dashboard />
-            </ProtectedRoute>
-          } />
-          
-          {/* Platform administration routes - staff only */}
-          <Route path="/platform/accounts" element={
-            <ProtectedRoute>
-              <StaffRouteCheck>
-                <Accounts />
-              </StaffRouteCheck>
-            </ProtectedRoute>
-          } />
-          
-          {/* Users route */}
-          <Route path="/platform/users" element={
-            <ProtectedRoute>
-              <StaffRouteCheck>
-                <Users />
-              </StaffRouteCheck>
-            </ProtectedRoute>
-          } />
-          
-          {/* Services routes */}
-          <Route path="/platform/services" element={
-            <ProtectedRoute>
-              <StaffRouteCheck>
-                <Services />
-              </StaffRouteCheck>
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/platform/services/services" element={
-            <ProtectedRoute>
-              <StaffRouteCheck>
-                <ServicesList />
-              </StaffRouteCheck>
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/platform/services/features" element={
-            <ProtectedRoute>
-              <StaffRouteCheck>
-                <Features />
-              </StaffRouteCheck>
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/platform/services/plans" element={
-            <ProtectedRoute>
-              <StaffRouteCheck>
-                <Plans />
-              </StaffRouteCheck>
-            </ProtectedRoute>
-          } />
+        <AccountProvider>
+          <Routes>
+            {/* Public routes - no layout */}
+            <Route path="/login" element={<Login />} />
+            
+            {/* Protected routes - for all authenticated users */}
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            
+            {/* Platform administration routes - staff only */}
+            <Route path="/platform/accounts" element={<ProtectedRoute><StaffRouteCheck><Accounts /></StaffRouteCheck></ProtectedRoute>} />
+            
+            {/* Users route */}
+            <Route path="/platform/users" element={<ProtectedRoute><StaffRouteCheck><Users /></StaffRouteCheck></ProtectedRoute>} />
+            
+            {/* Services routes */}
+            <Route path="/platform/services" element={<ProtectedRoute><StaffRouteCheck><Services /></StaffRouteCheck></ProtectedRoute>} />
+            
+            <Route path="/platform/services/services" element={<ProtectedRoute><StaffRouteCheck><ServicesList /></StaffRouteCheck></ProtectedRoute>} />
 
-          <Route path="/platform/contracts" element={
-            <ProtectedRoute>
-              <StaffRouteCheck>
-                <Contracts />
-              </StaffRouteCheck>
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/clinic/locations" element={
-            <ProtectedRoute>
-                <Locations />
-            </ProtectedRoute>
-          } />
+            <Route path="/platform/services/features" element={<ProtectedRoute><StaffRouteCheck><Features /></StaffRouteCheck></ProtectedRoute>} />
 
-          <Route path="/clinic/catalog" element={
-            <ProtectedRoute>
-              <Catalog />
-            </ProtectedRoute>
-          } />
+            <Route path="/platform/services/plans" element={<ProtectedRoute><StaffRouteCheck><Plans /></StaffRouteCheck></ProtectedRoute>} />
 
-          <Route path="/clinic/catalog/specialties" element={
-            <ProtectedRoute>
-              <Specialties />
-            </ProtectedRoute>
-          } />
+            <Route path="/platform/contracts" element={<ProtectedRoute><StaffRouteCheck><Contracts /></StaffRouteCheck></ProtectedRoute>} />
 
-          <Route path="/clinic/catalog/items" element={
-            <ProtectedRoute>
-              <CatalogItems />
-            </ProtectedRoute>
-          } />
+            <Route path="/clinic/locations" element={<ProtectedRoute><Locations /></ProtectedRoute>} />
 
-          <Route path="/clinic/patients/edit/:id" element={
-            <ProtectedRoute>
-              <Patients />
-            </ProtectedRoute>
-          } />
+            <Route path="/clinic/catalog" element={<ProtectedRoute><Catalog /></ProtectedRoute>} />
 
-          <Route path="/clinic/patients/:id" element={
-            <ProtectedRoute>
-              <PatientDetail />
-            </ProtectedRoute>
-          } />
+            <Route path="/clinic/catalog/specialties" element={<ProtectedRoute><Specialties /></ProtectedRoute>} />
 
-          <Route path="/clinic/patients" element={
-            <ProtectedRoute>
-              <Patients />
-            </ProtectedRoute>
-          } />
+            <Route path="/clinic/catalog/items" element={<ProtectedRoute><CatalogItems /></ProtectedRoute>} />
 
-          <Route path="/clinic/treatments" element={
-            <ProtectedRoute>
-              <Treatments />
-            </ProtectedRoute>
-          } />
+            <Route path="/clinic/patients/edit/:id" element={<ProtectedRoute><Patients /></ProtectedRoute>} />
 
-          <Route path="/clinic/treatments/new" element={
-            <ProtectedRoute>
-              <NewTreatment />
-            </ProtectedRoute>
-          } />
+            <Route path="/clinic/patients/:id" element={<ProtectedRoute><PatientDetail /></ProtectedRoute>} />
 
-          {/* Redirect root to dashboard or login */}
-          <Route path="/" element={<Navigate to="/dashboard" />} />
-          
-          {/* 404 route */}
-          <Route path="*" element={
-            <div className="text-center mt-5">
-              <h1>404 - Page Not Found</h1>
-              <p>The page you're looking for doesn't exist.</p>
-            </div>
-          } />
-        </Routes>
+            <Route path="/clinic/patients" element={<ProtectedRoute><Patients /></ProtectedRoute>} />
+
+            <Route path="/clinic/treatments" element={<ProtectedRoute><Treatments /></ProtectedRoute>} />
+
+            <Route path="/clinic/treatments/new" element={<ProtectedRoute><NewTreatment /></ProtectedRoute>} />
+            {/* Redirect root to dashboard or login */}
+            <Route path="/" element={<Navigate to="/dashboard" />} />
+            
+            {/* 404 route */}
+            <Route path="*" element={
+              <div className="text-center mt-5">
+                <h1>404 - Page Not Found</h1>
+                <p>The page you're looking for doesn't exist.</p>
+              </div>
+            } />
+          </Routes>
+        </AccountProvider>
       </AuthProvider>
     </Router>
   );

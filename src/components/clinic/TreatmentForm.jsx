@@ -8,6 +8,7 @@ import patientsService from '../../services/patients.service';
 import catalogService from '../../services/catalog.service';
 import usersService from '../../services/users.service';
 import locationsService from '../../services/locations.service';
+import treatmentsService from '../../services/treatments.service';
 
 const TreatmentForm = ({ treatment, onSave, onCancel }) => {
   const { t } = useTranslation();
@@ -48,18 +49,18 @@ const TreatmentForm = ({ treatment, onSave, onCancel }) => {
     const loadOptions = async () => {
       try {
         setLoadingOptions(true);
-        const [patientsData, catalogData, specialtiesData, usersData, branchesData] = await Promise.all([
+        const [patientsData, catalogData, specialtiesData, formOptionsData, branchesData] = await Promise.all([
           patientsService.getPatients({ limit: 100 }),
           catalogService.getCatalogItems(),
           catalogService.getSpecialties(),
-          usersService.getUsers(),
+          treatmentsService.getFormOptions(), // NEW - use treatment service for doctors
           locationsService.getBranches()
         ]);
         
         setPatients(patientsData.results || patientsData);
         setCatalogItems(catalogData);
         setSpecialties(specialtiesData);
-        setDoctors(usersData.filter(user => user.is_active));
+        setDoctors(formOptionsData.doctors || []); // Use doctors from form options
         setBranches(branchesData.filter(branch => branch.is_active));
       } catch (err) {
         console.error('Error loading form options:', err);

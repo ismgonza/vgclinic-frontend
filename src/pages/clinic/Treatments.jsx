@@ -1,10 +1,11 @@
 // src/pages/clinic/Treatments.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Container, Row, Col, Card, Button, Spinner, Alert } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { AccountContext } from '../../contexts/AccountContext';
 import treatmentsService from '../../services/treatments.service';
 import TreatmentFilters from '../../components/clinic/TreatmentFilters';
 import TreatmentsList from '../../components/clinic/TreatmentsList';
@@ -13,6 +14,7 @@ const Treatments = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
+  const { selectedAccount } = useContext(AccountContext);
   
   // State
   const [treatments, setTreatments] = useState([]);
@@ -46,6 +48,13 @@ const Treatments = () => {
     setFilters(newFilters);
   }, [location.search]);
 
+  useEffect(() => {
+    if (selectedAccount) {
+      console.log('Account changed, refetching treatments for:', selectedAccount.account_name);
+      fetchTreatments();
+    }
+  }, [selectedAccount]);
+
   // Fetch treatments
   useEffect(() => {
     fetchTreatments();
@@ -61,10 +70,10 @@ const Treatments = () => {
       if (filters.patient) params.patient = filters.patient;
       if (filters.status.length > 0) params.status = filters.status.join(',');
       if (filters.doctor.length > 0) params.doctor = filters.doctor.join(',');
-      if (filters.branch) params.branch = filters.branch;
+      if (filters.branch) params.location = filters.branch; // NOTE: using 'location' instead of 'branch'
       if (filters.date_from) params.start_date = filters.date_from;
       if (filters.date_to) params.end_date = filters.date_to;
-      
+        
       const data = await treatmentsService.getTreatments(params);
       setTreatments(data.results || data);
     } catch (err) {

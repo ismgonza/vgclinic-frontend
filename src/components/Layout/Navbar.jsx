@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faSignOutAlt, faGlobe } from '@fortawesome/free-solid-svg-icons';
 import { AuthContext } from '../../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
+import AccountSelector from '../common/AccountSelector';
 import './Navbar.css';
 
 const AppNavbar = () => {
@@ -78,6 +79,11 @@ const AppNavbar = () => {
               </>
             )}
           </Nav>
+          {/* ADD AccountSelector between Nav sections */}
+          <div className="d-flex align-items-center me-3">
+            <AccountSelector />
+          </div>
+          
           <Nav>
             <NavDropdown 
               title={
