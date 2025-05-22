@@ -1,16 +1,18 @@
 // src/pages/clinic/catalog/CatalogItems.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Container, Row, Col, Card, Button, Spinner, Alert, Modal } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
+import { AccountContext } from '../../../contexts/AccountContext';
 import catalogService from '../../../services/catalog.service';
 import CatalogItemForm from '../../../components/clinic/catalog/CatalogItemForm';
 import CatalogItemsList from '../../../components/clinic/catalog/CatalogItemsList';
 
 const CatalogItems = () => {
   const { t } = useTranslation();
+  const { selectedAccount } = useContext(AccountContext);
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const specialtyId = queryParams.get('specialty');
@@ -25,25 +27,46 @@ const CatalogItems = () => {
   const [itemToDelete, setItemToDelete] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
 
+  // Fetch data when component mounts or account changes
   useEffect(() => {
-    fetchData();
-  }, [specialtyId]);
+    if (selectedAccount) {
+      fetchData();
+    } else {
+      // Clear data if no account selected
+      setItems([]);
+      setSpecialty(null);
+      setLoading(false);
+    }
+  }, [specialtyId, selectedAccount]);
 
   const fetchData = async () => {
+    if (!selectedAccount) return;
+    
     try {
       setLoading(true);
+      setError(null);
+      
+      // Set account context for API calls
+      const accountHeaders = {
+        'X-Account-Context': selectedAccount.account_id
+      };
       
       // Fetch items (filtered by specialty if specialtyId is provided)
-      const itemsData = await catalogService.getCatalogItems(specialtyId);
+      const itemsData = await catalogService.getCatalogItems(specialtyId, accountHeaders);
       setItems(itemsData);
       
       // If specialtyId is provided, fetch the specialty details
       if (specialtyId) {
-        const specialtyData = await catalogService.getSpecialty(specialtyId);
+        const specialtyData = await catalogService.getSpecialty(specialtyId, accountHeaders);
         setSpecialty(specialtyData);
       }
       
-      setError(null);
+      console.log('Loaded catalog items for account:', selectedAccount.account_name);
+      console.log('Items count:', itemsData.length);
+      if (specialtyId) {
+        console.log('Filtered by specialty:', specialtyData?.name);
+      }
+      
     } catch (err) {
       console.error('Error fetching catalog items:', err);
       setError(t('common.errorLoading'));
@@ -69,7 +92,11 @@ const CatalogItems = () => {
 
   const handleDeleteConfirm = async () => {
     try {
-      await catalogService.deleteCatalogItem(itemToDelete.id);
+      const accountHeaders = selectedAccount ? {
+        'X-Account-Context': selectedAccount.account_id
+      } : {};
+      
+      await catalogService.deleteCatalogItem(itemToDelete.id, accountHeaders);
       setItems(items.filter(i => i.id !== itemToDelete.id));
       setShowDeleteModal(false);
       setItemToDelete(null);
@@ -83,10 +110,14 @@ const CatalogItems = () => {
 
   const handleFormSave = async (formData) => {
     try {
+      const accountHeaders = selectedAccount ? {
+        'X-Account-Context': selectedAccount.account_id
+      } : {};
+      
       if (currentItem) {
-        await catalogService.updateCatalogItem(currentItem.id, formData);
+        await catalogService.updateCatalogItem(currentItem.id, formData, accountHeaders);
       } else {
-        await catalogService.createCatalogItem(formData);
+        await catalogService.createCatalogItem(formData, accountHeaders);
       }
       
       await fetchData();
@@ -103,6 +134,22 @@ const CatalogItems = () => {
   const handleFormCancel = () => {
     setShowForm(false);
   };
+
+  // Show message if no account selected
+  if (!selectedAccount) {
+    return (
+      <Container fluid className="py-4">
+        <Row className="mb-4">
+          <Col>
+            <h1 className="h3">{t('catalog.itemsTitle')}</h1>
+          </Col>
+        </Row>
+        <Alert variant="info">
+          {t('catalog.selectAccountFirst') || 'Please select a clinic first to manage catalog items.'}
+        </Alert>
+      </Container>
+    );
+  }
 
   return (
     <Container fluid className="py-4">
@@ -151,6 +198,12 @@ const CatalogItems = () => {
                 </ol>
               </nav>
               <p className="text-muted">{t('catalog.itemsDescription')}</p>
+              {selectedAccount && (
+                <p className="text-muted">
+                  <strong>Clinic:</strong> {selectedAccount.account_name}
+                  {specialty && <span> | <strong>Specialty:</strong> {specialty.name}</span>}
+                </p>
+              )}
             </Col>
             <Col xs="auto">
               {specialty && (

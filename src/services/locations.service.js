@@ -3,45 +3,45 @@ import api from './api';
 
 class LocationsService {
   // Branches
-  async getBranches() {
+  async getBranches(headers = {}) {
     try {
-      const response = await api.get('/clinic/locations/branches/');
+      const response = await api.get('/clinic/locations/branches/', { headers });
       return response.data;
     } catch (error) {
       throw error;
     }
   }
 
-  async getBranch(id) {
+  async getBranch(id, headers = {}) {
     try {
-      const response = await api.get(`/clinic/locations/branches/${id}/`);
+      const response = await api.get(`/clinic/locations/branches/${id}/`, { headers });
       return response.data;
     } catch (error) {
       throw error;
     }
   }
 
-  async createBranch(branchData) {
+  async createBranch(branchData, headers = {}) {
     try {
-      const response = await api.post('/clinic/locations/branches/', branchData);
+      const response = await api.post('/clinic/locations/branches/', branchData, { headers });
       return response.data;
     } catch (error) {
       throw error;
     }
   }
 
-  async updateBranch(id, branchData) {
+  async updateBranch(id, branchData, headers = {}) {
     try {
-      const response = await api.put(`/clinic/locations/branches/${id}/`, branchData);
+      const response = await api.put(`/clinic/locations/branches/${id}/`, branchData, { headers });
       return response.data;
     } catch (error) {
       throw error;
     }
   }
 
-  async deleteBranch(id) {
+  async deleteBranch(id, headers = {}) {
     try {
-      await api.delete(`/clinic/locations/branches/${id}/`);
+      await api.delete(`/clinic/locations/branches/${id}/`, { headers });
       return true;
     } catch (error) {
       throw error;
@@ -49,49 +49,49 @@ class LocationsService {
   }
 
   // Rooms
-  async getRooms(branchId = null) {
+  async getRooms(branchId = null, headers = {}) {
     try {
       let url = '/clinic/locations/rooms/';
       if (branchId) {
         url += `?branch=${branchId}`;
       }
-      const response = await api.get(url);
+      const response = await api.get(url, { headers });
       return response.data;
     } catch (error) {
       throw error;
     }
   }
 
-  async getRoom(id) {
+  async getRoom(id, headers = {}) {
     try {
-      const response = await api.get(`/clinic/locations/rooms/${id}/`);
+      const response = await api.get(`/clinic/locations/rooms/${id}/`, { headers });
       return response.data;
     } catch (error) {
       throw error;
     }
   }
 
-  async createRoom(roomData) {
+  async createRoom(roomData, headers = {}) {
     try {
-      const response = await api.post('/clinic/locations/rooms/', roomData);
+      const response = await api.post('/clinic/locations/rooms/', roomData, { headers });
       return response.data;
     } catch (error) {
       throw error;
     }
   }
 
-  async updateRoom(id, roomData) {
+  async updateRoom(id, roomData, headers = {}) {
     try {
-      const response = await api.put(`/clinic/locations/rooms/${id}/`, roomData);
+      const response = await api.put(`/clinic/locations/rooms/${id}/`, roomData, { headers });
       return response.data;
     } catch (error) {
       throw error;
     }
   }
 
-  async deleteRoom(id) {
+  async deleteRoom(id, headers = {}) {
     try {
-      await api.delete(`/clinic/locations/rooms/${id}/`);
+      await api.delete(`/clinic/locations/rooms/${id}/`, { headers });
       return true;
     } catch (error) {
       throw error;

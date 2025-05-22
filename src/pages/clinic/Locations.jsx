@@ -1,9 +1,10 @@
 // src/pages/clinic/Locations.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Container, Row, Col, Card, Table, Button, Badge, Spinner, Alert, Modal } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faEdit, faTrash, faMapMarkerAlt, faPhone, faEnvelope, faDoorOpen } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
+import { AccountContext } from '../../contexts/AccountContext';
 import locationsService from '../../services/locations.service';
 import LocationForm from '../../components/clinic/LocationForm';
 import RoomsModal from '../../components/clinic/RoomsModal';
@@ -11,6 +12,7 @@ import RoomsModal from '../../components/clinic/RoomsModal';
 
 const Locations = () => {
   const { t } = useTranslation();
+  const { selectedAccount } = useContext(AccountContext);
   const [branches, setBranches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -22,16 +24,35 @@ const Locations = () => {
   const [showRoomsModal, setShowRoomsModal] = useState(false);
   const [selectedBranch, setSelectedBranch] = useState(null);
 
+  // Fetch branches when component mounts or account changes
   useEffect(() => {
-    fetchBranches();
-  }, []);
+    if (selectedAccount) {
+      fetchBranches();
+    } else {
+      // Clear branches if no account selected
+      setBranches([]);
+      setLoading(false);
+    }
+  }, [selectedAccount]);
 
   const fetchBranches = async () => {
+    if (!selectedAccount) return;
+    
     try {
       setLoading(true);
-      const data = await locationsService.getBranches();
-      setBranches(data);
       setError(null);
+      
+      // Set account context for API call
+      const accountHeaders = {
+        'X-Account-Context': selectedAccount.account_id
+      };
+      
+      const data = await locationsService.getBranches(accountHeaders);
+      setBranches(data);
+      
+      console.log('Loaded branches for account:', selectedAccount.account_name);
+      console.log('Branches count:', data.length);
+      
     } catch (err) {
       console.error('Error fetching branches:', err);
       setError('Error loading locations. Please try again.');
@@ -95,6 +116,22 @@ const Locations = () => {
     setShowRoomsModal(true);
   };
 
+  // Show message if no account selected
+  if (!selectedAccount) {
+    return (
+      <Container fluid className="py-4">
+        <Row className="mb-4">
+          <Col>
+            <h1 className="h3">{t('locations.title')}</h1>
+          </Col>
+        </Row>
+        <Alert variant="info">
+          {t('locations.selectAccountFirst') || 'Please select a clinic first to view locations.'}
+        </Alert>
+      </Container>
+    );
+  }
+
   return (
     <Container fluid className="py-4">
       {showForm ? (
@@ -142,6 +179,7 @@ const Locations = () => {
           <Card>
             <Card.Header>
               <div className="d-flex justify-content-between align-items-center">
+                {/* <span><strong>{selectedAccount.account_name}</strong>: {t('locations.locationsListTitle')}</span> */}
                 <span>{t('locations.locationsListTitle')}</span>
                 <div>
                   {/* Add filter/search controls here in the future */}
@@ -251,6 +289,7 @@ const Locations = () => {
             branch={selectedBranch}
             onClose={() => setShowRoomsModal(false)}
           />
+          
           <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
             <Modal.Header closeButton>
               <Modal.Title>{t('locations.delete')}</Modal.Title>

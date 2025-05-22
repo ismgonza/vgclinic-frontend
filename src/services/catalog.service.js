@@ -3,46 +3,45 @@ import api from './api';
 
 class CatalogService {
   // Specialties
-  async getSpecialties() {
+  async getSpecialties(headers = {}) {
     try {
-      // Change this URL to match Django's URL structure
-      const response = await api.get('/clinic/catalog/specialties/');
+      const response = await api.get('/clinic/catalog/specialties/', { headers });
       return response.data;
     } catch (error) {
       throw error;
     }
   }
 
-  async getSpecialty(id) {
+  async getSpecialty(id, headers = {}) {
     try {
-      const response = await api.get(`/clinic/catalog/specialties/${id}/`);
+      const response = await api.get(`/clinic/catalog/specialties/${id}/`, { headers });
       return response.data;
     } catch (error) {
       throw error;
     }
   }
 
-  async createSpecialty(specialtyData) {
+  async createSpecialty(specialtyData, headers = {}) {
     try {
-      const response = await api.post('/clinic/catalog/specialties/', specialtyData);
+      const response = await api.post('/clinic/catalog/specialties/', specialtyData, { headers });
       return response.data;
     } catch (error) {
       throw error;
     }
   }
 
-  async updateSpecialty(id, specialtyData) {
+  async updateSpecialty(id, specialtyData, headers = {}) {
     try {
-      const response = await api.put(`/clinic/catalog/specialties/${id}/`, specialtyData);
+      const response = await api.put(`/clinic/catalog/specialties/${id}/`, specialtyData, { headers });
       return response.data;
     } catch (error) {
       throw error;
     }
   }
 
-  async deleteSpecialty(id) {
+  async deleteSpecialty(id, headers = {}) {
     try {
-      await api.delete(`/clinic/catalog/specialties/${id}/`);
+      await api.delete(`/clinic/catalog/specialties/${id}/`, { headers });
       return true;
     } catch (error) {
       throw error;
@@ -50,49 +49,49 @@ class CatalogService {
   }
 
   // Catalog Items
-  async getCatalogItems(specialtyId = null) {
+  async getCatalogItems(specialtyId = null, headers = {}) {
     try {
       let url = '/clinic/catalog/catalog-items/';
       if (specialtyId) {
         url += `?specialty=${specialtyId}`;
       }
-      const response = await api.get(url);
+      const response = await api.get(url, { headers });
       return response.data;
     } catch (error) {
       throw error;
     }
   }
 
-  async getCatalogItem(id) {
+  async getCatalogItem(id, headers = {}) {
     try {
-      const response = await api.get(`/clinic/catalog/catalog-items/${id}/`);
+      const response = await api.get(`/clinic/catalog/catalog-items/${id}/`, { headers });
       return response.data;
     } catch (error) {
       throw error;
     }
   }
 
-  async createCatalogItem(itemData) {
+  async createCatalogItem(itemData, headers = {}) {
     try {
-      const response = await api.post('/clinic/catalog/catalog-items/', itemData);
+      const response = await api.post('/clinic/catalog/catalog-items/', itemData, { headers });
       return response.data;
     } catch (error) {
       throw error;
     }
   }
 
-  async updateCatalogItem(id, itemData) {
+  async updateCatalogItem(id, itemData, headers = {}) {
     try {
-      const response = await api.put(`/clinic/catalog/catalog-items/${id}/`, itemData);
+      const response = await api.put(`/clinic/catalog/catalog-items/${id}/`, itemData, { headers });
       return response.data;
     } catch (error) {
       throw error;
     }
   }
 
-  async deleteCatalogItem(id) {
+  async deleteCatalogItem(id, headers = {}) {
     try {
-      await api.delete(`/clinic/catalog/catalog-items/${id}/`);
+      await api.delete(`/clinic/catalog/catalog-items/${id}/`, { headers });
       return true;
     } catch (error) {
       throw error;

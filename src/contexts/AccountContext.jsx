@@ -29,16 +29,36 @@ export const AccountProvider = ({ children }) => {
     }
   }, [currentUser]);
 
-  // Load accounts from localStorage on mount
+  // Handle account selection after accounts are loaded
   useEffect(() => {
-    const savedAccountId = localStorage.getItem('selectedAccountId');
-    if (savedAccountId && userAccounts.length > 0) {
-      const savedAccount = userAccounts.find(acc => acc.account_id === savedAccountId);
-      if (savedAccount) {
-        setSelectedAccount(savedAccount);
+    if (userAccounts.length > 0 && !selectedAccount) {
+      const savedAccountId = localStorage.getItem('selectedAccountId');
+      
+      if (savedAccountId) {
+        // Try to find the saved account (convert both to strings for comparison)
+        const savedAccount = userAccounts.find(acc => 
+          String(acc.account_id) === String(savedAccountId)
+        );
+        
+        if (savedAccount) {
+          console.log('Restoring saved account:', savedAccount.account_name);
+          setSelectedAccount(savedAccount);
+        } else {
+          // Saved account not found, auto-select first account
+          console.log('Saved account not found, selecting first account');
+          const firstAccount = userAccounts[0];
+          setSelectedAccount(firstAccount);
+          localStorage.setItem('selectedAccountId', String(firstAccount.account_id));
+        }
+      } else {
+        // No saved account, auto-select first account
+        console.log('No saved account, selecting first account');
+        const firstAccount = userAccounts[0];
+        setSelectedAccount(firstAccount);
+        localStorage.setItem('selectedAccountId', String(firstAccount.account_id));
       }
     }
-  }, [userAccounts]);
+  }, [userAccounts, selectedAccount]);
 
   const loadUserAccounts = async () => {
     try {
@@ -47,26 +67,22 @@ export const AccountProvider = ({ children }) => {
       
       // Get accounts the user has access to
       const accounts = await accountsService.getAccounts();
+      console.log('Loaded user accounts:', accounts);
       setUserAccounts(accounts);
-      
-      // Auto-select first account if none selected
-      if (accounts.length > 0 && !selectedAccount) {
-        const firstAccount = accounts[0];
-        setSelectedAccount(firstAccount);
-        localStorage.setItem('selectedAccountId', firstAccount.account_id);
-      }
       
     } catch (err) {
       console.error('Error loading user accounts:', err);
       setError('Failed to load accounts');
+      setLoading(false);
     } finally {
       setLoading(false);
     }
   };
 
   const switchAccount = (account) => {
+    console.log('Switching to account:', account.account_name);
     setSelectedAccount(account);
-    localStorage.setItem('selectedAccountId', account.account_id);
+    localStorage.setItem('selectedAccountId', String(account.account_id));
   };
 
   const clearAccount = () => {

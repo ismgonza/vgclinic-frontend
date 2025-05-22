@@ -1,11 +1,13 @@
 // src/components/clinic/catalog/SpecialtyForm.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Form, Button, Row, Col, Card, Alert } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
+import { AccountContext } from '../../../contexts/AccountContext';
 import accountsService from '../../../services/accounts.service';
 
 const SpecialtyForm = ({ specialty, onSave, onCancel }) => {
   const { t } = useTranslation();
+  const { selectedAccount } = useContext(AccountContext);
   const [accounts, setAccounts] = useState([]);
   const [formData, setFormData] = useState({
     account: '',
@@ -18,8 +20,8 @@ const SpecialtyForm = ({ specialty, onSave, onCancel }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Load accounts only if needed (shouldn't be needed anymore, but keep for backward compatibility)
   useEffect(() => {
-    // Fetch accounts for dropdown
     const fetchAccounts = async () => {
       try {
         const data = await accountsService.getAccounts();
@@ -28,11 +30,17 @@ const SpecialtyForm = ({ specialty, onSave, onCancel }) => {
         console.error('Error fetching accounts:', err);
       }
     };
-    fetchAccounts();
-  }, []);
+    
+    // Only fetch accounts if we don't have selectedAccount (fallback)
+    if (!selectedAccount) {
+      fetchAccounts();
+    }
+  }, [selectedAccount]);
 
+  // Initialize form data
   useEffect(() => {
     if (specialty) {
+      // Editing existing specialty
       setFormData({
         account: specialty.account || '',
         name: specialty.name || '',
@@ -40,8 +48,17 @@ const SpecialtyForm = ({ specialty, onSave, onCancel }) => {
         description: specialty.description || '',
         is_active: specialty.is_active !== undefined ? specialty.is_active : true
       });
+    } else if (selectedAccount) {
+      // Creating new specialty - auto-select current account
+      setFormData({
+        account: selectedAccount.account_id,
+        name: '',
+        code: '',
+        description: '',
+        is_active: true
+      });
     }
-  }, [specialty]);
+  }, [specialty, selectedAccount]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -79,6 +96,25 @@ const SpecialtyForm = ({ specialty, onSave, onCancel }) => {
     }
   };
 
+  // Show error if no account selected
+  if (!selectedAccount) {
+    return (
+      <Card>
+        <Card.Header>
+          {specialty ? t('catalog.editSpecialty') : t('catalog.newSpecialty')}
+        </Card.Header>
+        <Card.Body>
+          <Alert variant="warning">
+            {t('catalog.selectAccountFirst') || 'Please select a clinic first to manage specialties.'}
+          </Alert>
+          <Button variant="secondary" onClick={onCancel}>
+            {t('common.back')}
+          </Button>
+        </Card.Body>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <Card.Header>
@@ -86,29 +122,22 @@ const SpecialtyForm = ({ specialty, onSave, onCancel }) => {
       </Card.Header>
       <Card.Body>
         {error && <Alert variant="danger">{error}</Alert>}
+        
         <Form onSubmit={handleSubmit}>
-          <Form.Group as={Row} className="mb-3">
-            <Form.Label column sm={3}>{t('catalog.account')}</Form.Label>
-            <Col sm={9}>
-              <Form.Select
-                name="account"
-                value={formData.account}
-                onChange={handleChange}
-                isInvalid={!!errors.account}
-                required
-              >
-                <option value="">{t('catalog.selectAccount')}</option>
-                {accounts.map(account => (
-                  <option key={account.account_id} value={account.account_id}>
-                    {account.account_name}
-                  </option>
-                ))}
-              </Form.Select>
-              <Form.Control.Feedback type="invalid">
-                {errors.account}
-              </Form.Control.Feedback>
-            </Col>
-          </Form.Group>
+          {/* Hide account selection for editing, show as disabled for creating */}
+          {!specialty && (
+            <Form.Group as={Row} className="mb-3">
+              <Form.Label column sm={3}>{t('catalog.account')}</Form.Label>
+              <Col sm={9}>
+                <Form.Control
+                  type="text"
+                  value={selectedAccount.account_name}
+                  disabled
+                  className="bg-light"
+                />
+              </Col>
+            </Form.Group>
+          )}
 
           <Form.Group as={Row} className="mb-3">
             <Form.Label column sm={3}>{t('catalog.name')}</Form.Label>

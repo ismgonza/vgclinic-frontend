@@ -1,16 +1,18 @@
 // src/pages/clinic/catalog/Specialties.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Container, Row, Col, Card, Button, Spinner, Alert, Modal } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { AccountContext } from '../../../contexts/AccountContext';
 import catalogService from '../../../services/catalog.service';
 import SpecialtyForm from '../../../components/clinic/catalog/SpecialtyForm';
 import SpecialtiesList from '../../../components/clinic/catalog/SpecialtiesList';
 
 const Specialties = () => {
   const { t } = useTranslation();
+  const { selectedAccount } = useContext(AccountContext);
   const [specialties, setSpecialties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -20,16 +22,35 @@ const Specialties = () => {
   const [specialtyToDelete, setSpecialtyToDelete] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
 
+  // Fetch specialties when component mounts or account changes
   useEffect(() => {
-    fetchSpecialties();
-  }, []);
+    if (selectedAccount) {
+      fetchSpecialties();
+    } else {
+      // Clear specialties if no account selected
+      setSpecialties([]);
+      setLoading(false);
+    }
+  }, [selectedAccount]);
 
   const fetchSpecialties = async () => {
+    if (!selectedAccount) return;
+    
     try {
       setLoading(true);
-      const data = await catalogService.getSpecialties();
-      setSpecialties(data);
       setError(null);
+      
+      // Set account context for API call
+      const accountHeaders = {
+        'X-Account-Context': selectedAccount.account_id
+      };
+      
+      const data = await catalogService.getSpecialties(accountHeaders);
+      setSpecialties(data);
+      
+      console.log('Loaded specialties for account:', selectedAccount.account_name);
+      console.log('Specialties count:', data.length);
+      
     } catch (err) {
       console.error('Error fetching specialties:', err);
       setError(t('common.errorLoading'));
@@ -60,7 +81,11 @@ const Specialties = () => {
 
   const handleDeleteConfirm = async () => {
     try {
-      await catalogService.deleteSpecialty(specialtyToDelete.id);
+      const accountHeaders = selectedAccount ? {
+        'X-Account-Context': selectedAccount.account_id
+      } : {};
+      
+      await catalogService.deleteSpecialty(specialtyToDelete.id, accountHeaders);
       setSpecialties(specialties.filter(s => s.id !== specialtyToDelete.id));
       setShowDeleteModal(false);
       setSpecialtyToDelete(null);
@@ -74,10 +99,14 @@ const Specialties = () => {
 
   const handleFormSave = async (formData) => {
     try {
+      const accountHeaders = selectedAccount ? {
+        'X-Account-Context': selectedAccount.account_id
+      } : {};
+      
       if (currentSpecialty) {
-        await catalogService.updateSpecialty(currentSpecialty.id, formData);
+        await catalogService.updateSpecialty(currentSpecialty.id, formData, accountHeaders);
       } else {
-        await catalogService.createSpecialty(formData);
+        await catalogService.createSpecialty(formData, accountHeaders);
       }
       
       await fetchSpecialties();
@@ -94,6 +123,22 @@ const Specialties = () => {
   const handleFormCancel = () => {
     setShowForm(false);
   };
+
+  // Show message if no account selected
+  if (!selectedAccount) {
+    return (
+      <Container fluid className="py-4">
+        <Row className="mb-4">
+          <Col>
+            <h1 className="h3">{t('catalog.specialtiesTitle')}</h1>
+          </Col>
+        </Row>
+        <Alert variant="info">
+          {t('catalog.selectAccountFirst') || 'Please select a clinic first to manage specialties.'}
+        </Alert>
+      </Container>
+    );
+  }
 
   return (
     <Container fluid className="py-4">
@@ -128,6 +173,11 @@ const Specialties = () => {
                 </ol>
               </nav>
               <p className="text-muted">{t('catalog.specialtiesDescription')}</p>
+              {selectedAccount && (
+                <p className="text-muted">
+                  <strong>Clinic:</strong> {selectedAccount.account_name}
+                </p>
+              )}
             </Col>
             <Col xs="auto">
               <Button variant="primary" onClick={handleAddClick}>

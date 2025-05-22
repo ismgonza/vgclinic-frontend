@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Form, Button, Row, Col, Card, Alert } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
+import { AccountContext } from '../../contexts/AccountContext';
 import locationsService from '../../services/locations.service';
 import accountsService from '../../services/accounts.service';
 import CostaRicaGeoSelector from '../common/CostaRicaGeoSelector';
 
 const LocationForm = ({ location, onSave, onCancel }) => {
   const { t } = useTranslation();
+  const { selectedAccount } = useContext(AccountContext);
   const [accounts, setAccounts] = useState([]);
   const [formData, setFormData] = useState({
     account: '',
@@ -23,8 +25,8 @@ const LocationForm = ({ location, onSave, onCancel }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Load accounts only if needed (shouldn't be needed anymore, but keep for backward compatibility)
   useEffect(() => {
-    // Fetch accounts for dropdown
     const fetchAccounts = async () => {
       try {
         const data = await accountsService.getAccounts();
@@ -33,11 +35,17 @@ const LocationForm = ({ location, onSave, onCancel }) => {
         console.error('Error fetching accounts:', err);
       }
     };
-    fetchAccounts();
-  }, []);
+    
+    // Only fetch accounts if we don't have selectedAccount (fallback)
+    if (!selectedAccount) {
+      fetchAccounts();
+    }
+  }, [selectedAccount]);
 
+  // Initialize form data
   useEffect(() => {
     if (location) {
+      // Editing existing location
       setFormData({
         account: location.account || '',
         name: location.name || '',
@@ -49,8 +57,21 @@ const LocationForm = ({ location, onSave, onCancel }) => {
         address: location.address || '',
         is_active: location.is_active !== undefined ? location.is_active : true
       });
+    } else if (selectedAccount) {
+      // Creating new location - auto-select current account
+      setFormData({
+        account: selectedAccount.account_id,
+        name: '',
+        email: '',
+        phone: '',
+        province: '',
+        canton: '',
+        district: '',
+        address: '',
+        is_active: true
+      });
     }
-  }, [location]);
+  }, [location, selectedAccount]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -92,10 +113,15 @@ const LocationForm = ({ location, onSave, onCancel }) => {
       setLoading(true);
       setError(null);
       
+      // Set account context for API calls
+      const accountHeaders = selectedAccount ? {
+        'X-Account-Context': selectedAccount.account_id
+      } : {};
+      
       if (location) {
-        await locationsService.updateBranch(location.id, formData);
+        await locationsService.updateBranch(location.id, formData, accountHeaders);
       } else {
-        await locationsService.createBranch(formData);
+        await locationsService.createBranch(formData, accountHeaders);
       }
       
       if (onSave) onSave();
@@ -107,6 +133,25 @@ const LocationForm = ({ location, onSave, onCancel }) => {
     }
   };
 
+  // Show error if no account selected
+  if (!selectedAccount) {
+    return (
+      <Card>
+        <Card.Header>
+          {location ? t('locations.editLocation') : t('locations.newLocation')}
+        </Card.Header>
+        <Card.Body>
+          <Alert variant="warning">
+            {t('locations.selectAccountFirst') || 'Please select a clinic first to manage locations.'}
+          </Alert>
+          <Button variant="secondary" onClick={onCancel}>
+            {t('common.back')}
+          </Button>
+        </Card.Body>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <Card.Header>
@@ -114,28 +159,22 @@ const LocationForm = ({ location, onSave, onCancel }) => {
       </Card.Header>
       <Card.Body>
         {error && <Alert variant="danger">{error}</Alert>}
+        
         <Form onSubmit={handleSubmit}>
-          <Form.Group as={Row} className="mb-3">
-            <Form.Label column sm={3}>{t('accounts.accountName')}</Form.Label>
-            <Col sm={9}>
-              <Form.Select
-                name="account"
-                value={formData.account}
-                onChange={handleChange}
-                isInvalid={!!errors.account}
-              >
-                <option value="">{t('accounts.selectAccount')}</option>
-                {accounts.map(account => (
-                  <option key={account.account_id} value={account.account_id}>
-                    {account.account_name}
-                  </option>
-                ))}
-              </Form.Select>
-              <Form.Control.Feedback type="invalid">
-                {errors.account}
-              </Form.Control.Feedback>
-            </Col>
-          </Form.Group>
+          {/* Hide account selection for editing, show as disabled for creating */}
+          {!location && (
+            <Form.Group as={Row} className="mb-3">
+              <Form.Label column sm={3}>{t('accounts.accountName')}</Form.Label>
+              <Col sm={9}>
+                <Form.Control
+                  type="text"
+                  value={selectedAccount.account_name}
+                  disabled
+                  className="bg-light"
+                />
+              </Col>
+            </Form.Group>
+          )}
 
           <Form.Group as={Row} className="mb-3">
             <Form.Label column sm={3}>{t('locations.locationName')}</Form.Label>

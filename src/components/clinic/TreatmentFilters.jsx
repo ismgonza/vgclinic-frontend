@@ -1,9 +1,10 @@
 // src/components/clinic/TreatmentFilters.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Row, Col, Form, Button, InputGroup } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
+import { AccountContext } from '../../contexts/AccountContext';
 import patientsService from '../../services/patients.service';
 import locationsService from '../../services/locations.service';
 import treatmentsService from '../../services/treatments.service';
@@ -11,6 +12,7 @@ import treatmentsService from '../../services/treatments.service';
 
 const TreatmentFilters = ({ filters, onFiltersChange, onClearFilters }) => {
   const { t } = useTranslation();
+  const { selectedAccount } = useContext(AccountContext);
   
   // Options for dropdowns
   const [patients, setPatients] = useState([]);
@@ -23,29 +25,50 @@ const TreatmentFilters = ({ filters, onFiltersChange, onClearFilters }) => {
   const [showPatientDropdown, setShowPatientDropdown] = useState(false);
   const [filteredPatients, setFilteredPatients] = useState([]);
 
-  // Load dropdown options
+  // Load dropdown options - reload when account changes
   useEffect(() => {
-    const loadOptions = async () => {
-      try {
-        setLoadingOptions(true);
-        const [patientsData, formOptionsData, branchesData] = await Promise.all([
-          patientsService.getPatients({ limit: 100 }),
-          treatmentsService.getFormOptions(), // Use same endpoint as form
-          locationsService.getBranches()
-        ]);
-        
-        setPatients(patientsData.results || patientsData);
-        setDoctors(formOptionsData.doctors || []); // Use doctors from form options
-        setBranches(branchesData.filter(branch => branch.is_active));
-      } catch (err) {
-        console.error('Error loading filter options:', err);
-      } finally {
-        setLoadingOptions(false);
-      }
-    };
+    if (selectedAccount) {
+      loadOptions();
+    } else {
+      // Clear options if no account selected
+      setPatients([]);
+      setDoctors([]);
+      setBranches([]);
+      setLoadingOptions(false);
+    }
+  }, [selectedAccount]);
+
+  const loadOptions = async () => {
+    if (!selectedAccount) return;
     
-    loadOptions();
-  }, []);
+    try {
+      setLoadingOptions(true);
+      
+      // Set account context for API calls
+      const accountHeaders = {
+        'X-Account-Context': selectedAccount.account_id
+      };
+      
+      const [patientsData, formOptionsData, branchesData] = await Promise.all([
+        patientsService.getPatients({ limit: 100 }, accountHeaders),
+        treatmentsService.getFormOptions(accountHeaders),
+        locationsService.getBranches(accountHeaders)
+      ]);
+      
+      setPatients(patientsData.results || patientsData);
+      setDoctors(formOptionsData.doctors || []);
+      setBranches(branchesData.filter(branch => branch.is_active));
+      
+      console.log('Loaded filter options for account:', selectedAccount.account_name);
+      console.log('Doctors:', formOptionsData.doctors?.length || 0);
+      console.log('Branches:', branchesData.filter(branch => branch.is_active).length);
+      
+    } catch (err) {
+      console.error('Error loading filter options:', err);
+    } finally {
+      setLoadingOptions(false);
+    }
+  };
 
   // Filter patients based on search
   useEffect(() => {
@@ -110,6 +133,17 @@ const TreatmentFilters = ({ filters, onFiltersChange, onClearFilters }) => {
     { value: 'CANCELED', label: t('treatments.status.CANCELED') }
   ];
 
+  // Show message if no account selected
+  if (!selectedAccount) {
+    return (
+      <div className="treatment-filters">
+        <div className="text-center py-4 text-muted">
+          <p>{t('treatments.filters.selectAccountFirst') || 'Please select a clinic first'}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="treatment-filters">
       <Row className="g-3">
@@ -127,6 +161,7 @@ const TreatmentFilters = ({ filters, onFiltersChange, onClearFilters }) => {
                 value={patientSearch}
                 onChange={(e) => setPatientSearch(e.target.value)}
                 onFocus={() => patientSearch.length >= 2 && setShowPatientDropdown(true)}
+                disabled={loadingOptions}
               />
               {patientSearch && (
                 <Button 
@@ -208,6 +243,7 @@ const TreatmentFilters = ({ filters, onFiltersChange, onClearFilters }) => {
             value={filters.branch || ''}
             onChange={(e) => handleFilterChange('branch', e.target.value)}
             size="sm"
+            disabled={loadingOptions}
           >
             <option value="">{t('treatments.filters.selectBranch')}</option>
             {branches.map(branch => (

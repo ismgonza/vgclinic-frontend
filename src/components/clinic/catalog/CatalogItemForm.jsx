@@ -1,12 +1,14 @@
 // src/components/clinic/catalog/CatalogItemForm.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Form, Button, Row, Col, Card, Alert } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
+import { AccountContext } from '../../../contexts/AccountContext';
 import accountsService from '../../../services/accounts.service';
 import catalogService from '../../../services/catalog.service';
 
 const CatalogItemForm = ({ item, onSave, onCancel, specialtyId = null }) => {
   const { t } = useTranslation();
+  const { selectedAccount } = useContext(AccountContext);
   const [accounts, setAccounts] = useState([]);
   const [specialties, setSpecialties] = useState([]);
   const [formData, setFormData] = useState({
@@ -23,35 +25,50 @@ const CatalogItemForm = ({ item, onSave, onCancel, specialtyId = null }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  // Load form data when component mounts or account changes
   useEffect(() => {
-    // Fetch accounts and specialties for dropdowns
-    const fetchData = async () => {
-      try {
-        const [accountsData, specialtiesData] = await Promise.all([
-          accountsService.getAccounts(),
-          catalogService.getSpecialties()
-        ]);
-        setAccounts(accountsData);
-        setSpecialties(specialtiesData);
-        
-        // If specialtyId is provided, find the corresponding specialty and set the account
-        if (specialtyId && !item) {
-          const selectedSpecialty = specialtiesData.find(s => s.id == specialtyId);
-          if (selectedSpecialty) {
-            setFormData(prev => ({
-              ...prev,
-              specialty: specialtyId,
-              account: selectedSpecialty.account
-            }));
-          }
-        }
-      } catch (err) {
-        console.error('Error fetching form data:', err);
-      }
-    };
-    fetchData();
-  }, [specialtyId]);
+    if (selectedAccount) {
+      fetchData();
+    }
+  }, [selectedAccount, specialtyId]);
 
+  const fetchData = async () => {
+    if (!selectedAccount) return;
+    
+    try {
+      // Set account context for API calls
+      const accountHeaders = {
+        'X-Account-Context': selectedAccount.account_id
+      };
+      
+      // Fetch specialties for the current account
+      const specialtiesData = await catalogService.getSpecialties(accountHeaders);
+      setSpecialties(specialtiesData);
+      
+      // If specialtyId is provided, find the corresponding specialty and set the account
+      if (specialtyId && !item) {
+        const selectedSpecialty = specialtiesData.find(s => s.id == specialtyId);
+        if (selectedSpecialty) {
+          setFormData(prev => ({
+            ...prev,
+            specialty: specialtyId,
+            account: selectedAccount.account_id
+          }));
+        }
+      } else if (!item) {
+        // Creating new item - auto-select current account
+        setFormData(prev => ({
+          ...prev,
+          account: selectedAccount.account_id
+        }));
+      }
+      
+    } catch (err) {
+      console.error('Error fetching form data:', err);
+    }
+  };
+
+  // Initialize form for editing
   useEffect(() => {
     if (item) {
       setFormData({
@@ -67,19 +84,6 @@ const CatalogItemForm = ({ item, onSave, onCancel, specialtyId = null }) => {
     }
   }, [item, specialtyId]);
 
-  // When specialty changes, update the account if necessary
-  useEffect(() => {
-    if (formData.specialty && !formData.account) {
-      const selectedSpecialty = specialties.find(s => s.id == formData.specialty);
-      if (selectedSpecialty) {
-        setFormData(prev => ({
-          ...prev,
-          account: selectedSpecialty.account
-        }));
-      }
-    }
-  }, [formData.specialty, specialties]);
-
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData({
@@ -87,18 +91,6 @@ const CatalogItemForm = ({ item, onSave, onCancel, specialtyId = null }) => {
       [name]: type === 'checkbox' ? checked : 
               name === 'price' ? parseFloat(value) : value
     });
-    
-    // If specialty is changed, update the account accordingly
-    if (name === 'specialty' && value) {
-      const selectedSpecialty = specialties.find(s => s.id == value);
-      if (selectedSpecialty) {
-        setFormData(prev => ({
-          ...prev,
-          specialty: value,
-          account: selectedSpecialty.account
-        }));
-      }
-    }
   };
 
   const validateForm = () => {
@@ -131,10 +123,24 @@ const CatalogItemForm = ({ item, onSave, onCancel, specialtyId = null }) => {
     }
   };
 
-  // Helper to filter specialties by account
-  const filteredSpecialties = formData.account 
-    ? specialties.filter(s => s.account === formData.account) 
-    : specialties;
+  // Show error if no account selected
+  if (!selectedAccount) {
+    return (
+      <Card>
+        <Card.Header>
+          {item ? t('catalog.editItem') : t('catalog.newItem')}
+        </Card.Header>
+        <Card.Body>
+          <Alert variant="warning">
+            {t('catalog.selectAccountFirst') || 'Please select a clinic first to manage catalog items.'}
+          </Alert>
+          <Button variant="secondary" onClick={onCancel}>
+            {t('common.back')}
+          </Button>
+        </Card.Body>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -143,30 +149,37 @@ const CatalogItemForm = ({ item, onSave, onCancel, specialtyId = null }) => {
       </Card.Header>
       <Card.Body>
         {error && <Alert variant="danger">{error}</Alert>}
+        
+        {/* Show current clinic info */}
+        <Alert variant="info" className="mb-3">
+          <strong>{t('catalog.clinic')}:</strong> {selectedAccount.account_name}
+          {item && (
+            <div className="mt-1">
+              <small className="text-muted">
+                {t('catalog.editNote') || 'Note: Catalog items belong to their original clinic and cannot be transferred.'}
+              </small>
+            </div>
+          )}
+        </Alert>
+        
         <Form onSubmit={handleSubmit}>
-          <Form.Group as={Row} className="mb-3">
-            <Form.Label column sm={3}>{t('catalog.account')}</Form.Label>
-            <Col sm={9}>
-              <Form.Select
-                name="account"
-                value={formData.account}
-                onChange={handleChange}
-                isInvalid={!!errors.account}
-                required
-                disabled={!!specialtyId} // Disable if specialty is pre-selected
-              >
-                <option value="">{t('catalog.selectAccount')}</option>
-                {accounts.map(account => (
-                  <option key={account.account_id} value={account.account_id}>
-                    {account.account_name}
-                  </option>
-                ))}
-              </Form.Select>
-              <Form.Control.Feedback type="invalid">
-                {errors.account}
-              </Form.Control.Feedback>
-            </Col>
-          </Form.Group>
+          {/* Hide account selection for editing, show as disabled for creating */}
+          {!item && (
+            <Form.Group as={Row} className="mb-3">
+              <Form.Label column sm={3}>{t('catalog.account')}</Form.Label>
+              <Col sm={9}>
+                <Form.Control
+                  type="text"
+                  value={selectedAccount.account_name}
+                  disabled
+                  className="bg-light"
+                />
+                <Form.Text className="text-muted">
+                  {t('catalog.autoSelectedClinic') || 'This catalog item will be created for the currently selected clinic.'}
+                </Form.Text>
+              </Col>
+            </Form.Group>
+          )}
 
           <Form.Group as={Row} className="mb-3">
             <Form.Label column sm={3}>{t('catalog.specialty')}</Form.Label>
@@ -180,7 +193,7 @@ const CatalogItemForm = ({ item, onSave, onCancel, specialtyId = null }) => {
                 disabled={!!specialtyId} // Disable if specialty is pre-selected
               >
                 <option value="">{t('catalog.selectSpecialty')}</option>
-                {filteredSpecialties.map(specialty => (
+                {specialties.map(specialty => (
                   <option key={specialty.id} value={specialty.id}>
                     {specialty.name}
                   </option>
@@ -189,10 +202,14 @@ const CatalogItemForm = ({ item, onSave, onCancel, specialtyId = null }) => {
               <Form.Control.Feedback type="invalid">
                 {errors.specialty}
               </Form.Control.Feedback>
+              {specialtyId && (
+                <Form.Text className="text-muted">
+                  {t('catalog.preSelectedSpecialty') || 'Specialty is pre-selected based on navigation.'}
+                </Form.Text>
+              )}
             </Col>
           </Form.Group>
 
-          {/* Rest of the form remains the same */}
           <Form.Group as={Row} className="mb-3">
             <Form.Label column sm={3}>{t('catalog.code')}</Form.Label>
             <Col sm={9}>
