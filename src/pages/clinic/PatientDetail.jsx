@@ -51,7 +51,12 @@ const PatientDetail = () => {
   };
 
   const handleEditPatient = () => {
-    navigate(`/clinic/patients/edit/${id}`);
+    navigate('/clinic/patients', { 
+      state: { 
+        editPatient: patient,
+        editMode: true 
+      } 
+    });
   };
 
   const handleAddMedicalHistory = () => {

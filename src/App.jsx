@@ -19,6 +19,8 @@ import Specialties from './pages/clinic/catalog/Specialties';
 import CatalogItems from './pages/clinic/catalog/CatalogItems';
 import Patients from './pages/clinic/Patients';
 import PatientDetail from './pages/clinic/PatientDetail';
+import Treatments from './pages/clinic/Treatments';
+import NewTreatment from './pages/clinic/NewTreatment';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -146,6 +148,18 @@ function App() {
           <Route path="/clinic/patients" element={
             <ProtectedRoute>
               <Patients />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/clinic/treatments" element={
+            <ProtectedRoute>
+              <Treatments />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/clinic/treatments/new" element={
+            <ProtectedRoute>
+              <NewTreatment />
             </ProtectedRoute>
           } />
 

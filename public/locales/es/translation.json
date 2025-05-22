@@ -544,5 +544,86 @@
       },
       "confirmation": "Confirmo que la información anterior es correcta según mi conocimiento"
     }
+  },
+  "treatments": {
+    "title": "Tratamientos",
+    "description": "Gestionar tratamientos y procedimientos de pacientes",
+    "newTreatment": "Nuevo Tratamiento",
+    "editTreatment": "Editar Tratamiento",
+    "viewTreatment": "Ver Detalles del Tratamiento",
+    "treatmentsList": "Lista de Tratamientos",
+    "searchFilters": "Filtros",
+    "filtersPlaceholder": "Los filtros de tratamientos aparecerán aquí",
+    "noTreatments": "No se encontraron tratamientos. Cree su primer tratamiento para comenzar.",
+    "errorLoading": "Error al cargar los tratamientos. Por favor, intente nuevamente.",
+    "totalTreatments": "tratamientos",
+    "foundTreatments": "Se encontraron {{count}} tratamientos",
+    "tableComingSoon": "Tabla de tratamientos próximamente...",
+    "searchPatient": "Buscar paciente por nombre o ID...",
+    "procedure": "Procedimiento",
+    "selectProcedure": "Seleccionar un procedimiento",
+    "selectDoctor": "Seleccionar un doctor",
+    "selectBranch": "Seleccionar una sucursal",
+    "scheduledDate": "Fecha Programada",
+    "scheduledTime": "Hora Programada",
+    "notesPlaceholder": "Agregar notas iniciales sobre este tratamiento...",
+    "loadingOptions": "Cargando opciones del formulario...",
+    "errorLoadingOptions": "Error al cargar las opciones del formulario. Por favor, intente nuevamente.",
+    "errorSaving": "Error al guardar el tratamiento. Por favor, intente nuevamente.",
+    "backToTreatments": "Volver a Tratamientos",
+    "newTreatmentDescription": "Crear un nuevo tratamiento para un paciente",
+    
+    "status": {
+      "SCHEDULED": "Programado",
+      "IN_PROGRESS": "En Progreso",
+      "COMPLETED": "Completado",
+      "CANCELED": "Cancelado"
+    },
+    
+    "billing": {
+      "PENDING": "Pendiente",
+      "PARTIAL": "Parcial",
+      "PAID": "Pagado"
+    },
+    
+    "fields": {
+      "patient": "Paciente",
+      "treatment": "Tratamiento",
+      "doctor": "Doctor",
+      "branch": "Sucursal",
+      "status": "Estado",
+      "billing": "Facturación",
+      "scheduledDate": "Fecha Programada",
+      "completedDate": "Fecha Completada",
+      "notes": "Notas"
+    },
+    
+    "actions": {
+      "view": "Ver Detalles",
+      "edit": "Editar",
+      "complete": "Marcar Completado",
+      "cancel": "Cancelar Tratamiento",
+      "addNote": "Agregar Nota"
+    },
+    
+    "filters": {
+      "searchPatient": "Buscar paciente...",
+      "selectStatus": "Seleccionar estado",
+      "selectDoctor": "Seleccionar doctor",
+      "selectBranch": "Seleccionar sucursal",
+      "dateFrom": "Desde fecha",
+      "dateTo": "Hasta fecha",
+      "clearFilters": "Limpiar Filtros",
+      "applyFilters": "Aplicar Filtros",
+      "filtersActive": "Filtros activos"
+    },
+    
+    "messages": {
+      "treatmentCreated": "Tratamiento creado exitosamente",
+      "treatmentUpdated": "Tratamiento actualizado exitosamente",
+      "treatmentDeleted": "Tratamiento eliminado exitosamente",
+      "statusUpdated": "Estado del tratamiento actualizado exitosamente",
+      "noteAdded": "Nota agregada exitosamente"
+    }
   }
 }

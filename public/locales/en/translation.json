@@ -543,5 +543,87 @@
       },
       "confirmation": "I confirm that the above information is correct to the best of my knowledge"
     }
+  },
+  "treatments": {
+    "title": "Treatments",
+    "description": "Manage patient treatments and procedures",
+    "newTreatment": "New Treatment",
+    "editTreatment": "Edit Treatment",
+    "viewTreatment": "View Treatment Details",
+    "treatmentsList": "Treatments List",
+    "searchFilters": "Filters",
+    "filtersPlaceholder": "Treatment filters will appear here",
+    "noTreatments": "No treatments found. Create your first treatment to get started.",
+    "errorLoading": "Error loading treatments. Please try again.",
+    "totalTreatments": "treatments",
+    "foundTreatments": "Found {{count}} treatments",
+    "tableComingSoon": "Treatments table coming soon...",
+    "searchPatient": "Search patient by name or ID...",
+    "procedure": "Procedure",
+    "selectProcedure": "Select a procedure",
+    "selectDoctor": "Select a doctor",
+    "selectBranch": "Select a branch",
+    "scheduledDate": "Scheduled Date",
+    "scheduledTime": "Scheduled Time",
+    "notesPlaceholder": "Add initial notes about this treatment...",
+    "loadingOptions": "Loading form options...",
+    "errorLoadingOptions": "Error loading form options. Please try again.",
+    "errorSaving": "Error saving treatment. Please try again.",
+    "backToTreatments": "Back to Treatments",
+    "newTreatmentDescription": "Create a new treatment for a patient",
+    
+    "status": {
+      "SCHEDULED": "Scheduled",
+      "IN_PROGRESS": "In Progress", 
+      "COMPLETED": "Completed",
+      "CANCELED": "Canceled"
+    },
+    
+    "billing": {
+      "PENDING": "Pending",
+      "PARTIAL": "Partial",
+      "PAID": "Paid"
+    },
+    
+    "fields": {
+      "patient": "Patient",
+      "treatment": "Treatment",
+      "doctor": "Doctor", 
+      "branch": "Branch",
+      "status": "Status",
+      "billing": "Billing",
+      "scheduledDate": "Scheduled Date",
+      "completedDate": "Completed Date",
+      "notes": "Notes"
+    },
+    
+    "actions": {
+      "view": "View Details",
+      "edit": "Edit",
+      "complete": "Mark Complete",
+      "cancel": "Cancel Treatment",
+      "addNote": "Add Note"
+    },
+    
+    "filters": {
+      "searchPatient": "Search patient...",
+      "selectStatus": "Select status",
+      "selectDoctor": "Select doctor", 
+      "selectBranch": "Select branch",
+      "dateFrom": "From date",
+      "dateTo": "To date",
+      "clearFilters": "Clear Filters",
+      "applyFilters": "Apply Filters",
+      "filtersActive": "Filters are active"
+
+    },
+    
+    "messages": {
+      "treatmentCreated": "Treatment created successfully",
+      "treatmentUpdated": "Treatment updated successfully", 
+      "treatmentDeleted": "Treatment deleted successfully",
+      "statusUpdated": "Treatment status updated successfully",
+      "noteAdded": "Note added successfully"
+    }
   }
 }

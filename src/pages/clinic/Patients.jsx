@@ -1,6 +1,6 @@
 // src/pages/clinic/Patients.jsx - Updated version
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { Container, Row, Col, Card, Table, Button, Badge, Spinner, Alert, Modal } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faEdit, faTrash, faEye, faUserInjured, faPhone, faEnvelope } from '@fortawesome/free-solid-svg-icons';
@@ -10,6 +10,7 @@ import PatientForm from '../../components/clinic/PatientForm';
 
 const Patients = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { t } = useTranslation();
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,6 +24,14 @@ const Patients = () => {
   useEffect(() => {
     fetchPatients();
   }, []);
+
+  useEffect(() => {
+    if (location.state?.editMode && location.state?.editPatient) {
+      setCurrentPatient(location.state.editPatient);
+      setShowForm(true);
+      navigate('/clinic/patients', { replace: true });
+    }
+  }, [location.state]);
 
   const fetchPatients = async () => {
     try {
