@@ -1,0 +1,289 @@
+/* src/components/common/AccountSelector.css */
+
+/* Loading state */
+.account-selector-loading {
+  display: flex;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.8);
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Empty state */
+.account-selector-empty {
+  display: flex;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.6);
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Single account display */
+.account-selector-single {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 10px 16px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.account-selector-single .account-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  margin-right: 12px;
+  font-size: 14px;
+}
+
+.account-selector-single .account-info .account-label {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.account-selector-single .account-info .account-name {
+  font-size: 14px;
+  color: white;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+/* Dropdown container */
+.account-selector-dropdown {
+  min-width: 380px;
+}
+
+/* Custom dropdown toggle */
+.account-dropdown-toggle {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 12px !important;
+  backdrop-filter: blur(10px);
+  padding: 0 !important;
+  transition: all 0.3s ease;
+  min-width: 240px;
+}
+
+.account-dropdown-toggle:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.account-dropdown-toggle:focus {
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.25) !important;
+}
+
+.account-dropdown-toggle::after {
+  display: none !important;
+}
+
+/* Selected account in toggle */
+.selected-account {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  width: 100%;
+}
+
+.selected-account .account-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  margin-right: 12px;
+  font-size: 16px;
+}
+
+.selected-account .account-info {
+  flex: 1;
+  text-align: left;
+}
+
+.selected-account .account-info .account-label {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.selected-account .account-info .account-name {
+  font-size: 14px;
+  color: white;
+  font-weight: 600;
+  line-height: 1.2;
+  display: flex;
+  align-items: center;
+}
+
+.selected-account .dropdown-arrow {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  margin-left: 8px;
+  transition: transform 0.3s ease;
+}
+
+.account-dropdown-toggle[aria-expanded="true"] .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+/* Dropdown menu */
+.account-dropdown-menu {
+  background: white;
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  padding: 8px;
+  margin-top: 8px;
+  min-width: 250px !important;
+  max-height: 400px;
+  /* overflow-y: auto; */
+}
+
+.account-dropdown-menu .dropdown-header {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6c757d;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 12px 16px 8px;
+  margin-bottom: 0;
+}
+
+.account-dropdown-menu .dropdown-divider {
+  margin: 8px 0;
+  border-color: #e9ecef;
+}
+
+/* Account dropdown items */
+.account-dropdown-item {
+  border-radius: 12px !important;
+  margin-bottom: 4px;
+  margin-right: 4px;
+  padding: 0 !important;
+  border: none !important;
+  transition: all 0.2s ease;
+  transform: scale(0.95);
+}
+
+.account-dropdown-item:hover {
+  background: #f8f9fa !important;
+  transform: scale(1.0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.account-dropdown-item.active {
+  background: linear-gradient(135deg, #007bff, #0056b3) !important;
+  color: white !important;
+}
+
+.account-dropdown-item.active:hover {
+  background: linear-gradient(135deg, #0056b3, #004085) !important;
+}
+
+/* Account option content */
+.account-option {
+  padding: 12px 16px;
+  width: 100%;
+  overflow: hidden;
+  word-wrap: break-word;
+}
+
+.account-main .account-name-option {
+  font-size: 15px;
+  font-weight: 600;
+  color: #212529;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+  word-wrap: break-word;
+  white-space: normal;
+  line-height: 1.3;
+}
+
+.account-dropdown-item.active .account-name-option {
+  color: white;
+}
+
+.account-main .account-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.account-main .account-email {
+  font-size: 12px;
+  color: #6c757d;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  word-wrap: break-word;
+  white-space: normal;
+  line-height: 1.2;
+}
+
+.account-dropdown-item.active .account-email {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.account-main .detail-icon {
+  margin-right: 6px;
+  font-size: 10px;
+  width: 12px;
+}
+
+.check-icon {
+  color: #28a745;
+  font-size: 14px;
+}
+
+.account-dropdown-item.active .check-icon {
+  color: white;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .account-selector-dropdown {
+    min-width: 280px;
+  }
+  
+  .account-dropdown-toggle {
+    min-width: 280px;
+  }
+  
+  .account-dropdown-menu {
+    min-width: 250px !important;
+    max-width: 450px;
+  }
+  
+  .selected-account {
+    padding: 10px 12px;
+  }
+  
+  .selected-account .account-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+  }
+}

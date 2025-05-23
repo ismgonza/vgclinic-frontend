@@ -1,4 +1,4 @@
-// src/pages/clinic/catalog/Catalog.jsx
+// src/pages/clinic/catalog/Catalog.jsx - Centered text version
 import React from 'react';
 import { Container, Row, Col, Card } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
@@ -14,20 +14,20 @@ const Catalog = () => {
       <Row className="mb-4">
         <Col>
           <h1 className="h3">{t('catalog.title')}</h1>
-          <p className="text-muted">{t('catalog.description')}</p>
+          {/* <p className="text-muted">{t('catalog.description')}</p> */}
         </Col>
       </Row>
 
       <Row>
         <Col md={6} className="mb-4">
           <Card className="h-100">
-            <Card.Body className="d-flex flex-column">
-              <div className="text-center mb-3">
+            <Card.Body className="d-flex flex-column text-center">
+              <div className="mb-3">
                 <FontAwesomeIcon icon={faBriefcaseMedical} size="4x" className="text-primary" />
               </div>
-              <h5 className="card-title text-center">{t('catalog.specialtiesTitle')}</h5>
+              <h5 className="card-title">{t('catalog.specialtiesTitle')}</h5>
               <p className="card-text">{t('catalog.specialtiesDescription')}</p>
-              <div className="mt-auto text-center">
+              <div className="mt-auto">
                 <Link to="/clinic/catalog/specialties" className="btn btn-primary">
                   {t('catalog.manageSpecialties')}
                 </Link>
@@ -38,13 +38,13 @@ const Catalog = () => {
 
         <Col md={6} className="mb-4">
           <Card className="h-100">
-            <Card.Body className="d-flex flex-column">
-              <div className="text-center mb-3">
-                <FontAwesomeIcon icon={faList} size="4x" className="text-primary" />
+            <Card.Body className="d-flex flex-column text-center">
+              <div className="mb-3">
+                <FontAwesomeIcon icon={faBriefcaseMedical} size="4x" className="text-primary" />
               </div>
-              <h5 className="card-title text-center">{t('catalog.itemsTitle')}</h5>
+              <h5 className="card-title">{t('catalog.itemsTitle')}</h5>
               <p className="card-text">{t('catalog.itemsDescription')}</p>
-              <div className="mt-auto text-center">
+              <div className="mt-auto">
                 <Link to="/clinic/catalog/items" className="btn btn-primary">
                   {t('catalog.manageItems')}
                 </Link>

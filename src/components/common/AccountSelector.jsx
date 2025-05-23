@@ -1,11 +1,12 @@
-// src/components/common/AccountSelector.jsx
+// src/components/common/AccountSelector.jsx - Beautified version
 import React, { useContext } from 'react';
 import { Dropdown, Spinner, Badge } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBuilding, faCheck } from '@fortawesome/free-solid-svg-icons';
+import { faBuilding, faCheck, faChevronDown, faMapMarkerAlt, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
 import { AccountContext } from '../../contexts/AccountContext';
 import { AuthContext } from '../../contexts/AuthContext';
+import './AccountSelector.css'; // We'll need to create this
 
 const AccountSelector = () => {
   const { t } = useTranslation();
@@ -26,9 +27,9 @@ const AccountSelector = () => {
   // Show loading state
   if (loading) {
     return (
-      <div className="d-flex align-items-center text-muted">
+      <div className="account-selector-loading">
         <Spinner size="sm" className="me-2" />
-        <small>Loading accounts...</small>
+        <small>Loading clinics...</small>
       </div>
     );
   }
@@ -36,64 +37,87 @@ const AccountSelector = () => {
   // No accounts available
   if (!userAccounts || userAccounts.length === 0) {
     return (
-      <div className="d-flex align-items-center text-muted">
+      <div className="account-selector-empty">
         <FontAwesomeIcon icon={faBuilding} className="me-2" />
         <small>No clinics available</small>
       </div>
     );
   }
 
-  // Single account - just show it
+  // Single account - beautiful display
   if (userAccounts.length === 1) {
     return (
-      <div className="d-flex align-items-center">
-        <FontAwesomeIcon icon={faBuilding} className="me-2 text-primary" />
-        <div>
-          <small className="text-muted d-block">Current Clinic:</small>
-          <span className="fw-bold">{userAccounts[0].account_name}</span>
+      <div className="account-selector-single">
+        <div className="account-icon">
+          <FontAwesomeIcon icon={faBuilding} />
+        </div>
+        <div className="account-info">
+          <div className="account-label">Current Clinic</div>
+          <div className="account-name">{userAccounts[0].account_name}</div>
         </div>
       </div>
     );
   }
 
-  // Multiple accounts - show dropdown
+  // Multiple accounts - beautiful dropdown
   return (
-    <div className="d-flex align-items-center">
-      <FontAwesomeIcon icon={faBuilding} className="me-2 text-primary" />
-      <div>
-        <small className="text-muted d-block">Current Clinic:</small>
-        <Dropdown>
-          <Dropdown.Toggle 
-            variant="link" 
-            className="p-0 text-decoration-none text-dark fw-bold"
-            style={{ border: 'none', boxShadow: 'none' }}
-          >
-            {selectedAccount ? selectedAccount.account_name : 'Select Clinic'}
-            {!isAccountSelected && (
-              <Badge bg="warning" className="ms-2">!</Badge>
-            )}
-          </Dropdown.Toggle>
-
-          <Dropdown.Menu>
-            <Dropdown.Header>Available Clinics</Dropdown.Header>
-            {userAccounts.map((account) => (
-              <Dropdown.Item
-                key={account.account_id}
-                onClick={() => switchAccount(account)}
-                className="d-flex justify-content-between align-items-center"
-              >
-                <div>
-                  <div className="fw-bold">{account.account_name}</div>
-                  <small className="text-muted">{account.account_email}</small>
-                </div>
-                {selectedAccount?.account_id === account.account_id && (
-                  <FontAwesomeIcon icon={faCheck} className="text-success" />
+    <div className="account-selector-dropdown">
+      <Dropdown align="start">
+        <Dropdown.Toggle 
+          variant="outline-light" 
+          className="account-dropdown-toggle"
+          id="account-dropdown"
+        >
+          <div className="selected-account">
+            <div className="account-icon">
+              <FontAwesomeIcon icon={faBuilding} />
+            </div>
+            <div className="account-info">
+              <div className="account-label">Current Clinic</div>
+              <div className="account-name">
+                {selectedAccount ? selectedAccount.account_name : 'Select Clinic'}
+                {!isAccountSelected && (
+                  <Badge bg="warning" className="ms-2">!</Badge>
                 )}
-              </Dropdown.Item>
-            ))}
-          </Dropdown.Menu>
-        </Dropdown>
-      </div>
+              </div>
+            </div>
+            <FontAwesomeIcon icon={faChevronDown} className="dropdown-arrow" />
+          </div>
+        </Dropdown.Toggle>
+
+        <Dropdown.Menu className="account-dropdown-menu">
+          <div className="dropdown-header">
+            <FontAwesomeIcon icon={faBuilding} className="me-2" />
+            Available Clinics
+          </div>
+          <div className="dropdown-divider"></div>
+          
+          {userAccounts.map((account) => (
+            <Dropdown.Item
+              key={account.account_id}
+              onClick={() => switchAccount(account)}
+              className={`account-dropdown-item ${selectedAccount?.account_id === account.account_id ? 'active' : ''}`}
+            >
+              <div className="account-option">
+                <div className="account-main">
+                  <div className="account-name-option">
+                    {account.account_name}
+                    {selectedAccount?.account_id === account.account_id && (
+                      <FontAwesomeIcon icon={faCheck} className="check-icon" />
+                    )}
+                  </div>
+                  <div className="account-details">
+                    <div className="account-email">
+                      <FontAwesomeIcon icon={faEnvelope} className="detail-icon" />
+                      {account.account_email}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Dropdown.Item>
+          ))}
+        </Dropdown.Menu>
+      </Dropdown>
     </div>
   );
 };
