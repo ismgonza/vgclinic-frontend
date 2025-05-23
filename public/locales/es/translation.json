@@ -572,7 +572,36 @@
     "errorSaving": "Error al guardar el tratamiento. Por favor, intente nuevamente.",
     "backToTreatments": "Volver a Tratamientos",
     "newTreatmentDescription": "Crear un nuevo tratamiento para un paciente",
-    
+    "cancel":"Marcar como Cancelado",
+    "markComplete":"Marcar como Completado",
+    "back": "Regresar a Tratamientos",
+    "notes": {
+      "title": "Notas del Tratamiento",
+      "newNote": "Nueva Nota",
+      "addNote": "Agregar Nota",
+      "editNote": "Editar Nota", 
+      "viewNote": "Ver Nota",
+      "deleteNote": "Eliminar Nota",
+      "updateNote": "Actualizar Nota",
+      "noteLabel": "Nota",
+      "note": "Nota",
+      "dateTime": "Fecha y Hora",
+      "createdBy": "Creado Por",
+      "notePlaceholder": "Ingrese nota del tratamiento...",
+      "timestampHelp": "La nota será marcada con fecha y hora automáticamente al guardar.",
+      "loading": "Cargando notas...",
+      "noNotes": "No se han agregado notas a este tratamiento aún.",
+      "clickViewFull": "Haga clic en ver para ver la nota completa",
+      "viewNoteDetails": "Detalles de la Nota del Tratamiento",
+      "confirmDelete": "¿Está seguro que desea eliminar esta nota? Esta acción no se puede deshacer.",
+      "selectAccountFirst": "Por favor seleccione una clínica primero para gestionar las notas del tratamiento.",
+      "addSuccess": "Nota agregada exitosamente",
+      "updateSuccess": "Nota actualizada exitosamente",
+      "deleteSuccess": "Nota eliminada exitosamente", 
+      "errorLoading": "Error al cargar las notas del tratamiento",
+      "errorSaving": "Error al guardar la nota",
+      "errorDeleting": "Error al eliminar la nota"
+    },
     "status": {
       "SCHEDULED": "Programado",
       "IN_PROGRESS": "En Progreso",
@@ -595,7 +624,10 @@
       "billing": "Facturación",
       "scheduledDate": "Fecha Programada",
       "completedDate": "Fecha Completada",
-      "notes": "Notas"
+      "notes": "Notas",
+      "procedure": "Procedimiento",
+      "specialty": "Especialidad",
+      "phase": "Fase"
     },
     
     "actions": {

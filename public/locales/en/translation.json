@@ -571,7 +571,36 @@
     "errorSaving": "Error saving treatment. Please try again.",
     "backToTreatments": "Back to Treatments",
     "newTreatmentDescription": "Create a new treatment for a patient",
-    
+    "cancel":"Mark as Canceled",
+    "markComplete":"Mark as Complete",
+    "back": "Back to Treatments",
+    "notes": {
+      "title": "Treatment Notes",
+      "newNote": "New Note",
+      "addNote": "Add Note",
+      "editNote": "Edit Note",
+      "viewNote": "View Note",
+      "deleteNote": "Delete Note",
+      "updateNote": "Update Note",
+      "noteLabel": "Note",
+      "note": "Note",
+      "dateTime": "Date & Time",
+      "createdBy": "Created By",
+      "notePlaceholder": "Enter treatment note...",
+      "timestampHelp": "Note will be timestamped automatically when saved.",
+      "loading": "Loading notes...",
+      "noNotes": "No notes have been added to this treatment yet.",
+      "clickViewFull": "Click view to see full note",
+      "viewNoteDetails": "Treatment Note Details",
+      "confirmDelete": "Are you sure you want to delete this note? This action cannot be undone.",
+      "selectAccountFirst": "Please select a clinic first to manage treatment notes.",
+      "addSuccess": "Note added successfully",
+      "updateSuccess": "Note updated successfully", 
+      "deleteSuccess": "Note deleted successfully",
+      "errorLoading": "Error loading treatment notes",
+      "errorSaving": "Error saving note",
+      "errorDeleting": "Error deleting note"
+    },
     "status": {
       "SCHEDULED": "Scheduled",
       "IN_PROGRESS": "In Progress", 
@@ -594,7 +623,10 @@
       "billing": "Billing",
       "scheduledDate": "Scheduled Date",
       "completedDate": "Completed Date",
-      "notes": "Notes"
+      "notes": "Notes",
+      "procedure": "Procedure",
+      "specialty": "Specialty", 
+      "phase": "Phase"
     },
     
     "actions": {

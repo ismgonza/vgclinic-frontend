@@ -1,4 +1,4 @@
-// src/App.jsx - Back to simpler structure
+// src/App.jsx - Updated with TreatmentDetail route
 import React, { useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, AuthContext } from './contexts/AuthContext';
@@ -21,6 +21,7 @@ import CatalogItems from './pages/clinic/catalog/CatalogItems';
 import Patients from './pages/clinic/Patients';
 import PatientDetail from './pages/clinic/PatientDetail';
 import Treatments from './pages/clinic/Treatments';
+import TreatmentDetail from './pages/clinic/TreatmentDetail';
 import NewTreatment from './pages/clinic/NewTreatment';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
@@ -79,9 +80,12 @@ function App() {
 
             <Route path="/clinic/patients" element={<ProtectedRoute><Patients /></ProtectedRoute>} />
 
+            <Route path="/clinic/treatments/:id" element={<ProtectedRoute><TreatmentDetail /></ProtectedRoute>} />
+
             <Route path="/clinic/treatments" element={<ProtectedRoute><Treatments /></ProtectedRoute>} />
 
             <Route path="/clinic/treatments/new" element={<ProtectedRoute><NewTreatment /></ProtectedRoute>} />
+            
             {/* Redirect root to dashboard or login */}
             <Route path="/" element={<Navigate to="/dashboard" />} />
             

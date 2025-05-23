@@ -1,9 +1,10 @@
 // src/components/clinic/TreatmentForm.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Form, Button, Row, Col, Card, Alert, InputGroup } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
+import { AccountContext } from '../../contexts/AccountContext';
 import patientsService from '../../services/patients.service';
 import catalogService from '../../services/catalog.service';
 import usersService from '../../services/users.service';
@@ -12,6 +13,7 @@ import treatmentsService from '../../services/treatments.service';
 
 const TreatmentForm = ({ treatment, onSave, onCancel }) => {
   const { t } = useTranslation();
+  const { selectedAccount } = useContext(AccountContext);
   
   // Form data state
   const [formData, setFormData] = useState({
@@ -44,34 +46,59 @@ const TreatmentForm = ({ treatment, onSave, onCancel }) => {
   const [loadingOptions, setLoadingOptions] = useState(true);
   const [error, setError] = useState(null);
 
-  // Load form options
+  // Load form options - reload when account changes
   useEffect(() => {
-    const loadOptions = async () => {
-      try {
-        setLoadingOptions(true);
-        const [patientsData, catalogData, specialtiesData, formOptionsData, branchesData] = await Promise.all([
-          patientsService.getPatients({ limit: 100 }),
-          catalogService.getCatalogItems(),
-          catalogService.getSpecialties(),
-          treatmentsService.getFormOptions(), // NEW - use treatment service for doctors
-          locationsService.getBranches()
-        ]);
-        
-        setPatients(patientsData.results || patientsData);
-        setCatalogItems(catalogData);
-        setSpecialties(specialtiesData);
-        setDoctors(formOptionsData.doctors || []); // Use doctors from form options
-        setBranches(branchesData.filter(branch => branch.is_active));
-      } catch (err) {
-        console.error('Error loading form options:', err);
-        setError(t('treatments.errorLoadingOptions'));
-      } finally {
-        setLoadingOptions(false);
-      }
-    };
+    if (selectedAccount) {
+      loadOptions();
+    } else {
+      // Clear options if no account selected
+      setPatients([]);
+      setCatalogItems([]);
+      setSpecialties([]);
+      setDoctors([]);
+      setBranches([]);
+      setLoadingOptions(false);
+    }
+  }, [selectedAccount]);
+
+  const loadOptions = async () => {
+    if (!selectedAccount) return;
     
-    loadOptions();
-  }, [t]);
+    try {
+      setLoadingOptions(true);
+      
+      // Set account context for API calls
+      const accountHeaders = {
+        'X-Account-Context': selectedAccount.account_id
+      };
+      
+      const [patientsData, catalogData, specialtiesData, formOptionsData, branchesData] = await Promise.all([
+        patientsService.getPatients({ limit: 100 }, accountHeaders),
+        catalogService.getCatalogItems(null, accountHeaders),
+        catalogService.getSpecialties(accountHeaders),
+        treatmentsService.getFormOptions(accountHeaders),
+        locationsService.getBranches({}, accountHeaders)
+      ]);
+      
+      setPatients(patientsData.results || patientsData);
+      setCatalogItems(catalogData);
+      setSpecialties(specialtiesData);
+      setDoctors(formOptionsData.doctors || []);
+      setBranches(branchesData.filter(branch => branch.is_active));
+      
+      console.log('Loaded form options for account:', selectedAccount.account_name);
+      console.log('Patients:', (patientsData.results || patientsData).length);
+      console.log('Doctors:', formOptionsData.doctors?.length || 0);
+      console.log('Catalog items:', catalogData.length);
+      console.log('Branches:', branchesData.filter(branch => branch.is_active).length);
+      
+    } catch (err) {
+      console.error('Error loading form options:', err);
+      setError(t('treatments.errorLoadingOptions'));
+    } finally {
+      setLoadingOptions(false);
+    }
+  };
 
   // Initialize form for editing
   useEffect(() => {
@@ -213,6 +240,22 @@ const TreatmentForm = ({ treatment, onSave, onCancel }) => {
     if (!formData.specialty) return catalogItems;
     return catalogItems.filter(item => item.specialty == formData.specialty);
   };
+
+  // Show message if no account selected
+  if (!selectedAccount) {
+    return (
+      <Card>
+        <Card.Header>
+          {treatment ? t('treatments.editTreatment') : t('treatments.newTreatment')}
+        </Card.Header>
+        <Card.Body>
+          <div className="text-center py-4 text-muted">
+            <p>{t('treatments.selectAccountFirst') || 'Please select a clinic first'}</p>
+          </div>
+        </Card.Body>
+      </Card>
+    );
+  }
 
   return (
     <Card>
