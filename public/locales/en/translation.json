@@ -574,6 +574,8 @@
     "cancel":"Mark as Canceled",
     "markComplete":"Mark as Complete",
     "back": "Back to Treatments",
+    "errorLoadingDetails": "Error loading treatment details. Please try again.",
+    "errorUpdatingStatus": "Error updating treatment status. Please try again.",
     "notes": {
       "title": "Treatment Notes",
       "newNote": "New Note",

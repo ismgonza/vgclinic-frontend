@@ -575,6 +575,8 @@
     "cancel":"Marcar como Cancelado",
     "markComplete":"Marcar como Completado",
     "back": "Regresar a Tratamientos",
+    "errorLoadingDetails": "Error al cargar los detalles del tratamiento. Por favor, intente nuevamente.",
+    "errorUpdatingStatus": "Error al actualizar el estado del tratamiento. Por favor, intente nuevamente.", 
     "notes": {
       "title": "Notas del Tratamiento",
       "newNote": "Nueva Nota",
@@ -595,7 +597,7 @@
       "viewNoteDetails": "Detalles de la Nota del Tratamiento",
       "confirmDelete": "¿Está seguro que desea eliminar esta nota? Esta acción no se puede deshacer.",
       "selectAccountFirst": "Por favor seleccione una clínica primero para gestionar las notas del tratamiento.",
-      "addSuccess": "Nota agregada exitosamente",
+      "addSuccess": "Nota agregada exitosamente",   
       "updateSuccess": "Nota actualizada exitosamente",
       "deleteSuccess": "Nota eliminada exitosamente", 
       "errorLoading": "Error al cargar las notas del tratamiento",

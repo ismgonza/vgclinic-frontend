@@ -127,12 +127,26 @@ const TreatmentDetail = () => {
     if (!selectedAccount) return;
     
     try {
+      console.log('DEBUG: handleAddNoteSave called with noteData:', noteData);
+      
       const accountHeaders = {
         'X-Account-Context': selectedAccount.account_id
       };
       
-      // Add new note
-      await treatmentsService.addTreatmentNote(id, noteData, accountHeaders);
+      // For the add_note action, we don't need to include the treatment ID
+      // The backend action will set it automatically
+      const addNoteData = {
+        note: noteData.note
+        // Don't include treatment ID - the backend action handles this
+      };
+      
+      console.log('DEBUG: Final addNoteData:', addNoteData);
+      console.log('DEBUG: Account headers:', accountHeaders);
+      
+      // Add new note using the treatment's add_note action
+      const result = await treatmentsService.addTreatmentNote(id, addNoteData, accountHeaders);
+      
+      console.log('DEBUG: Add note result:', result);
       
       setShowAddNoteModal(false);
       setSuccessMessage(t('treatments.notes.addSuccess'));
@@ -143,7 +157,16 @@ const TreatmentDetail = () => {
       setTimeout(() => setSuccessMessage(''), 3000);
       
     } catch (err) {
-      console.error('Error adding note:', err);
+      console.error('DEBUG: Error adding note:', err);
+      console.error('DEBUG: Error response data:', err.response?.data);
+      console.error('DEBUG: Error response status:', err.response?.status);
+      console.error('DEBUG: Error response headers:', err.response?.headers);
+      console.error('DEBUG: Full error object:', {
+        message: err.message,
+        response: err.response,
+        status: err.response?.status,
+        data: err.response?.data
+      });
       throw err;
     }
   };
@@ -154,63 +177,115 @@ const TreatmentDetail = () => {
   };
 
   const handleEditNote = (note) => {
+    console.log('DEBUG: handleEditNote called with note:', note);
+    console.log('DEBUG: note.id =', note.id);
     setSelectedNote(note);
     setShowNoteEditModal(true);
   };
 
   const handleDeleteNote = (note) => {
+    console.log('DEBUG: handleDeleteNote called with note:', note);
+    console.log('DEBUG: note.id =', note.id);
     setNoteToDelete(note);
     setShowNoteDeleteModal(true);
   };
-
+  
   const handleDeleteNoteConfirm = async () => {
-    if (!selectedAccount || !noteToDelete) return;
+    console.log('DEBUG: handleDeleteNoteConfirm called');
+    console.log('DEBUG: selectedAccount =', selectedAccount);
+    console.log('DEBUG: noteToDelete =', noteToDelete);
+    
+    if (!selectedAccount || !noteToDelete) {
+      console.log('DEBUG: Missing selectedAccount or noteToDelete, returning early');
+      return;
+    }
     
     try {
+      console.log('DEBUG: About to delete note with ID:', noteToDelete.id);
+      
       const accountHeaders = {
         'X-Account-Context': selectedAccount.account_id
       };
       
-      // Delete note (if your API supports it)
-      // await treatmentsService.deleteTreatmentNote(noteToDelete.id, accountHeaders);
+      console.log('DEBUG: Account headers:', accountHeaders);
+      console.log('DEBUG: Calling treatmentsService.deleteTreatmentNote...');
+      
+      // Delete note
+      const result = await treatmentsService.deleteTreatmentNote(noteToDelete.id, accountHeaders);
+      
+      console.log('DEBUG: Delete result:', result);
       
       setShowNoteDeleteModal(false);
       setNoteToDelete(null);
       setSuccessMessage(t('treatments.notes.deleteSuccess'));
       
       // Refresh treatment data
+      console.log('DEBUG: Refreshing treatment data...');
       await fetchTreatmentData();
       
       setTimeout(() => setSuccessMessage(''), 3000);
       
     } catch (err) {
-      console.error('Error deleting note:', err);
+      console.error('DEBUG: Error deleting note:', err);
+      console.error('DEBUG: Error details:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status
+      });
       setError(t('treatments.notes.errorDeleting'));
     }
   };
 
   const handleEditNoteSave = async (noteData) => {
-    if (!selectedAccount || !selectedNote) return;
+    console.log('DEBUG: handleEditNoteSave called');
+    console.log('DEBUG: selectedAccount =', selectedAccount);
+    console.log('DEBUG: selectedNote =', selectedNote);
+    console.log('DEBUG: noteData =', noteData);
+    
+    if (!selectedAccount || !selectedNote) {
+      console.log('DEBUG: Missing selectedAccount or selectedNote, returning early');
+      return;
+    }
     
     try {
+      console.log('DEBUG: About to update note with ID:', selectedNote.id);
+      
       const accountHeaders = {
         'X-Account-Context': selectedAccount.account_id
       };
       
-      // Update note (if your API supports it)
-      // await treatmentsService.updateTreatmentNote(selectedNote.id, noteData, accountHeaders);
+      // Include the treatment ID in the update data
+      const updateData = {
+        ...noteData,
+        treatment: selectedNote.treatment || parseInt(id) // Include treatment ID
+      };
+      
+      console.log('DEBUG: Account headers:', accountHeaders);
+      console.log('DEBUG: Final updateData:', updateData);
+      console.log('DEBUG: Calling treatmentsService.updateTreatmentNote...');
+      
+      // Update note
+      const result = await treatmentsService.updateTreatmentNote(selectedNote.id, updateData, accountHeaders);
+      
+      console.log('DEBUG: Update result:', result);
       
       setShowNoteEditModal(false);
       setSelectedNote(null);
       setSuccessMessage(t('treatments.notes.updateSuccess'));
       
       // Refresh treatment data
+      console.log('DEBUG: Refreshing treatment data...');
       await fetchTreatmentData();
       
       setTimeout(() => setSuccessMessage(''), 3000);
       
     } catch (err) {
-      console.error('Error updating note:', err);
+      console.error('DEBUG: Error updating note:', err);
+      console.error('DEBUG: Error details:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status
+      });
       throw err;
     }
   };
@@ -218,11 +293,6 @@ const TreatmentDetail = () => {
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleString();
-  };
-
-  const formatDateOnly = (dateString) => {
-    if (!dateString) return 'N/A';
-    return new Date(dateString).toLocaleDateString();
   };
 
   const getStatusVariant = (status) => {
@@ -751,9 +821,11 @@ const NoteAddForm = ({ onSave, onCancel }) => {
         note: formData.note.trim()
       };
       
+      console.log('DEBUG: NoteAddForm - About to save with data:', noteData);
+      
       await onSave(noteData);
     } catch (err) {
-      console.error('Error saving note:', err);
+      console.error('DEBUG: NoteAddForm - Error saving note:', err);
     } finally {
       setSaving(false);
     }

@@ -128,6 +128,30 @@ class TreatmentsService {
       throw error;
     }
   }
+
+  // Update treatment note
+  async updateTreatmentNote(noteId, noteData, headers = {}) {
+    try {
+      const response = await api.put(`/clinic/treatments/treatment-notes/${noteId}/`, noteData, {
+        headers
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Delete treatment note
+  async deleteTreatmentNote(noteId, headers = {}) {
+    try {
+      await api.delete(`/clinic/treatments/treatment-notes/${noteId}/`, {
+        headers
+      });
+      return true;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 export default new TreatmentsService();
