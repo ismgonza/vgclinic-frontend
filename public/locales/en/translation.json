@@ -487,18 +487,18 @@
     "patientNotFound": "Patient not found",
     "noPhones": "No phone numbers",
     "noEmergencyContacts": "No emergency contacts",
-    "medicalHistory": {
-      "title": "Medical History",
-      "add": "Add Medical History",
-      "noRecords": "No medical history records found",
+    "anamnesis": {
+      "title": "Anamnesis",
+      "add": "Add Anamnesis",
+      "noRecords": "No anamnesis records found",
       "latest": "Latest Entry",
       "all": "All Entries",
       "date": "Date",
       "confirmed": "Confirmed",
-      "viewDetails": "View Medical History Details",
-      "errorLoading": "Error loading medical history details. Please try again.",  
-      "addSuccess": "Medical history added successfully",
-      "errorSaving": "Error saving medical history. Please try again.",
+      "viewDetails": "View Anamnesis Details",
+      "errorLoading": "Error loading anamnesis details. Please try again.",  
+      "addSuccess": "Anamnesis added successfully",
+      "errorSaving": "Error saving anamnesis. Please try again.",
       "treatmentDetails": "Treatment Details",
       "medicalStatus": "Medical Status",
       "medicalConditions": "Medical Conditions",
@@ -542,6 +542,10 @@
         "psychiatricTreatment": "Psychiatric treatment"
       },
       "confirmation": "I confirm that the above information is correct to the best of my knowledge"
+    },
+    "finances": {
+      "title": "Finances",
+      "comingSoon": "Patient finances coming soon..."
     }
   },
   "treatments": {

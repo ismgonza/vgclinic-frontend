@@ -488,18 +488,18 @@
     "patientNotFound": "Paciente no encontrado",
     "noPhones": "Sin números de teléfono",
     "noEmergencyContacts": "Sin contactos de emergencia",
-    "medicalHistory": {
-      "title": "Historial Médico",
-      "add": "Agregar Historial Médico",
-      "noRecords": "No se encontraron registros de historial médico",
+    "anamnesis": {
+      "title": "Anamnesis",
+      "add": "Agregar Anamnesis",
+      "noRecords": "No se encontraron registros de anamnesis",
       "latest": "Última Entrada",
       "all": "Todas las Entradas",
       "date": "Fecha",
       "confirmed": "Confirmado",
-      "viewDetails": "Ver Detalles del Historial Médico",
-      "errorLoading": "Error al cargar los detalles del historial médico. Por favor, intente nuevamente.",  
-      "addSuccess": "Historial médico agregado correctamente",
-      "errorSaving": "Error al guardar el historial médico. Por favor, intente nuevamente.",
+      "viewDetails": "Ver Detalles de Anamnesis",
+      "errorLoading": "Error al cargar los detalles de anamnesis. Por favor, intente nuevamente.",  
+      "addSuccess": "Anamnesis agregada exitosamente",
+      "errorSaving": "Error al guardar la anamnesis. Por favor, intente nuevamente.",
       "treatmentDetails": "Detalles del Tratamiento",
       "medicalStatus": "Estado Médico",
       "medicalConditions": "Condiciones Médicas",
@@ -543,6 +543,10 @@
         "psychiatricTreatment": "Tratamiento psiquiátrico"
       },
       "confirmation": "Confirmo que la información anterior es correcta según mi conocimiento"
+    },
+    "finances": {
+      "title": "Finanzas",
+      "comingSoon": "Finanzas del paciente proximamente..."
     }
   },
   "treatments": {

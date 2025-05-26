@@ -1,9 +1,10 @@
-// src/components/clinic/TreatmentForm.jsx
+// src/components/clinic/TreatmentForm.jsx - Updated with pre-selected patient
 import React, { useState, useEffect, useContext } from 'react';
 import { Form, Button, Row, Col, Card, Alert, InputGroup } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
 import { AccountContext } from '../../contexts/AccountContext';
 import patientsService from '../../services/patients.service';
 import catalogService from '../../services/catalog.service';
@@ -11,9 +12,13 @@ import usersService from '../../services/users.service';
 import locationsService from '../../services/locations.service';
 import treatmentsService from '../../services/treatments.service';
 
-const TreatmentForm = ({ treatment, onSave, onCancel }) => {
+const TreatmentForm = ({ treatment, onSave, onCancel, preSelectedPatient }) => {
   const { t } = useTranslation();
+  const location = useLocation();
   const { selectedAccount } = useContext(AccountContext);
+  
+  // Get pre-selected patient from props or location state
+  const selectedPatient = preSelectedPatient || location.state?.selectedPatient;
   
   // Form data state
   const [formData, setFormData] = useState({
@@ -60,6 +65,22 @@ const TreatmentForm = ({ treatment, onSave, onCancel }) => {
       setLoadingOptions(false);
     }
   }, [selectedAccount]);
+
+  // Handle pre-selected patient
+  useEffect(() => {
+    if (selectedPatient && !treatment) {
+      // Pre-fill patient data
+      setFormData(prev => ({
+        ...prev,
+        patient: selectedPatient.id
+      }));
+      
+      // Set patient search display
+      setPatientSearch(`${selectedPatient.first_name} ${selectedPatient.last_name1} ${selectedPatient.last_name2 || ''}`.trim());
+      
+      console.log('Pre-selected patient:', selectedPatient);
+    }
+  }, [selectedPatient, treatment]);
 
   const loadOptions = async () => {
     if (!selectedAccount) return;
@@ -261,6 +282,11 @@ const TreatmentForm = ({ treatment, onSave, onCancel }) => {
     <Card>
       <Card.Header>
         {treatment ? t('treatments.editTreatment') : t('treatments.newTreatment')}
+        {selectedPatient && !treatment && (
+          <small className="text-muted d-block mt-1">
+            Patient: {selectedPatient.first_name} {selectedPatient.last_name1} {selectedPatient.last_name2}
+          </small>
+        )}
       </Card.Header>
       <Card.Body>
         {error && <Alert variant="danger">{error}</Alert>}
@@ -290,11 +316,12 @@ const TreatmentForm = ({ treatment, onSave, onCancel }) => {
                       onChange={(e) => setPatientSearch(e.target.value)}
                       onFocus={() => patientSearch.length >= 2 && setShowPatientDropdown(true)}
                       isInvalid={!!errors.patient}
+                      disabled={selectedPatient && !treatment} // Disable if patient is pre-selected
                     />
                   </InputGroup>
                   
                   {/* Patient Dropdown */}
-                  {showPatientDropdown && filteredPatients.length > 0 && (
+                  {showPatientDropdown && filteredPatients.length > 0 && !selectedPatient && (
                     <div className="position-absolute w-100 bg-white border rounded shadow-sm" style={{ zIndex: 1000, top: '100%' }}>
                       {filteredPatients.map(patient => (
                         <div
