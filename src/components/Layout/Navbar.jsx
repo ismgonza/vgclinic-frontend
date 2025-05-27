@@ -56,6 +56,9 @@ const AppNavbar = () => {
                     <Nav.Link as={Link} to="/clinic/treatments">
                       {t('navigation.treatments')}
                     </Nav.Link>
+                    <Nav.Link as={Link} to="/clinic/team">
+                      {t('team.title')}
+                    </Nav.Link>
                   </>
                 )}
                 

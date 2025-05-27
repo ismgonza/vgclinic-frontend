@@ -771,5 +771,47 @@
       "resendSuccess": "Invitation resent successfully",
       "revokeSuccess": "Invitation revoked successfully"
     }
+  },
+  "team": {
+    "title": "Team Management",
+    "description": "Manage your clinic team and invitations",
+    "membersTitle": "Team Members",
+    "membersDescription": "View and manage current team members",
+    "manageMembers": "Manage Members",
+    "invitationsTitle": "Invitations",
+    "invitationsDescription": "Send and manage team invitations",
+    "manageInvitations": "Manage Invitations",
+    "selectAccountFirst": "Please select a clinic first to manage team",
+    "members": {
+      "title": "Team Members",
+      "description": "View and manage current team members",
+      "noMembers": "No team members found.",
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "specialty": "Specialty",
+      "status": "Status",
+      "joinDate": "Join Date",
+      "actions": "Actions",
+      "active": "Active",
+      "inactive": "Inactive",
+      "deactivate": "Deactivate",
+      "reactivate": "Reactivate",
+      "edit": "Edit Member",
+      "remove": "Remove Member",
+      "confirmRemove": "Are you sure you want to remove this team member?",
+      "memberRemoved": "Team member removed successfully",
+      "memberDeactivated": "Team member deactivated successfully",
+      "memberReactivated": "Team member reactivated successfully",
+      "errorLoading": "Error loading team members. Please try again.",
+      "errorRemoving": "Error removing team member. Please try again.",
+      "back": "Back to Team",
+      "roles": {
+        "adm": "Administrator",
+        "doc": "Doctor",
+        "ast": "Assistant", 
+        "rdo": "Read Only"
+      }
+    }
   }
 }

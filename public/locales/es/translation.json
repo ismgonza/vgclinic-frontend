@@ -771,5 +771,85 @@
       "resendSuccess": "Invitación reenviada exitosamente",
       "revokeSuccess": "Invitación revocada exitosamente"
     }
+  },
+  "team": {
+    "title": "Gestión de Equipo",
+    "description": "Administrar el equipo de la clínica e invitaciones",
+    "membersTitle": "Miembros del Equipo",
+    "membersDescription": "Ver y administrar los miembros actuales del equipo",
+    "manageMembers": "Administrar Miembros",
+    "invitationsTitle": "Invitaciones",
+    "invitationsDescription": "Enviar y administrar invitaciones del equipo",
+    "manageInvitations": "Administrar Invitaciones",
+    "selectAccountFirst": "Por favor seleccione una clínica primero para administrar el equipo",
+    "members": {
+      "title": "Miembros del Equipo",
+      "description": "Ver y administrar los miembros actuales del equipo",
+      "noMembers": "No se encontraron miembros del equipo.",
+      "name": "Nombre",
+      "email": "Correo Electrónico",
+      "role": "Rol",
+      "specialty": "Especialidad",
+      "status": "Estado",
+      "joinDate": "Fecha de Ingreso",
+      "actions": "Acciones",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "deactivate": "Desactivar",
+      "reactivate": "Reactivar",
+      "edit": "Editar Miembro",
+      "remove": "Eliminar Miembro",
+      "confirmRemove": "¿Está seguro que desea eliminar este miembro del equipo?",
+      "memberRemoved": "Miembro del equipo eliminado exitosamente",
+      "memberDeactivated": "Miembro del equipo desactivado exitosamente",
+      "memberReactivated": "Miembro del equipo reactivado exitosamente",
+      "errorLoading": "Error al cargar los miembros del equipo. Por favor, intente nuevamente.",
+      "errorRemoving": "Error al eliminar el miembro del equipo. Por favor, intente nuevamente.",
+      "back": "Volver al Equipo",
+      "roles": {
+        "adm": "Administrador",
+        "doc": "Doctor",
+        "ast": "Asistente",
+        "rdo": "Solo Lectura"
+      }
+    },
+    "invitations": {
+      "title": "Invitaciones del Equipo",
+      "description": "Enviar y administrar invitaciones del equipo",
+      "sendInvitation": "Enviar Invitación",
+      "newInvitation": "Nueva Invitación",
+      "noInvitations": "No se encontraron invitaciones.",
+      "email": "Dirección de Correo",
+      "role": "Rol",
+      "specialty": "Especialidad",
+      "status": "Estado",
+      "sentDate": "Enviado",
+      "expiresDate": "Expira",
+      "personalMessage": "Mensaje Personal",
+      "actions": "Acciones",
+      "resend": "Reenviar",
+      "revoke": "Revocar",
+      "pending": "Pendiente",
+      "accepted": "Aceptado",
+      "expired": "Expirado",
+      "revoked": "Revocado",
+      "back": "Volver al Equipo",
+      "form": {
+        "emailHelp": "Ingresa la dirección de correo de la persona que deseas invitar",
+        "selectRole": "Selecciona un rol",
+        "selectSpecialty": "Seleccionar especialidad (opcional)",
+        "personalMessageHelp": "Mensaje opcional para incluir en el correo de invitación",
+        "send": "Enviar Invitación"
+      },
+      "messages": {
+        "invitationSent": "Invitación enviada exitosamente",
+        "invitationResent": "Invitación reenviada exitosamente",
+        "invitationRevoked": "Invitación revocada exitosamente",
+        "errorSending": "Error al enviar la invitación. Por favor, intente nuevamente.",
+        "errorResending": "Error al reenviar la invitación. Por favor, intente nuevamente.",
+        "errorRevoking": "Error al revocar la invitación. Por favor, intente nuevamente.",
+        "errorLoading": "Error al cargar las invitaciones. Por favor, intente nuevamente."
+      }
+    }
   }
 }
