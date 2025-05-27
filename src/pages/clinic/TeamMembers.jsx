@@ -222,11 +222,11 @@ const TeamMembers = () => {
               <tbody>
                 {members.map(member => (
                   <tr key={member.id}>
-                    <td>{member.user?.full_name || `${member.user?.first_name} ${member.user?.last_name}`}</td>
+                    <td>{member.user_details?.full_name || `${member.user_details?.first_name} ${member.user_details?.last_name}`}</td>
                     <td>
-                      {member.user?.email && (
-                        <a href={`mailto:${member.user.email}`} className="text-decoration-none">
-                          {member.user.email}
+                      {member.user_details?.email && (
+                        <a href={`mailto:${member.user_details.email}`} className="text-decoration-none">
+                          {member.user_details.email}
                         </a>
                       )}
                     </td>
@@ -235,7 +235,7 @@ const TeamMembers = () => {
                         {t(`team.members.roles.${member.role}`)}
                       </Badge>
                     </td>
-                    <td>{member.specialty?.name || '-'}</td>
+                    <td>{member.specialty_details?.name || '-'}</td>
                     <td>
                       <Badge bg={member.is_active_in_account ? "success" : "secondary"}>
                         {member.is_active_in_account ? t('team.members.active') : t('team.members.inactive')}
@@ -287,7 +287,7 @@ const TeamMembers = () => {
           {t('team.members.confirmRemove')}
           {memberToRemove && (
             <p className="mt-2 fw-bold">
-              {memberToRemove.user?.full_name || `${memberToRemove.user?.first_name} ${memberToRemove.user?.last_name}`}
+              {memberToRemove.user_details?.full_name || `${memberToRemove.user_details?.first_name} ${memberToRemove.user_details?.last_name}`}
             </p>
           )}
         </Modal.Body>

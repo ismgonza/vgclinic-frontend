@@ -113,7 +113,8 @@ const TeamInvitations = () => {
         email: inviteForm.email,
         role: inviteForm.role,
         specialty: inviteForm.specialty || null,
-        personal_message: inviteForm.personal_message || ''
+        personal_message: inviteForm.personal_message || '',
+        account: selectedAccount.account_id
       };
 
       await invitationsService.sendInvitation(invitationData, accountHeaders);

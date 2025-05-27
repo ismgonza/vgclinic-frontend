@@ -31,11 +31,14 @@ class InvitationsService {
   // Send invitation
   async sendInvitation(invitationData, headers = {}) {
     try {
+      console.log('Sending invitation with data:', invitationData);
       const response = await api.post('/accounts/invitations/', invitationData, {
         headers
       });
       return response.data;
     } catch (error) {
+      console.error('Full error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
       throw error;
     }
   }
