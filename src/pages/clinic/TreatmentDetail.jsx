@@ -720,7 +720,7 @@ const TreatmentDetail = () => {
               <Card.Header>
                 <h6 className="mb-0">
                   <FontAwesomeIcon icon={faMapMarkerAlt} className="me-2" />
-                  Location
+                  {t('treatments.fields.location')}
                 </h6>
               </Card.Header>
               <Card.Body>
@@ -754,7 +754,7 @@ const TreatmentDetail = () => {
                 <thead>
                   <tr>
                     <th width="140">{t('treatments.notes.dateTime')}</th>
-                    <th width="100">Type</th>
+                    <th width="100">{t('treatments.notes.type')}</th>
                     <th>{t('treatments.notes.note')}</th>
                     <th width="140">{t('treatments.notes.createdBy')}</th>
                     <th width="120">{t('common.actions')}</th>

@@ -18,7 +18,12 @@
     "locations": "Ubicaciones",
     "profile": "Mi Perfil",
     "logout": "Cerrar Sesión",
-    "user": "Usuario"
+    "user": "Usuario",
+    "acctSelector": {
+      "noClinic": "No hay clínicas disponibles",
+      "current": "Clínica Actual",
+      "available": "Clínicas Disponibles"
+    }
   },
   "footer": {
     "allRightsReserved": "Todos los derechos reservados.",
@@ -591,7 +596,7 @@
       "updateNote": "Actualizar Nota",
       "noteLabel": "Nota",
       "note": "Nota",
-      "type": "Tipo de nota",
+      "type": "Tipo",
       "dateTime": "Fecha y Hora",
       "createdBy": "Creado Por",
       "notePlaceholder": "Ingrese nota del tratamiento...",
@@ -657,6 +662,7 @@
       "branch": "Sucursal",
       "status": "Estado",
       "billing": "Facturación",
+      "location": "Sucursal",
       "scheduledDate": "Fecha Programada",
       "completedDate": "Fecha Completada",
       "notes": "Notas",
@@ -688,6 +694,7 @@
     },
     
     "schedule": {
+      "title": "Programación del Tratamiento",
       "currentSchedule": "Horario Actual",
       "previousSchedules": "Horarios Anteriores",
       "rescheduled": "Reprogramado",

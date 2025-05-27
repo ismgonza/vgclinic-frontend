@@ -18,7 +18,12 @@
     "locations": "Locations",
     "profile": "My Profile",
     "logout": "Logout",
-    "user": "User"
+    "user": "User",
+    "acctSelector": {
+      "noClinic": "No clinics available",
+      "current": "Current Clinic",
+      "available": "Available Clinics"
+    }
   },
   "footer": {
     "allRightsReserved": "All rights reserved.",
@@ -590,7 +595,7 @@
       "updateNote": "Update Note",
       "noteLabel": "Note",
       "note": "Note",
-      "type": "Note Type",
+      "type": "Type",
       "dateTime": "Date & Time",
       "createdBy": "Created By",
       "notePlaceholder": "Enter treatment note...",
@@ -656,6 +661,7 @@
       "branch": "Branch",
       "status": "Status",
       "billing": "Billing",
+      "location": "Branch",
       "scheduledDate": "Scheduled Date",
       "completedDate": "Completed Date",
       "notes": "Notes",
@@ -688,6 +694,7 @@
     },
 
     "schedule": {
+      "title": "Treatment Schedule",
       "currentSchedule": "Current Schedule",
       "previousSchedules": "Previous Schedules",
       "rescheduled": "Rescheduled",

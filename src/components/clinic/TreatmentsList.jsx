@@ -54,6 +54,8 @@ const TreatmentsList = ({ treatments, onStatusChange, onViewTreatment, loading }
     switch (status) {
       case 'SCHEDULED':
         return 'primary';
+      case 'RESCHEDULED':
+        return 'warning';
       case 'IN_PROGRESS':
         return 'warning';
       case 'COMPLETED':
@@ -82,6 +84,7 @@ const TreatmentsList = ({ treatments, onStatusChange, onViewTreatment, loading }
   // Status options for dropdown
   const statusOptions = [
     { value: 'SCHEDULED', label: t('treatments.status.SCHEDULED') },
+    { value: 'RESCHEDULED', label: t('treatments.status.RESCHEDULED') },
     { value: 'IN_PROGRESS', label: t('treatments.status.IN_PROGRESS') },
     { value: 'COMPLETED', label: t('treatments.status.COMPLETED') },
     { value: 'CANCELED', label: t('treatments.status.CANCELED') }
@@ -150,8 +153,11 @@ const TreatmentsList = ({ treatments, onStatusChange, onViewTreatment, loading }
               </div>
             </td>
 
-            {/* Treatment Column */}
+            {/* Treatment Column - Now includes specialty */}
             <td className="treatment-cell">
+              <div className="specialty-name text-primary fw-bold small">
+                {treatment.specialty_details?.name || 'General'}
+              </div>
               <div className="treatment-name fw-bold">
                 {treatment.catalog_item_details?.name || 'Treatment'}
               </div>

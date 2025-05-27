@@ -6,6 +6,7 @@ import { faSearch, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
 import { AccountContext } from '../../contexts/AccountContext';
 import patientsService from '../../services/patients.service';
+import catalogService from '../../services/catalog.service';
 import locationsService from '../../services/locations.service';
 import treatmentsService from '../../services/treatments.service';
 
@@ -18,6 +19,7 @@ const TreatmentFilters = ({ filters, onFiltersChange, onClearFilters }) => {
   const [patients, setPatients] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [branches, setBranches] = useState([]);
+  const [specialties, setSpecialties] = useState([]);
   const [loadingOptions, setLoadingOptions] = useState(true);
   
   // Patient search
@@ -34,6 +36,7 @@ const TreatmentFilters = ({ filters, onFiltersChange, onClearFilters }) => {
       setPatients([]);
       setDoctors([]);
       setBranches([]);
+      setSpecialties([]);
       setLoadingOptions(false);
     }
   }, [selectedAccount]);
@@ -49,20 +52,23 @@ const TreatmentFilters = ({ filters, onFiltersChange, onClearFilters }) => {
         'X-Account-Context': selectedAccount.account_id
       };
       
-      const [patientsData, formOptionsData, branchesData] = await Promise.all([
+      const [patientsData, formOptionsData, branchesData, specialtiesData] = await Promise.all([
         patientsService.getPatients({ limit: 100 }, accountHeaders),
         treatmentsService.getFormOptions(accountHeaders),
-        locationsService.getBranches(accountHeaders)
+        locationsService.getBranches(accountHeaders),
+        catalogService.getSpecialties(accountHeaders)
       ]);
       
       setPatients(patientsData.results || patientsData);
       setDoctors(formOptionsData.doctors || []);
       setBranches(branchesData.filter(branch => branch.is_active));
+      setSpecialties(specialtiesData || []);
       
       console.log('Loaded filter options for account:', selectedAccount.account_name);
       console.log('Patients:', (patientsData.results || patientsData).length);
       console.log('Doctors:', formOptionsData.doctors?.length || 0);
       console.log('Branches:', branchesData.filter(branch => branch.is_active).length);
+      console.log('Specialties:', specialtiesData?.length || 0);
       
     } catch (err) {
       console.error('Error loading filter options:', err);
@@ -98,7 +104,7 @@ const TreatmentFilters = ({ filters, onFiltersChange, onClearFilters }) => {
     onFiltersChange(newFilters);
   };
 
-  // Handle multi-select changes (status, doctor)
+  // Handle multi-select changes (status, doctor, specialty)
   const handleMultiSelectChange = (filterName, value, checked) => {
     const currentValues = filters[filterName] || [];
     let newValues;
@@ -129,6 +135,7 @@ const TreatmentFilters = ({ filters, onFiltersChange, onClearFilters }) => {
   // Status options
   const statusOptions = [
     { value: 'SCHEDULED', label: t('treatments.status.SCHEDULED') },
+    { value: 'RESCHEDULED', label: t('treatments.status.RESCHEDULED') },
     { value: 'IN_PROGRESS', label: t('treatments.status.IN_PROGRESS') },
     { value: 'COMPLETED', label: t('treatments.status.COMPLETED') },
     { value: 'CANCELED', label: t('treatments.status.CANCELED') }
@@ -149,7 +156,7 @@ const TreatmentFilters = ({ filters, onFiltersChange, onClearFilters }) => {
     <div className="treatment-filters">
       <Row className="g-3">
         {/* Patient Search */}
-        <Col md={3}>
+        <Col lg={2} md={3}>
           <Form.Label className="small fw-bold">{t('treatments.fields.patient')}</Form.Label>
           <div className="position-relative">
             <InputGroup>
@@ -163,6 +170,7 @@ const TreatmentFilters = ({ filters, onFiltersChange, onClearFilters }) => {
                 onChange={(e) => setPatientSearch(e.target.value)}
                 onFocus={() => patientSearch.length >= 2 && setShowPatientDropdown(true)}
                 disabled={loadingOptions}
+                size="sm"
               />
               {patientSearch && (
                 <Button 
@@ -188,7 +196,7 @@ const TreatmentFilters = ({ filters, onFiltersChange, onClearFilters }) => {
                     onMouseEnter={(e) => e.target.style.backgroundColor = '#f8f9fa'}
                     onMouseLeave={(e) => e.target.style.backgroundColor = 'transparent'}
                   >
-                    <div className="fw-bold">{patient.first_name} {patient.last_name1} {patient.last_name2}</div>
+                    <div className="fw-bold small">{patient.first_name} {patient.last_name1} {patient.last_name2}</div>
                     <small className="text-muted">ID: {patient.id_number}</small>
                   </div>
                 ))}
@@ -197,8 +205,30 @@ const TreatmentFilters = ({ filters, onFiltersChange, onClearFilters }) => {
           </div>
         </Col>
 
+        {/* Specialty Multi-Select */}
+        <Col lg={2} md={3}>
+          <Form.Label className="small fw-bold">{t('treatments.fields.specialty')}</Form.Label>
+          <div className="border rounded p-2" style={{ maxHeight: '120px', overflowY: 'auto' }}>
+            {loadingOptions ? (
+              <small className="text-muted">{t('common.loading')}...</small>
+            ) : (
+              specialties.map(specialty => (
+                <Form.Check
+                  key={specialty.id}
+                  type="checkbox"
+                  id={`specialty-${specialty.id}`}
+                  label={specialty.name}
+                  checked={filters.specialty?.includes(specialty.id.toString()) || false}
+                  onChange={(e) => handleMultiSelectChange('specialty', specialty.id.toString(), e.target.checked)}
+                  className="small"
+                />
+              ))
+            )}
+          </div>
+        </Col>
+
         {/* Status Multi-Select */}
-        <Col md={2}>
+        <Col lg={2} md={3}>
           <Form.Label className="small fw-bold">{t('treatments.fields.status')}</Form.Label>
           <div className="border rounded p-2" style={{ maxHeight: '120px', overflowY: 'auto' }}>
             {statusOptions.map(option => (
@@ -216,7 +246,7 @@ const TreatmentFilters = ({ filters, onFiltersChange, onClearFilters }) => {
         </Col>
 
         {/* Doctor Multi-Select */}
-        <Col md={2}>
+        <Col lg={2} md={3}>
           <Form.Label className="small fw-bold">{t('treatments.fields.doctor')}</Form.Label>
           <div className="border rounded p-2" style={{ maxHeight: '120px', overflowY: 'auto' }}>
             {loadingOptions ? (
@@ -238,7 +268,7 @@ const TreatmentFilters = ({ filters, onFiltersChange, onClearFilters }) => {
         </Col>
 
         {/* Branch Select */}
-        <Col md={2}>
+        <Col lg={2} md={3}>
           <Form.Label className="small fw-bold">{t('treatments.fields.branch')}</Form.Label>
           <Form.Select
             value={filters.branch || ''}
@@ -256,7 +286,7 @@ const TreatmentFilters = ({ filters, onFiltersChange, onClearFilters }) => {
         </Col>
 
         {/* Date Range */}
-        <Col md={2}>
+        <Col lg={1} md={2}>
           <Form.Label className="small fw-bold">{t('treatments.filters.dateFrom')}</Form.Label>
           <Form.Control
             type="date"
@@ -266,7 +296,7 @@ const TreatmentFilters = ({ filters, onFiltersChange, onClearFilters }) => {
           />
         </Col>
 
-        <Col md={1}>
+        <Col lg={1} md={2}>
           <Form.Label className="small fw-bold">{t('treatments.filters.dateTo')}</Form.Label>
           <Form.Control
             type="date"

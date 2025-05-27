@@ -1,4 +1,4 @@
-// src/components/clinic/TreatmentForm.jsx - Updated with pre-selected patient
+// src/components/clinic/TreatmentForm.jsx - Updated with specialty-based doctor filtering
 import React, { useState, useEffect, useContext } from 'react';
 import { Form, Button, Row, Col, Card, Alert, InputGroup } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -38,6 +38,7 @@ const TreatmentForm = ({ treatment, onSave, onCancel, preSelectedPatient }) => {
   const [catalogItems, setCatalogItems] = useState([]);
   const [specialties, setSpecialties] = useState([]);
   const [doctors, setDoctors] = useState([]);
+  const [allDoctors, setAllDoctors] = useState([]); // Store all doctors for fallback
   const [branches, setBranches] = useState([]);
   
   // Patient search
@@ -49,6 +50,7 @@ const TreatmentForm = ({ treatment, onSave, onCancel, preSelectedPatient }) => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [loadingOptions, setLoadingOptions] = useState(true);
+  const [loadingDoctors, setLoadingDoctors] = useState(false);
   const [error, setError] = useState(null);
 
   // Load form options - reload when account changes
@@ -61,6 +63,7 @@ const TreatmentForm = ({ treatment, onSave, onCancel, preSelectedPatient }) => {
       setCatalogItems([]);
       setSpecialties([]);
       setDoctors([]);
+      setAllDoctors([]);
       setBranches([]);
       setLoadingOptions(false);
     }
@@ -97,7 +100,7 @@ const TreatmentForm = ({ treatment, onSave, onCancel, preSelectedPatient }) => {
         patientsService.getPatients({ limit: 100 }, accountHeaders),
         catalogService.getCatalogItems(null, accountHeaders),
         catalogService.getSpecialties(accountHeaders),
-        treatmentsService.getFormOptions(accountHeaders),
+        treatmentsService.getFormOptions(accountHeaders), // Load all doctors initially
         locationsService.getBranches({}, accountHeaders)
       ]);
       
@@ -105,11 +108,12 @@ const TreatmentForm = ({ treatment, onSave, onCancel, preSelectedPatient }) => {
       setCatalogItems(catalogData);
       setSpecialties(specialtiesData);
       setDoctors(formOptionsData.doctors || []);
+      setAllDoctors(formOptionsData.doctors || []); // Store all doctors
       setBranches(branchesData.filter(branch => branch.is_active));
       
       console.log('Loaded form options for account:', selectedAccount.account_name);
       console.log('Patients:', (patientsData.results || patientsData).length);
-      console.log('Doctors:', formOptionsData.doctors?.length || 0);
+      console.log('All Doctors:', formOptionsData.doctors?.length || 0);
       console.log('Catalog items:', catalogData.length);
       console.log('Branches:', branchesData.filter(branch => branch.is_active).length);
       
@@ -118,6 +122,38 @@ const TreatmentForm = ({ treatment, onSave, onCancel, preSelectedPatient }) => {
       setError(t('treatments.errorLoadingOptions'));
     } finally {
       setLoadingOptions(false);
+    }
+  };
+
+  // Load doctors filtered by specialty
+  const loadDoctorsBySpecialty = async (specialtyId) => {
+    if (!selectedAccount || !specialtyId) {
+      // No specialty selected, show all doctors
+      setDoctors(allDoctors);
+      return;
+    }
+    
+    try {
+      setLoadingDoctors(true);
+      console.log('Loading doctors for specialty:', specialtyId);
+      
+      // Set account context for API calls
+      const accountHeaders = {
+        'X-Account-Context': selectedAccount.account_id
+      };
+      
+      // Fetch doctors filtered by specialty
+      const formOptionsData = await treatmentsService.getFormOptions(accountHeaders, specialtyId);
+      
+      console.log('Filtered doctors by specialty:', formOptionsData.doctors?.length || 0);
+      setDoctors(formOptionsData.doctors || []);
+      
+    } catch (err) {
+      console.error('Error loading doctors by specialty:', err);
+      // Fallback to all doctors if filtering fails
+      setDoctors(allDoctors);
+    } finally {
+      setLoadingDoctors(false);
     }
   };
 
@@ -198,16 +234,68 @@ const TreatmentForm = ({ treatment, onSave, onCancel, preSelectedPatient }) => {
     }
   };
 
-  // Handle catalog item change (update specialty)
+  // Handle catalog item change (update specialty and filter doctors)
   const handleCatalogItemChange = (e) => {
     const catalogItemId = e.target.value;
     const selectedItem = catalogItems.find(item => item.id == catalogItemId);
     
-    setFormData({
+    console.log('Selected catalog item:', selectedItem);
+    
+    // Update form data
+    const newFormData = {
       ...formData,
       catalog_item: catalogItemId,
-      specialty: selectedItem ? selectedItem.specialty : ''
+      specialty: selectedItem ? selectedItem.specialty : '',
+      doctor: '' // Reset doctor selection when procedure changes
+    };
+    
+    setFormData(newFormData);
+    
+    // Clear doctor error since we're resetting the selection
+    if (errors.doctor) {
+      setErrors({
+        ...errors,
+        doctor: undefined
+      });
+    }
+    
+    // Load doctors filtered by the new specialty
+    if (selectedItem && selectedItem.specialty) {
+      console.log('Loading doctors for specialty:', selectedItem.specialty);
+      loadDoctorsBySpecialty(selectedItem.specialty);
+    } else {
+      // No specialty, show all doctors
+      setDoctors(allDoctors);
+    }
+  };
+
+  // Handle specialty change (filter catalog items and doctors)
+  const handleSpecialtyChange = (e) => {
+    const specialtyId = e.target.value;
+    
+    setFormData({
+      ...formData,
+      specialty: specialtyId,
+      catalog_item: '', // Reset catalog item when specialty changes
+      doctor: '' // Reset doctor selection when specialty changes
     });
+    
+    // Clear errors
+    if (errors.catalog_item) {
+      setErrors({
+        ...errors,
+        catalog_item: undefined,
+        doctor: undefined
+      });
+    }
+    
+    // Load doctors for the new specialty
+    if (specialtyId) {
+      loadDoctorsBySpecialty(specialtyId);
+    } else {
+      // No specialty selected, show all doctors
+      setDoctors(allDoctors);
+    }
   };
 
   // Form validation
@@ -353,7 +441,7 @@ const TreatmentForm = ({ treatment, onSave, onCancel, preSelectedPatient }) => {
                 <Form.Select
                   name="specialty"
                   value={formData.specialty}
-                  onChange={handleChange}
+                  onChange={handleSpecialtyChange}
                 >
                   <option value="">{t('catalog.selectSpecialty')}</option>
                   {specialties.map(specialty => (
@@ -391,16 +479,24 @@ const TreatmentForm = ({ treatment, onSave, onCancel, preSelectedPatient }) => {
 
             {/* Doctor Selection */}
             <Form.Group as={Row} className="mb-3">
-              <Form.Label column sm={3}>{t('treatments.fields.doctor')} *</Form.Label>
+              <Form.Label column sm={3}>
+                {t('treatments.fields.doctor')} *
+                {loadingDoctors && (
+                  <small className="text-muted d-block">Loading doctors...</small>
+                )}
+              </Form.Label>
               <Col sm={9}>
                 <Form.Select
                   name="doctor"
                   value={formData.doctor}
                   onChange={handleChange}
                   isInvalid={!!errors.doctor}
+                  disabled={loadingDoctors}
                   required
                 >
-                  <option value="">{t('treatments.selectDoctor')}</option>
+                  <option value="">
+                    {loadingDoctors ? 'Loading doctors...' : t('treatments.selectDoctor')}
+                  </option>
                   {doctors.map(doctor => (
                     <option key={doctor.id} value={doctor.id}>
                       {doctor.first_name} {doctor.last_name}
@@ -410,6 +506,11 @@ const TreatmentForm = ({ treatment, onSave, onCancel, preSelectedPatient }) => {
                 <Form.Control.Feedback type="invalid">
                   {errors.doctor}
                 </Form.Control.Feedback>
+                {formData.specialty && doctors.length === 0 && !loadingDoctors && (
+                  <Form.Text className="text-muted">
+                    No doctors available for this specialty. Owners can perform any procedure.
+                  </Form.Text>
+                )}
               </Col>
             </Form.Group>
 
@@ -501,7 +602,7 @@ const TreatmentForm = ({ treatment, onSave, onCancel, preSelectedPatient }) => {
                 <Button 
                   variant="primary" 
                   type="submit"
-                  disabled={loading || loadingOptions}
+                  disabled={loading || loadingOptions || loadingDoctors}
                 >
                   {loading ? t('common.saving') : t('common.save')}
                 </Button>

@@ -22,9 +22,10 @@ const Treatments = () => {
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
 
-  // Filters state (we'll expand this in the next step)
+  // Filters state - Added specialty filter
   const [filters, setFilters] = useState({
     patient: '',
+    specialty: [], // Added specialty filter
     status: [],
     doctor: [],
     branch: '',
@@ -37,8 +38,9 @@ const Treatments = () => {
     const urlParams = new URLSearchParams(location.search);
     const newFilters = { ...filters };
     
-    // Parse URL parameters
+    // Parse URL parameters - Added specialty parsing
     if (urlParams.get('patient')) newFilters.patient = urlParams.get('patient');
+    if (urlParams.get('specialty')) newFilters.specialty = urlParams.get('specialty').split(',');
     if (urlParams.get('status')) newFilters.status = urlParams.get('status').split(',');
     if (urlParams.get('doctor')) newFilters.doctor = urlParams.get('doctor').split(',');
     if (urlParams.get('branch')) newFilters.branch = urlParams.get('branch');
@@ -61,21 +63,37 @@ const Treatments = () => {
   }, [filters]);
 
   const fetchTreatments = async () => {
+    if (!selectedAccount) {
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
       
-      // Prepare API parameters
+      // Set account context for API calls
+      const accountHeaders = {
+        'X-Account-Context': selectedAccount.account_id
+      };
+      
+      // Prepare API parameters - Added specialty parameter
       const params = {};
       if (filters.patient) params.patient = filters.patient;
-      if (filters.status.length > 0) params.status = filters.status.join(',');
-      if (filters.doctor.length > 0) params.doctor = filters.doctor.join(',');
+      if (filters.specialty && filters.specialty.length > 0) params.specialty = filters.specialty.join(',');
+      if (filters.status && filters.status.length > 0) params.status = filters.status.join(',');
+      if (filters.doctor && filters.doctor.length > 0) params.doctor = filters.doctor.join(',');
       if (filters.branch) params.location = filters.branch; // NOTE: using 'location' instead of 'branch'
       if (filters.date_from) params.start_date = filters.date_from;
       if (filters.date_to) params.end_date = filters.date_to;
+      
+      console.log('Fetching treatments with params:', params);
+      console.log('Account headers:', accountHeaders);
         
-      const data = await treatmentsService.getTreatments(params);
+      const data = await treatmentsService.getTreatments(params, accountHeaders);
       setTreatments(data.results || data);
+      
+      console.log('Fetched treatments:', data.results?.length || data.length);
     } catch (err) {
       console.error('Error fetching treatments:', err);
       setError(t('treatments.errorLoading'));
@@ -85,15 +103,17 @@ const Treatments = () => {
   };
 
   const handleNewTreatment = () => {
-    // We'll implement this later
     navigate('/clinic/treatments/new');
   };
 
   const handleFiltersChange = (newFilters) => {
-    // Update URL with new filters
+    console.log('Filters changed:', newFilters);
+    
+    // Update URL with new filters - Added specialty to URL params
     const params = new URLSearchParams();
     
     if (newFilters.patient) params.set('patient', newFilters.patient);
+    if (newFilters.specialty && newFilters.specialty.length > 0) params.set('specialty', newFilters.specialty.join(','));
     if (newFilters.status && newFilters.status.length > 0) params.set('status', newFilters.status.join(','));
     if (newFilters.doctor && newFilters.doctor.length > 0) params.set('doctor', newFilters.doctor.join(','));
     if (newFilters.branch) params.set('branch', newFilters.branch);
@@ -111,6 +131,7 @@ const Treatments = () => {
   const handleClearFilters = () => {
     const clearedFilters = {
       patient: '',
+      specialty: [], // Added specialty to clear filters
       status: [],
       doctor: [],
       branch: '',
@@ -126,8 +147,15 @@ const Treatments = () => {
   };
 
   const handleStatusChange = async (treatmentId, newStatus) => {
+    if (!selectedAccount) return;
+
     try {
-      await treatmentsService.updateTreatmentStatus(treatmentId, newStatus);
+      // Set account context for API calls
+      const accountHeaders = {
+        'X-Account-Context': selectedAccount.account_id
+      };
+      
+      await treatmentsService.updateTreatmentStatus(treatmentId, newStatus, accountHeaders);
       
       // Update local state
       setTreatments(treatments.map(treatment => 
@@ -147,6 +175,17 @@ const Treatments = () => {
   const handleViewTreatment = (treatment) => {
     navigate(`/clinic/treatments/${treatment.id}`);
   };
+
+  // Show message if no account selected
+  if (!selectedAccount) {
+    return (
+      <Container fluid className="py-4">
+        <div className="text-center py-4 text-muted">
+          <p>Please select a clinic first to view treatments</p>
+        </div>
+      </Container>
+    );
+  }
 
   return (
     <Container fluid className="py-4">

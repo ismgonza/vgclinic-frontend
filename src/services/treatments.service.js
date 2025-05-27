@@ -94,10 +94,17 @@ class TreatmentsService {
     }
   }
 
-  async getFormOptions(headers = {}) {
+  // Updated form options with specialty filtering
+  async getFormOptions(headers = {}, specialtyId = null) {
     try {
+      const params = {};
+      if (specialtyId) {
+        params.specialty_id = specialtyId;
+      }
+      
       const response = await api.get('/clinic/treatments/treatments/form_options/', {
-        headers
+        headers,
+        params
       });
       return response.data;
     } catch (error) {

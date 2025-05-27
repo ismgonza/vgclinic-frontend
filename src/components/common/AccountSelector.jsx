@@ -39,7 +39,7 @@ const AccountSelector = () => {
     return (
       <div className="account-selector-empty">
         <FontAwesomeIcon icon={faBuilding} className="me-2" />
-        <small>No clinics available</small>
+        <small>{t('navigation.acctSelector.noClinic')}</small>
       </div>
     );
   }
@@ -52,7 +52,7 @@ const AccountSelector = () => {
           <FontAwesomeIcon icon={faBuilding} />
         </div>
         <div className="account-info">
-          <div className="account-label">Current Clinic</div>
+          <div className="account-label">{t('navigation.acctSelector.current')}</div>
           <div className="account-name">{userAccounts[0].account_name}</div>
         </div>
       </div>
@@ -73,7 +73,7 @@ const AccountSelector = () => {
               <FontAwesomeIcon icon={faBuilding} />
             </div>
             <div className="account-info">
-              <div className="account-label">Current Clinic</div>
+              <div className="account-label">{t('navigation.acctSelector.current')}</div>
               <div className="account-name">
                 {selectedAccount ? selectedAccount.account_name : 'Select Clinic'}
                 {!isAccountSelected && (
@@ -88,7 +88,7 @@ const AccountSelector = () => {
         <Dropdown.Menu className="account-dropdown-menu">
           <div className="dropdown-header">
             <FontAwesomeIcon icon={faBuilding} className="me-2" />
-            Available Clinics
+            {t('navigation.acctSelector.available')}
           </div>
           <div className="dropdown-divider"></div>
           
