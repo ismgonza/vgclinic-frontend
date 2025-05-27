@@ -711,5 +711,65 @@
       "completedSuccess": "Tratamiento completado exitosamente",
       "canceledSuccess": "Tratamiento cancelado exitosamente"
     }
+  },
+  "invitations": {
+    "title": "Invitaciones de Equipo",
+    "description": "Invitar usuarios a unirse a su clínica", 
+    "sendInvitation": "Enviar Invitación",
+    "manageInvitations": "Gestionar Invitaciones",
+    "newInvitation": "Nueva Invitación",
+    "invitationSent": "Invitación enviada exitosamente",
+    "invitationAccepted": "Invitación aceptada exitosamente",
+    
+    "acceptance": {
+      "title": "Únete a {{clinicName}}",
+      "welcomeExisting": "¡Bienvenido de nuevo! Has sido invitado a unirte a {{clinicName}} como {{role}}.",
+      "welcomeNew": "Has sido invitado a crear una cuenta y unirte a {{clinicName}} como {{role}}.",
+      "personalMessage": "Mensaje Personal",
+      "acceptButton": "Aceptar Invitación",
+      "createAccountButton": "Crear Cuenta y Unirse",
+      "expired": "Esta invitación ha expirado",
+      "invalid": "Esta invitación ya no es válida",
+      "loading": "Validando invitación...",
+      "processing": "Procesando...",
+      "success": "¡Te has unido exitosamente a {{clinicName}}!",
+      "error": "Ocurrió un error al procesar tu invitación"
+    },
+    
+    "form": {
+      "email": "Dirección de Correo",
+      "emailHelp": "Ingresa la dirección de correo de la persona que deseas invitar",
+      "role": "Rol",
+      "selectRole": "Selecciona un rol",
+      "roles": {
+        "adm": "Administrador",
+        "doc": "Doctor",
+        "ast": "Asistente", 
+        "rdo": "Solo Lectura"
+      },
+      "specialty": "Especialidad",
+      "selectSpecialty": "Seleccionar especialidad (opcional)",
+      "personalMessage": "Mensaje Personal",
+      "personalMessageHelp": "Mensaje opcional para incluir en el correo de invitación",
+      "send": "Enviar Invitación"
+    },
+    
+    "list": {
+      "email": "Correo",
+      "role": "Rol",
+      "status": "Estado", 
+      "sentDate": "Enviado",
+      "expiresDate": "Expira",
+      "actions": "Acciones",
+      "resend": "Reenviar",
+      "revoke": "Revocar",
+      "pending": "Pendiente",
+      "accepted": "Aceptado",
+      "expired": "Expirado",
+      "revoked": "Revocado",
+      "noInvitations": "No se encontraron invitaciones",
+      "resendSuccess": "Invitación reenviada exitosamente",
+      "revokeSuccess": "Invitación revocada exitosamente"
+    }
   }
 }

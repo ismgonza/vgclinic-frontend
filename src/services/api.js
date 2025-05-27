@@ -1,8 +1,8 @@
-// src/services/api.js - UPDATE the request interceptor
+// src/services/api.js
 import axios from 'axios';
 
-// Define base URL for API requests
-const API_URL = 'http://localhost:8000/api/';
+// Use environment variable for API URL - with fallback for browser compatibility
+const API_URL = (typeof process !== 'undefined' && process.env?.REACT_APP_API_URL) || 'http://localhost:8000/api/';
 
 // Create axios instance with default config
 const api = axios.create({

@@ -23,6 +23,8 @@ import PatientDetail from './pages/clinic/PatientDetail';
 import Treatments from './pages/clinic/Treatments';
 import TreatmentDetail from './pages/clinic/TreatmentDetail';
 import NewTreatment from './pages/clinic/NewTreatment';
+import InvitationAcceptance from './pages/InvitationAcceptance';
+
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -46,6 +48,8 @@ function App() {
             {/* Public routes - no layout */}
             <Route path="/login" element={<Login />} />
             
+            <Route path="/accept-invitation/:token" element={<InvitationAcceptance />} />
+
             {/* Protected routes - for all authenticated users */}
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             

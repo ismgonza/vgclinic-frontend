@@ -711,5 +711,65 @@
       "completedSuccess": "Treatment completed successfully",
       "canceledSuccess": "Treatment canceled successfully"
     }
+  },
+  "invitations": {
+    "title": "Team Invitations", 
+    "description": "Invite users to join your clinic",
+    "sendInvitation": "Send Invitation",
+    "manageInvitations": "Manage Invitations",
+    "newInvitation": "New Invitation",
+    "invitationSent": "Invitation sent successfully",
+    "invitationAccepted": "Invitation accepted successfully",
+    
+    "acceptance": {
+      "title": "Join {{clinicName}}",
+      "welcomeExisting": "Welcome back! You've been invited to join {{clinicName}} as {{role}}.",
+      "welcomeNew": "You've been invited to create an account and join {{clinicName}} as {{role}}.",
+      "personalMessage": "Personal Message",
+      "acceptButton": "Accept Invitation",
+      "createAccountButton": "Create Account & Join",
+      "expired": "This invitation has expired",
+      "invalid": "This invitation is no longer valid",
+      "loading": "Validating invitation...",
+      "processing": "Processing...",
+      "success": "Successfully joined {{clinicName}}!",
+      "error": "An error occurred while processing your invitation"
+    },
+    
+    "form": {
+      "email": "Email Address",
+      "emailHelp": "Enter the email address of the person you want to invite",
+      "role": "Role",
+      "selectRole": "Select a role",
+      "roles": {
+        "adm": "Administrator",
+        "doc": "Doctor", 
+        "ast": "Assistant",
+        "rdo": "Read Only"
+      },
+      "specialty": "Specialty",
+      "selectSpecialty": "Select specialty (optional)",
+      "personalMessage": "Personal Message",
+      "personalMessageHelp": "Optional message to include in the invitation email",
+      "send": "Send Invitation"
+    },
+    
+    "list": {
+      "email": "Email",
+      "role": "Role", 
+      "status": "Status",
+      "sentDate": "Sent",
+      "expiresDate": "Expires",
+      "actions": "Actions",
+      "resend": "Resend",
+      "revoke": "Revoke",
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "expired": "Expired",
+      "revoked": "Revoked",
+      "noInvitations": "No invitations found",
+      "resendSuccess": "Invitation resent successfully",
+      "revokeSuccess": "Invitation revoked successfully"
+    }
   }
 }
