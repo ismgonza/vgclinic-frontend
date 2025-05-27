@@ -41,18 +41,15 @@ export const AccountProvider = ({ children }) => {
         );
         
         if (savedAccount) {
-          console.log('Restoring saved account:', savedAccount.account_name);
           setSelectedAccount(savedAccount);
         } else {
           // Saved account not found, auto-select first account
-          console.log('Saved account not found, selecting first account');
           const firstAccount = userAccounts[0];
           setSelectedAccount(firstAccount);
           localStorage.setItem('selectedAccountId', String(firstAccount.account_id));
         }
       } else {
         // No saved account, auto-select first account
-        console.log('No saved account, selecting first account');
         const firstAccount = userAccounts[0];
         setSelectedAccount(firstAccount);
         localStorage.setItem('selectedAccountId', String(firstAccount.account_id));
@@ -67,11 +64,9 @@ export const AccountProvider = ({ children }) => {
       
       // Get accounts the user has access to
       const accounts = await accountsService.getAccounts();
-      console.log('Loaded user accounts:', accounts);
       setUserAccounts(accounts);
       
     } catch (err) {
-      console.error('Error loading user accounts:', err);
       setError('Failed to load accounts');
       setLoading(false);
     } finally {
@@ -80,7 +75,6 @@ export const AccountProvider = ({ children }) => {
   };
 
   const switchAccount = (account) => {
-    console.log('Switching to account:', account.account_name);
     setSelectedAccount(account);
     localStorage.setItem('selectedAccountId', String(account.account_id));
   };

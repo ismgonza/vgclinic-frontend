@@ -94,6 +94,18 @@ class TreatmentsService {
     }
   }
 
+  // Get user role information in selected account
+  async getUserRoleInfo(headers = {}) {
+    try {
+      const response = await api.get('/clinic/treatments/treatments/user_role_info/', {
+        headers
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   // Updated form options with specialty filtering
   async getFormOptions(headers = {}, specialtyId = null) {
     try {

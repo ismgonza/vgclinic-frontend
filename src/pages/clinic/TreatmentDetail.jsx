@@ -46,16 +46,12 @@ const TreatmentDetail = () => {
       setLoading(true);
       setError(null);
       
-      // Set account context for API calls
       const accountHeaders = {
         'X-Account-Context': selectedAccount.account_id
       };
       
-      // Fetch treatment details
       const treatmentData = await treatmentsService.getTreatment(id, accountHeaders);
       setTreatment(treatmentData);
-      
-      console.log('Loaded treatment for account:', selectedAccount.account_name);
       
     } catch (err) {
       console.error('Error fetching treatment data:', err);
@@ -87,13 +83,12 @@ const TreatmentDetail = () => {
       setSuccessMessage(t('treatments.updateSuccess') || 'Treatment updated successfully');
       setShowEditForm(false);
       
-      // Refresh treatment data
       await fetchTreatmentData();
       
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
       console.error('Error updating treatment:', err);
-      throw err; // Re-throw to let the form component handle it
+      throw err;
     }
   };
 
@@ -113,7 +108,6 @@ const TreatmentDetail = () => {
       setTreatment({ ...treatment, status: newStatus });
       setSuccessMessage(t('treatments.messages.statusUpdated') || 'Status updated successfully');
       
-      // Refresh treatment data to get updated info
       await fetchTreatmentData();
       
       setTimeout(() => setSuccessMessage(''), 3000);
@@ -123,7 +117,6 @@ const TreatmentDetail = () => {
     }
   };
 
-
   const handleShowNotes = () => {
     setShowAddNoteModal(true);
   };
@@ -132,46 +125,30 @@ const TreatmentDetail = () => {
     if (!selectedAccount) return;
     
     try {
-      console.log('DEBUG: handleAddNoteSave called with noteData:', noteData);
-      
       const accountHeaders = {
         'X-Account-Context': selectedAccount.account_id
       };
       
-      // For the add_note action, we don't need to include the treatment ID
-      // The backend action will set it automatically
       const addNoteData = {
-        note: noteData.note
-        // Don't include treatment ID - the backend action handles this
+        note: noteData.note,
+        type: noteData.type
       };
+
+      if (noteData.assigned_doctor) {
+        addNoteData.assigned_doctor = noteData.assigned_doctor;
+      }
       
-      console.log('DEBUG: Final addNoteData:', addNoteData);
-      console.log('DEBUG: Account headers:', accountHeaders);
-      
-      // Add new note using the treatment's add_note action
-      const result = await treatmentsService.addTreatmentNote(id, addNoteData, accountHeaders);
-      
-      console.log('DEBUG: Add note result:', result);
+      await treatmentsService.addTreatmentNote(id, addNoteData, accountHeaders);
       
       setShowAddNoteModal(false);
       setSuccessMessage(t('treatments.notes.addSuccess'));
       
-      // Refresh treatment data
       await fetchTreatmentData();
       
       setTimeout(() => setSuccessMessage(''), 3000);
       
     } catch (err) {
-      console.error('DEBUG: Error adding note:', err);
-      console.error('DEBUG: Error response data:', err.response?.data);
-      console.error('DEBUG: Error response status:', err.response?.status);
-      console.error('DEBUG: Error response headers:', err.response?.headers);
-      console.error('DEBUG: Full error object:', {
-        message: err.message,
-        response: err.response,
-        status: err.response?.status,
-        data: err.response?.data
-      });
+      console.error('Error adding note:', err);
       throw err;
     }
   };
@@ -182,242 +159,149 @@ const TreatmentDetail = () => {
   };
 
   const handleEditNote = (note) => {
-    console.log('DEBUG: handleEditNote called with note:', note);
-    console.log('DEBUG: note.id =', note.id);
     setSelectedNote(note);
     setShowNoteEditModal(true);
   };
 
   const handleDeleteNote = (note) => {
-    console.log('DEBUG: handleDeleteNote called with note:', note);
-    console.log('DEBUG: note.id =', note.id);
     setNoteToDelete(note);
     setShowNoteDeleteModal(true);
   };
   
   const handleDeleteNoteConfirm = async () => {
-    console.log('DEBUG: handleDeleteNoteConfirm called');
-    console.log('DEBUG: selectedAccount =', selectedAccount);
-    console.log('DEBUG: noteToDelete =', noteToDelete);
-    
     if (!selectedAccount || !noteToDelete) {
-      console.log('DEBUG: Missing selectedAccount or noteToDelete, returning early');
       return;
     }
     
     try {
-      console.log('DEBUG: About to delete note with ID:', noteToDelete.id);
-      
       const accountHeaders = {
         'X-Account-Context': selectedAccount.account_id
       };
       
-      console.log('DEBUG: Account headers:', accountHeaders);
-      console.log('DEBUG: Calling treatmentsService.deleteTreatmentNote...');
-      
-      // Delete note
-      const result = await treatmentsService.deleteTreatmentNote(noteToDelete.id, accountHeaders);
-      
-      console.log('DEBUG: Delete result:', result);
+      await treatmentsService.deleteTreatmentNote(noteToDelete.id, accountHeaders);
       
       setShowNoteDeleteModal(false);
       setNoteToDelete(null);
       setSuccessMessage(t('treatments.notes.deleteSuccess'));
       
-      // Refresh treatment data
-      console.log('DEBUG: Refreshing treatment data...');
       await fetchTreatmentData();
       
       setTimeout(() => setSuccessMessage(''), 3000);
       
     } catch (err) {
-      console.error('DEBUG: Error deleting note:', err);
-      console.error('DEBUG: Error details:', {
-        message: err.message,
-        response: err.response?.data,
-        status: err.response?.status
-      });
+      console.error('Error deleting note:', err);
       setError(t('treatments.notes.errorDeleting'));
     }
   };
 
   const handleEditNoteSave = async (noteData) => {
-    console.log('DEBUG: handleEditNoteSave called');
-    console.log('DEBUG: selectedAccount =', selectedAccount);
-    console.log('DEBUG: selectedNote =', selectedNote);
-    console.log('DEBUG: noteData =', noteData);
-    
     if (!selectedAccount || !selectedNote) {
-      console.log('DEBUG: Missing selectedAccount or selectedNote, returning early');
       return;
     }
     
     try {
-      console.log('DEBUG: About to update note with ID:', selectedNote.id);
-      
       const accountHeaders = {
         'X-Account-Context': selectedAccount.account_id
       };
       
-      // Include the treatment ID in the update data
       const updateData = {
         ...noteData,
-        treatment: selectedNote.treatment || parseInt(id) // Include treatment ID
+        treatment: selectedNote.treatment || parseInt(id)
       };
       
-      console.log('DEBUG: Account headers:', accountHeaders);
-      console.log('DEBUG: Final updateData:', updateData);
-      console.log('DEBUG: Calling treatmentsService.updateTreatmentNote...');
-      
-      // Update note
-      const result = await treatmentsService.updateTreatmentNote(selectedNote.id, updateData, accountHeaders);
-      
-      console.log('DEBUG: Update result:', result);
+      await treatmentsService.updateTreatmentNote(selectedNote.id, updateData, accountHeaders);
       
       setShowNoteEditModal(false);
       setSelectedNote(null);
       setSuccessMessage(t('treatments.notes.updateSuccess'));
       
-      // Refresh treatment data
-      console.log('DEBUG: Refreshing treatment data...');
       await fetchTreatmentData();
       
       setTimeout(() => setSuccessMessage(''), 3000);
       
     } catch (err) {
-      console.error('DEBUG: Error updating note:', err);
-      console.error('DEBUG: Error details:', {
-        message: err.message,
-        response: err.response?.data,
-        status: err.response?.status
-      });
+      console.error('Error updating note:', err);
       throw err;
     }
   };
 
   const handleRescheduleSave = async (rescheduleData) => {
-    console.log('DEBUG: handleRescheduleSave called');
-    console.log('DEBUG: rescheduleData =', rescheduleData);
-    
     if (!selectedAccount) {
-      console.log('DEBUG: No selectedAccount, returning early');
       return;
     }
     
     try {
-      console.log('DEBUG: About to reschedule treatment with ID:', id);
-      
       const accountHeaders = {
         'X-Account-Context': selectedAccount.account_id
       };
       
-      // Convert the datetime to proper ISO format
       const newDate = new Date(rescheduleData.newDate).toISOString();
-      console.log('DEBUG: Converted newDate to ISO:', newDate);
       
-      // Update treatment with new scheduled date AND set status to RESCHEDULED
       const updateData = {
         scheduled_date: newDate,
         status: 'RESCHEDULED'
       };
       
-      console.log('DEBUG: Account headers:', accountHeaders);
-      console.log('DEBUG: Update data:', updateData);
-      
-      // Update the treatment
       await treatmentsService.updateTreatment(id, updateData, accountHeaders);
       
-      // Add reschedule note with type
       const noteData = {
         note: rescheduleData.note,
         type: 'RESCHEDULE'
       };
       
-      console.log('DEBUG: Adding note with data:', noteData);
       await treatmentsService.addTreatmentNote(id, noteData, accountHeaders);
-      
-      console.log('DEBUG: Reschedule completed successfully');
       
       setShowRescheduleModal(false);
       setSuccessMessage('Treatment rescheduled successfully');
       
-      // Refresh treatment data
       await fetchTreatmentData();
       
       setTimeout(() => setSuccessMessage(''), 3000);
       
     } catch (err) {
-      console.error('DEBUG: Error rescheduling treatment:', err);
-      console.error('DEBUG: Error details:', {
-        message: err.message,
-        response: err.response?.data,
-        status: err.response?.status
-      });
+      console.error('Error rescheduling treatment:', err);
       setError('Error rescheduling treatment');
     }
   };
 
   const handleStatusChangeWithNote = async (statusData) => {
-    console.log('DEBUG: handleStatusChangeWithNote called');
-    console.log('DEBUG: statusData =', statusData);
-    
     if (!selectedAccount) {
-      console.log('DEBUG: No selectedAccount, returning early');
       return;
     }
     
     try {
-      console.log('DEBUG: About to change status for treatment with ID:', id);
-      
       const accountHeaders = {
         'X-Account-Context': selectedAccount.account_id
       };
       
-      // Update treatment status
       const updateData = {
         status: statusData.status
       };
       
-      // If completing, set completed_date
       if (statusData.status === 'COMPLETED') {
         updateData.completed_date = new Date().toISOString();
       }
       
-      console.log('DEBUG: Account headers:', accountHeaders);
-      console.log('DEBUG: Update data:', updateData);
-      
-      // Update the treatment
       await treatmentsService.updateTreatment(id, updateData, accountHeaders);
       
-      // Add status change note
       const noteData = {
         note: statusData.note,
         type: 'MEDICAL'
       };
       
-      console.log('DEBUG: Adding note with data:', noteData);
       await treatmentsService.addTreatmentNote(id, noteData, accountHeaders);
       
-      console.log('DEBUG: Status change completed successfully');
-      
-      // Close modals
       setShowCompleteModal(false);
       setShowCancelModal(false);
       
       setSuccessMessage(`Treatment ${statusData.status.toLowerCase()} successfully`);
       
-      // Refresh treatment data
       await fetchTreatmentData();
       
       setTimeout(() => setSuccessMessage(''), 3000);
       
     } catch (err) {
-      console.error('DEBUG: Error changing status:', err);
-      console.error('DEBUG: Error details:', {
-        message: err.message,
-        response: err.response?.data,
-        status: err.response?.status
-      });
+      console.error('Error changing status:', err);
       setError('Error changing treatment status');
     }
   };
@@ -720,7 +604,7 @@ const TreatmentDetail = () => {
               <Card.Header>
                 <h6 className="mb-0">
                   <FontAwesomeIcon icon={faMapMarkerAlt} className="me-2" />
-                  {t('treatments.fields.location')}
+                  Location
                 </h6>
               </Card.Header>
               <Card.Body>
@@ -753,11 +637,12 @@ const TreatmentDetail = () => {
               <Table responsive hover>
                 <thead>
                   <tr>
-                    <th width="140">{t('treatments.notes.dateTime')}</th>
-                    <th width="100">{t('treatments.notes.type')}</th>
+                    <th width="120">{t('treatments.notes.dateTime')}</th>
+                    <th width="80">Type</th>
                     <th>{t('treatments.notes.note')}</th>
-                    <th width="140">{t('treatments.notes.createdBy')}</th>
-                    <th width="120">{t('common.actions')}</th>
+                    <th width="120">{t('treatments.notes.createdBy')}</th>
+                    <th width="120">Assigned Doctor</th>
+                    <th width="100">{t('common.actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -795,6 +680,17 @@ const TreatmentDetail = () => {
                       <td>
                         <small>
                           {note.created_by_details?.first_name} {note.created_by_details?.last_name}
+                        </small>
+                      </td>
+                      <td>
+                        <small>
+                          {note.type === 'MEDICAL' ? (
+                            note.assigned_doctor_details ? 
+                              `${note.assigned_doctor_details.first_name} ${note.assigned_doctor_details.last_name}` :
+                              <span className="text-muted">Not assigned</span>
+                          ) : (
+                            <span className="text-muted">N/A</span>
+                          )}
                         </small>
                       </td>
                       <td>
@@ -849,10 +745,20 @@ const TreatmentDetail = () => {
           <Modal.Title>{t('treatments.notes.addNote')}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <NoteAddForm 
-            onSave={handleAddNoteSave}
-            onCancel={() => setShowAddNoteModal(false)}
-          />
+          {treatment ? (
+            <NoteAddForm 
+              onSave={handleAddNoteSave}
+              onCancel={() => setShowAddNoteModal(false)}
+              treatment={treatment}
+            />
+          ) : (
+            <div className="text-center py-4">
+              <div className="spinner-border" role="status">
+                <span className="visually-hidden">Loading treatment data...</span>
+              </div>
+              <p className="mt-2">Loading treatment data...</p>
+            </div>
+          )}
         </Modal.Body>
       </Modal>
 
@@ -882,6 +788,29 @@ const TreatmentDetail = () => {
                   </Col>
                 </Row>
               </div>
+
+              {/* Show assigned doctor only for medical notes */}
+              {selectedNote.type === 'MEDICAL' && (
+                <div className="mb-3">
+                  <Row>
+                    <Col md={6}>
+                      <strong>Assigned Doctor:</strong><br />
+                      <span className="text-primary">
+                        {selectedNote.assigned_doctor_details ? 
+                          `${selectedNote.assigned_doctor_details.first_name} ${selectedNote.assigned_doctor_details.last_name}` :
+                          <span className="text-muted">Not assigned</span>
+                        }
+                      </span>
+                    </Col>
+                    <Col md={6}>
+                      <strong>Note Type:</strong><br />
+                      <Badge bg="success" className="text-dark">
+                        {selectedNote.type}
+                      </Badge>
+                    </Col>
+                  </Row>
+                </div>
+              )}
               
               <hr />
               
@@ -971,6 +900,7 @@ const TreatmentDetail = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+
       {/* Complete Treatment Modal */}
       <Modal 
         show={showCompleteModal} 
@@ -1029,14 +959,67 @@ const TreatmentDetail = () => {
 };
 
 // Helper component for adding notes
-const NoteAddForm = ({ onSave, onCancel }) => {
+const NoteAddForm = ({ onSave, onCancel, treatment }) => {
   const { t } = useTranslation();
+  const { selectedAccount } = useContext(AccountContext);
+  
   const [formData, setFormData] = useState({
     note: '',
-    type: 'MEDICAL' // Changed from DOCTOR to MEDICAL
+    type: 'MEDICAL',
+    assigned_doctor: ''
   });
   const [formErrors, setFormErrors] = useState({});
   const [saving, setSaving] = useState(false);
+  const [userRoleInfo, setUserRoleInfo] = useState(null);
+  const [doctors, setDoctors] = useState([]);
+  const [loadingDoctors, setLoadingDoctors] = useState(false);
+
+  // Load user role info when component mounts
+  useEffect(() => {
+    if (selectedAccount) {
+      loadUserRoleInfo();
+    }
+  }, [selectedAccount]);
+
+  // Load doctors when treatment data is available
+  useEffect(() => {
+    if (selectedAccount && treatment) {
+      loadDoctors();
+    }
+  }, [selectedAccount, treatment]);
+
+  const loadUserRoleInfo = async () => {
+    if (!selectedAccount) return;
+    
+    try {
+      const accountHeaders = {
+        'X-Account-Context': selectedAccount.account_id
+      };
+      
+      const response = await treatmentsService.getUserRoleInfo(accountHeaders);
+      setUserRoleInfo(response);
+    } catch (err) {
+      console.error('Error loading user role info:', err);
+    }
+  };
+
+  const loadDoctors = async () => {
+    if (!selectedAccount || !treatment) return;
+    
+    try {
+      setLoadingDoctors(true);
+      const accountHeaders = {
+        'X-Account-Context': selectedAccount.account_id
+      };
+      
+      const response = await treatmentsService.getFormOptions(accountHeaders, treatment.specialty);
+      setDoctors(response.doctors || []);
+    } catch (err) {
+      console.error('Error loading doctors:', err);
+    } finally {
+      setLoadingDoctors(false);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -1060,6 +1043,13 @@ const NoteAddForm = ({ onSave, onCancel }) => {
       errors.note = t('validation.required');
     }
     
+    // For medical notes, check doctor assignment requirement
+    if (formData.type === 'MEDICAL' && userRoleInfo && !userRoleInfo.is_doctor) {
+      if (!formData.assigned_doctor) {
+        errors.assigned_doctor = t('validation.required');
+      }
+    }
+    
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -1076,15 +1066,20 @@ const NoteAddForm = ({ onSave, onCancel }) => {
         type: formData.type
       };
       
-      console.log('DEBUG: NoteAddForm - About to save with data:', noteData);
+      // Add assigned doctor for medical notes if user is not a doctor
+      if (formData.type === 'MEDICAL' && userRoleInfo && !userRoleInfo.is_doctor) {
+        noteData.assigned_doctor = parseInt(formData.assigned_doctor);
+      }
       
       await onSave(noteData);
     } catch (err) {
-      console.error('DEBUG: NoteAddForm - Error saving note:', err);
+      console.error('Error saving note:', err);
     } finally {
       setSaving(false);
     }
   };
+
+  const showDoctorSelection = formData.type === 'MEDICAL' && userRoleInfo && !userRoleInfo.is_doctor;
 
   return (
     <Form onSubmit={handleSubmit}>
@@ -1099,6 +1094,44 @@ const NoteAddForm = ({ onSave, onCancel }) => {
           <option value="BILLING">{t('treatments.notes.types.billing') || 'Billing Note'}</option>
         </Form.Select>
       </Form.Group>
+
+      {/* Doctor Assignment - Only show for medical notes when user is not a doctor */}
+      {showDoctorSelection && (
+        <Form.Group className="mb-3">
+          <Form.Label>Assigned Doctor *</Form.Label>
+          <Form.Select
+            name="assigned_doctor"
+            value={formData.assigned_doctor}
+            onChange={handleChange}
+            isInvalid={!!formErrors.assigned_doctor}
+            disabled={loadingDoctors}
+          >
+            <option value="">
+              {loadingDoctors ? 'Loading doctors...' : 'Select a doctor'}
+            </option>
+            {doctors.map(doctor => (
+              <option key={doctor.id} value={doctor.id}>
+                {doctor.first_name} {doctor.last_name}
+              </option>
+            ))}
+          </Form.Select>
+          <Form.Control.Feedback type="invalid">
+            {formErrors.assigned_doctor}
+          </Form.Control.Feedback>
+          <Form.Text className="text-muted">
+            Select the doctor who should be assigned to this medical note.
+          </Form.Text>
+        </Form.Group>
+      )}
+
+      {/* Auto-assignment info for doctors */}
+      {formData.type === 'MEDICAL' && userRoleInfo && userRoleInfo.is_doctor && (
+        <Alert variant="info" className="mb-3">
+          <small>
+            <strong>Auto-assigned:</strong> This medical note will be automatically assigned to you.
+          </small>
+        </Alert>
+      )}
       
       <Form.Group className="mb-3">
         <Form.Label>{t('treatments.notes.noteLabel')} *</Form.Label>
@@ -1132,7 +1165,7 @@ const NoteAddForm = ({ onSave, onCancel }) => {
         <Button 
           variant="primary" 
           type="submit"
-          disabled={saving}
+          disabled={saving || (showDoctorSelection && loadingDoctors)}
         >
           <FontAwesomeIcon icon={faSave} className="me-2" />
           {saving ? t('common.saving') : t('treatments.notes.addNote')}
@@ -1147,7 +1180,7 @@ const NoteEditForm = ({ note, onSave, onCancel }) => {
   const { t } = useTranslation();
   const [formData, setFormData] = useState({
     note: note.note || '',
-    type: note.type || 'MEDICAL' // Changed from DOCTOR to MEDICAL
+    type: note.type || 'MEDICAL'
   });
   const [formErrors, setFormErrors] = useState({});
   const [saving, setSaving] = useState(false);
@@ -1258,7 +1291,7 @@ const NoteEditForm = ({ note, onSave, onCancel }) => {
   );
 };
 
-// Helper component for rescheduling treatments (separate component, NOT inside NoteEditForm)
+// Helper component for rescheduling treatments
 const RescheduleForm = ({ currentDate, onSave, onCancel }) => {
   const { t } = useTranslation();
   const [formData, setFormData] = useState({
