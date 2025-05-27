@@ -4,7 +4,7 @@ import { Container, Row, Col, Card, Button, Badge, Spinner, Alert, Table, Modal,
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faArrowLeft, faEdit, faPlus, faUser, faCalendarAlt, 
-  faStethoscope, faNotesMedical, faMapMarkerAlt, faCheck, faTimes, faEye, faTrash, faSave 
+  faStethoscope, faNotesMedical, faMapMarkerAlt, faCheck, faTimes, faEye, faTrash, faSave, faPlay 
 } from '@fortawesome/free-solid-svg-icons';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -29,6 +29,9 @@ const TreatmentDetail = () => {
   const [selectedNote, setSelectedNote] = useState(null);
   const [noteToDelete, setNoteToDelete] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
+  const [showRescheduleModal, setShowRescheduleModal] = useState(false);
+  const [showCompleteModal, setShowCompleteModal] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
 
   useEffect(() => {
     if (selectedAccount) {
@@ -108,7 +111,11 @@ const TreatmentDetail = () => {
       
       await treatmentsService.updateTreatmentStatus(id, newStatus, accountHeaders);
       setTreatment({ ...treatment, status: newStatus });
-      setSuccessMessage(t('treatments.statusUpdated') || 'Status updated successfully');
+      setSuccessMessage(t('treatments.messages.statusUpdated') || 'Status updated successfully');
+      
+      // Refresh treatment data to get updated info
+      await fetchTreatmentData();
+      
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
       console.error('Error updating status:', err);
@@ -116,8 +123,6 @@ const TreatmentDetail = () => {
     }
   };
 
-  const handleComplete = () => handleStatusChange('COMPLETED');
-  const handleCancel = () => handleStatusChange('CANCELED');
 
   const handleShowNotes = () => {
     setShowAddNoteModal(true);
@@ -290,6 +295,133 @@ const TreatmentDetail = () => {
     }
   };
 
+  const handleRescheduleSave = async (rescheduleData) => {
+    console.log('DEBUG: handleRescheduleSave called');
+    console.log('DEBUG: rescheduleData =', rescheduleData);
+    
+    if (!selectedAccount) {
+      console.log('DEBUG: No selectedAccount, returning early');
+      return;
+    }
+    
+    try {
+      console.log('DEBUG: About to reschedule treatment with ID:', id);
+      
+      const accountHeaders = {
+        'X-Account-Context': selectedAccount.account_id
+      };
+      
+      // Convert the datetime to proper ISO format
+      const newDate = new Date(rescheduleData.newDate).toISOString();
+      console.log('DEBUG: Converted newDate to ISO:', newDate);
+      
+      // Update treatment with new scheduled date AND set status to RESCHEDULED
+      const updateData = {
+        scheduled_date: newDate,
+        status: 'RESCHEDULED'
+      };
+      
+      console.log('DEBUG: Account headers:', accountHeaders);
+      console.log('DEBUG: Update data:', updateData);
+      
+      // Update the treatment
+      await treatmentsService.updateTreatment(id, updateData, accountHeaders);
+      
+      // Add reschedule note with type
+      const noteData = {
+        note: rescheduleData.note,
+        type: 'RESCHEDULE'
+      };
+      
+      console.log('DEBUG: Adding note with data:', noteData);
+      await treatmentsService.addTreatmentNote(id, noteData, accountHeaders);
+      
+      console.log('DEBUG: Reschedule completed successfully');
+      
+      setShowRescheduleModal(false);
+      setSuccessMessage('Treatment rescheduled successfully');
+      
+      // Refresh treatment data
+      await fetchTreatmentData();
+      
+      setTimeout(() => setSuccessMessage(''), 3000);
+      
+    } catch (err) {
+      console.error('DEBUG: Error rescheduling treatment:', err);
+      console.error('DEBUG: Error details:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status
+      });
+      setError('Error rescheduling treatment');
+    }
+  };
+
+  const handleStatusChangeWithNote = async (statusData) => {
+    console.log('DEBUG: handleStatusChangeWithNote called');
+    console.log('DEBUG: statusData =', statusData);
+    
+    if (!selectedAccount) {
+      console.log('DEBUG: No selectedAccount, returning early');
+      return;
+    }
+    
+    try {
+      console.log('DEBUG: About to change status for treatment with ID:', id);
+      
+      const accountHeaders = {
+        'X-Account-Context': selectedAccount.account_id
+      };
+      
+      // Update treatment status
+      const updateData = {
+        status: statusData.status
+      };
+      
+      // If completing, set completed_date
+      if (statusData.status === 'COMPLETED') {
+        updateData.completed_date = new Date().toISOString();
+      }
+      
+      console.log('DEBUG: Account headers:', accountHeaders);
+      console.log('DEBUG: Update data:', updateData);
+      
+      // Update the treatment
+      await treatmentsService.updateTreatment(id, updateData, accountHeaders);
+      
+      // Add status change note
+      const noteData = {
+        note: statusData.note,
+        type: 'MEDICAL'
+      };
+      
+      console.log('DEBUG: Adding note with data:', noteData);
+      await treatmentsService.addTreatmentNote(id, noteData, accountHeaders);
+      
+      console.log('DEBUG: Status change completed successfully');
+      
+      // Close modals
+      setShowCompleteModal(false);
+      setShowCancelModal(false);
+      
+      setSuccessMessage(`Treatment ${statusData.status.toLowerCase()} successfully`);
+      
+      // Refresh treatment data
+      await fetchTreatmentData();
+      
+      setTimeout(() => setSuccessMessage(''), 3000);
+      
+    } catch (err) {
+      console.error('DEBUG: Error changing status:', err);
+      console.error('DEBUG: Error details:', {
+        message: err.message,
+        response: err.response?.data,
+        status: err.response?.status
+      });
+      setError('Error changing treatment status');
+    }
+  };
+
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleString();
@@ -397,16 +529,39 @@ const TreatmentDetail = () => {
             <FontAwesomeIcon icon={faEdit} className="me-2" />
             {t('common.edit')}
           </Button>
+          
+          {/* Action Buttons */}
           {treatment.status === 'SCHEDULED' && (
-            <Button variant="success" onClick={handleComplete} className="me-2">
-              <FontAwesomeIcon icon={faCheck} className="me-2" />
-              {t('treatments.markComplete') || 'Mark Complete'}
+            <Button variant="info" onClick={() => handleStatusChange('IN_PROGRESS')} className="me-2">
+              <FontAwesomeIcon icon={faPlay} className="me-2" />
+              {t('treatments.actions.startProgress') || 'Start Progress'}
             </Button>
           )}
-          {treatment.status !== 'CANCELED' && treatment.status !== 'COMPLETED' && (
-            <Button variant="danger" onClick={handleCancel}>
+
+          {/* Complete button ONLY for IN_PROGRESS */}
+          {treatment.status === 'IN_PROGRESS' && (
+            <Button variant="success" onClick={() => setShowCompleteModal(true)} className="me-2">
+              <FontAwesomeIcon icon={faCheck} className="me-2" />
+              {t('treatments.actions.complete') || 'Mark Complete'}
+            </Button>
+          )}
+
+          {(treatment.status !== 'CANCELED' && treatment.status !== 'COMPLETED') && (
+            <Button variant="danger" onClick={() => setShowCancelModal(true)} className="me-2">
               <FontAwesomeIcon icon={faTimes} className="me-2" />
-              {t('treatments.cancel') || 'Cancel'}
+              {t('treatments.actions.cancel') || 'Cancel Treatment'}
+            </Button>
+          )}
+
+          {/* Reschedule Button */}
+          {(treatment.status === 'SCHEDULED' || treatment.status === 'IN_PROGRESS') && (
+            <Button 
+              variant="warning" 
+              onClick={() => setShowRescheduleModal(true)}
+              className="me-2"
+            >
+              <FontAwesomeIcon icon={faCalendarAlt} className="me-2" />
+              {t('treatments.actions.reschedule') || 'Reschedule'}
             </Button>
           )}
         </Col>
@@ -496,30 +651,66 @@ const TreatmentDetail = () => {
               </p>
             </Card.Body>
           </Card>
-
           {/* Schedule Info */}
           <Card className="mb-4">
             <Card.Header>
               <h6 className="mb-0">
                 <FontAwesomeIcon icon={faCalendarAlt} className="me-2" />
-                Schedule
+                {t('treatments.schedule.title') || 'Schedule'}
               </h6>
             </Card.Header>
             <Card.Body>
-              <p className="mb-2">
-                <strong>Scheduled:</strong><br />
-                {formatDate(treatment.scheduled_date)}
-              </p>
-              {treatment.completed_date && (
-                <p className="mb-2">
-                  <strong>Completed:</strong><br />
-                  {formatDate(treatment.completed_date)}
-                </p>
+              {/* Current Schedule */}
+              <div className="mb-3">
+                <strong>{t('treatments.schedule.currentSchedule') || 'Current Schedule'}:</strong><br />
+                <span className="text-primary fs-6">
+                  {formatDate(treatment.scheduled_date)}
+                </span>
+                {treatment.status === 'RESCHEDULED' && (
+                  <Badge bg="warning" className="ms-2 text-dark">
+                    {t('treatments.schedule.rescheduled') || 'Rescheduled'}
+                  </Badge>
+                )}
+              </div>
+
+              {/* Schedule History - only show previous schedules */}
+              {treatment.schedule_history && treatment.schedule_history.length > 1 && (
+                <div className="mb-3">
+                  <strong>{t('treatments.schedule.previousSchedules') || 'Previous Schedules'}:</strong>
+                  <div className="mt-2">
+                    {treatment.schedule_history
+                      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at)) // Sort by newest first
+                      .filter(historyItem => formatDate(historyItem.scheduled_date) !== formatDate(treatment.scheduled_date)) // Exclude current schedule
+                      .map((historyItem, index) => (
+                        <div key={historyItem.id || index} className="small mb-1">
+                          <span className="text-muted">
+                            <FontAwesomeIcon icon={faCalendarAlt} className="me-1" />
+                            <s>{formatDate(historyItem.scheduled_date)}</s>
+                            <small className="ms-2">
+                              ({t('treatments.schedule.changedOn') || 'Changed on'} {new Date(historyItem.created_at).toLocaleDateString()})
+                            </small>
+                          </span>
+                        </div>
+                      ))}
+                  </div>
+                </div>
               )}
-              <p className="mb-0">
-                <strong>Doctor:</strong><br />
+
+              {/* Completion Date */}
+              {treatment.completed_date && (
+                <div className="mb-3">
+                  <strong>{t('treatments.fields.completedDate') || 'Completed'}:</strong><br />
+                  <span className="text-success">
+                    {formatDate(treatment.completed_date)}
+                  </span>
+                </div>
+              )}
+
+              {/* Doctor */}
+              <div className="mb-0">
+                <strong>{t('treatments.fields.doctor') || 'Doctor'}:</strong><br />
                 {treatment.doctor_details?.first_name} {treatment.doctor_details?.last_name}
-              </p>
+              </div>
             </Card.Body>
           </Card>
 
@@ -558,81 +749,90 @@ const TreatmentDetail = () => {
               </Button>
             </Card.Header>
             <Card.Body>
-              {treatment.additional_notes && treatment.additional_notes.length > 0 ? (
-                <Table responsive hover>
-                  <thead>
-                    <tr>
-                      <th width="160">{t('treatments.notes.dateTime')}</th>
-                      <th>{t('treatments.notes.note')}</th>
-                      <th width="140">{t('treatments.notes.createdBy')}</th>
-                      <th width="120">{t('common.actions')}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {treatment.additional_notes.map((note, index) => (
-                      <tr key={note.id || index}>
-                        <td>
-                          <small>{formatDate(note.date)}</small>
-                        </td>
-                        <td>
-                          <div style={{ maxWidth: '400px' }}>
-                            <div 
-                              style={{ 
-                                whiteSpace: 'pre-wrap',
-                                wordBreak: 'break-word',
-                                lineHeight: '1.4'
-                              }}
-                            >
-                              {truncateText(note.note, 120)}
-                            </div>
-                            {note.note && note.note.length > 120 && (
-                              <small className="text-muted">
-                                <em>{t('treatments.notes.clickViewFull')}</em>
-                              </small>
-                            )}
+            {treatment.additional_notes && treatment.additional_notes.length > 0 ? (
+              <Table responsive hover>
+                <thead>
+                  <tr>
+                    <th width="140">{t('treatments.notes.dateTime')}</th>
+                    <th width="100">Type</th>
+                    <th>{t('treatments.notes.note')}</th>
+                    <th width="140">{t('treatments.notes.createdBy')}</th>
+                    <th width="120">{t('common.actions')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {treatment.additional_notes.map((note, index) => (
+                    <tr key={note.id || index}>
+                      <td>
+                        <small>{formatDate(note.date)}</small>
+                      </td>
+                      <td>
+                        <Badge 
+                          bg={note.type === 'RESCHEDULE' ? 'warning' : note.type === 'BILLING' ? 'info' : 'success'}
+                          className="text-dark"
+                        >
+                          {note.type || 'MEDICAL'}
+                        </Badge>
+                      </td>
+                      <td>
+                        <div style={{ maxWidth: '300px' }}>
+                          <div 
+                            style={{ 
+                              whiteSpace: 'pre-wrap',
+                              wordBreak: 'break-word',
+                              lineHeight: '1.4'
+                            }}
+                          >
+                            {truncateText(note.note, 100)}
                           </div>
-                        </td>
-                        <td>
-                          <small>
-                            {note.created_by_details?.first_name} {note.created_by_details?.last_name}
-                          </small>
-                        </td>
-                        <td>
-                          <Button
-                            variant="outline-info"
-                            size="sm"
-                            className="me-1"
-                            onClick={() => handleViewNote(note)}
-                            title={t('treatments.notes.viewNote')}
-                          >
-                            <FontAwesomeIcon icon={faEye} />
-                          </Button>
-                          <Button
-                            variant="outline-secondary"
-                            size="sm"
-                            className="me-1"
-                            onClick={() => handleEditNote(note)}
-                            title={t('treatments.notes.editNote')}
-                          >
-                            <FontAwesomeIcon icon={faEdit} />
-                          </Button>
-                          <Button
-                            variant="outline-danger"
-                            size="sm"
-                            onClick={() => handleDeleteNote(note)}
-                            title={t('treatments.notes.deleteNote')}
-                          >
-                            <FontAwesomeIcon icon={faTrash} />
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
-              ) : (
-                <Alert variant="info">
-                  {t('treatments.notes.noNotes')}
-                </Alert>
+                          {note.note && note.note.length > 100 && (
+                            <small className="text-muted">
+                              <em>{t('treatments.notes.clickViewFull')}</em>
+                            </small>
+                          )}
+                        </div>
+                      </td>
+                      <td>
+                        <small>
+                          {note.created_by_details?.first_name} {note.created_by_details?.last_name}
+                        </small>
+                      </td>
+                      <td>
+                        <Button
+                          variant="outline-info"
+                          size="sm"
+                          className="me-1"
+                          onClick={() => handleViewNote(note)}
+                          title={t('treatments.notes.viewNote')}
+                        >
+                          <FontAwesomeIcon icon={faEye} />
+                        </Button>
+                        <Button
+                          variant="outline-secondary"
+                          size="sm"
+                          className="me-1"
+                          onClick={() => handleEditNote(note)}
+                          title={t('treatments.notes.editNote')}
+                        >
+                          <FontAwesomeIcon icon={faEdit} />
+                        </Button>
+                        <Button
+                          variant="outline-danger"
+                          size="sm"
+                          onClick={() => handleDeleteNote(note)}
+                          title={t('treatments.notes.deleteNote')}
+                        >
+                          <FontAwesomeIcon icon={faTrash} />
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            ) : (
+              <Alert variant="info">
+                {t('treatments.notes.noNotes')}
+              </Alert>
               )}
             </Card.Body>
           </Card>
@@ -771,6 +971,59 @@ const TreatmentDetail = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+      {/* Complete Treatment Modal */}
+      <Modal 
+        show={showCompleteModal} 
+        onHide={() => setShowCompleteModal(false)}
+        size="lg"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>{t('treatments.modals.completeTitle') || 'Complete Treatment'}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <StatusChangeForm 
+            statusType="COMPLETED"
+            onSave={handleStatusChangeWithNote}
+            onCancel={() => setShowCompleteModal(false)}
+          />
+        </Modal.Body>
+      </Modal>
+
+      {/* Cancel Treatment Modal */}
+      <Modal 
+        show={showCancelModal} 
+        onHide={() => setShowCancelModal(false)}
+        size="lg"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>{t('treatments.modals.cancelTitle') || 'Cancel Treatment'}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <StatusChangeForm 
+            statusType="CANCELED"
+            onSave={handleStatusChangeWithNote}
+            onCancel={() => setShowCancelModal(false)}
+          />
+        </Modal.Body>
+      </Modal>
+
+      {/* Reschedule Treatment Modal */}
+      <Modal 
+        show={showRescheduleModal} 
+        onHide={() => setShowRescheduleModal(false)}
+        size="lg"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>{t('treatments.modals.rescheduleTitle') || 'Reschedule Treatment'}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <RescheduleForm 
+            currentDate={treatment.scheduled_date}
+            onSave={handleRescheduleSave}
+            onCancel={() => setShowRescheduleModal(false)}
+          />
+        </Modal.Body>
+      </Modal>
     </Container>
   );
 };
@@ -779,7 +1032,8 @@ const TreatmentDetail = () => {
 const NoteAddForm = ({ onSave, onCancel }) => {
   const { t } = useTranslation();
   const [formData, setFormData] = useState({
-    note: ''
+    note: '',
+    type: 'MEDICAL' // Changed from DOCTOR to MEDICAL
   });
   const [formErrors, setFormErrors] = useState({});
   const [saving, setSaving] = useState(false);
@@ -818,7 +1072,8 @@ const NoteAddForm = ({ onSave, onCancel }) => {
     try {
       setSaving(true);
       const noteData = {
-        note: formData.note.trim()
+        note: formData.note.trim(),
+        type: formData.type
       };
       
       console.log('DEBUG: NoteAddForm - About to save with data:', noteData);
@@ -833,6 +1088,18 @@ const NoteAddForm = ({ onSave, onCancel }) => {
 
   return (
     <Form onSubmit={handleSubmit}>
+      <Form.Group className="mb-3">
+        <Form.Label>{t('treatments.notes.type') || 'Note Type'} *</Form.Label>
+        <Form.Select
+          name="type"
+          value={formData.type}
+          onChange={handleChange}
+        >
+          <option value="MEDICAL">{t('treatments.notes.types.medical') || 'Medical Note'}</option>
+          <option value="BILLING">{t('treatments.notes.types.billing') || 'Billing Note'}</option>
+        </Form.Select>
+      </Form.Group>
+      
       <Form.Group className="mb-3">
         <Form.Label>{t('treatments.notes.noteLabel')} *</Form.Label>
         <Form.Control
@@ -879,7 +1146,8 @@ const NoteAddForm = ({ onSave, onCancel }) => {
 const NoteEditForm = ({ note, onSave, onCancel }) => {
   const { t } = useTranslation();
   const [formData, setFormData] = useState({
-    note: note.note || ''
+    note: note.note || '',
+    type: note.type || 'MEDICAL' // Changed from DOCTOR to MEDICAL
   });
   const [formErrors, setFormErrors] = useState({});
   const [saving, setSaving] = useState(false);
@@ -918,7 +1186,8 @@ const NoteEditForm = ({ note, onSave, onCancel }) => {
     try {
       setSaving(true);
       const noteData = {
-        note: formData.note.trim()
+        note: formData.note.trim(),
+        type: formData.type
       };
       
       await onSave(noteData);
@@ -931,6 +1200,22 @@ const NoteEditForm = ({ note, onSave, onCancel }) => {
 
   return (
     <Form onSubmit={handleSubmit}>
+      <Form.Group className="mb-3">
+        <Form.Label>{t('treatments.notes.type') || 'Note Type'} *</Form.Label>
+        <Form.Select
+          name="type"
+          value={formData.type}
+          onChange={handleChange}
+          disabled={note.type === 'RESCHEDULE'} // Don't allow changing reschedule notes
+        >
+          <option value="MEDICAL">{t('treatments.notes.types.medical') || 'Medical Note'}</option>
+          <option value="BILLING">{t('treatments.notes.types.billing') || 'Billing Note'}</option>
+          {note.type === 'RESCHEDULE' && (
+            <option value="RESCHEDULE">{t('treatments.notes.types.reschedule') || 'Reschedule Note'}</option>
+          )}
+        </Form.Select>
+      </Form.Group>
+      
       <Form.Group className="mb-3">
         <Form.Label>{t('treatments.notes.noteLabel')} *</Form.Label>
         <Form.Control
@@ -967,6 +1252,273 @@ const NoteEditForm = ({ note, onSave, onCancel }) => {
         >
           <FontAwesomeIcon icon={faSave} className="me-2" />
           {saving ? t('common.saving') : t('treatments.notes.updateNote')}
+        </Button>
+      </div>
+    </Form>
+  );
+};
+
+// Helper component for rescheduling treatments (separate component, NOT inside NoteEditForm)
+const RescheduleForm = ({ currentDate, onSave, onCancel }) => {
+  const { t } = useTranslation();
+  const [formData, setFormData] = useState({
+    newDate: currentDate ? new Date(currentDate).toISOString().slice(0, 16) : '',
+    note: ''
+  });
+  const [formErrors, setFormErrors] = useState({});
+  const [saving, setSaving] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    
+    if (formErrors[name]) {
+      setFormErrors(prev => ({
+        ...prev,
+        [name]: undefined
+      }));
+    }
+  };
+
+  const validateForm = () => {
+    const errors = {};
+    
+    if (!formData.newDate) {
+      errors.newDate = t('validation.required');
+    }
+    
+    if (!formData.note.trim()) {
+      errors.note = t('validation.required');
+    }
+    
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!validateForm()) return;
+    
+    try {
+      setSaving(true);
+      const rescheduleData = {
+        newDate: formData.newDate,
+        note: formData.note.trim()
+      };
+      
+      await onSave(rescheduleData);
+    } catch (err) {
+      console.error('Error saving reschedule:', err);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleString();
+  };
+
+  return (
+    <Form onSubmit={handleSubmit}>
+      <Alert variant="info" className="mb-3">
+        <strong>{t('treatments.modals.currentScheduledDate') || 'Current scheduled date'}:</strong> {formatDate(currentDate)}
+      </Alert>
+      
+      <Form.Group className="mb-3">
+        <Form.Label>{t('treatments.modals.newScheduledDateTime') || 'New Scheduled Date & Time'} *</Form.Label>
+        <Form.Control
+          type="datetime-local"
+          name="newDate"
+          value={formData.newDate}
+          onChange={handleChange}
+          isInvalid={!!formErrors.newDate}
+        />
+        <Form.Control.Feedback type="invalid">
+          {formErrors.newDate}
+        </Form.Control.Feedback>
+      </Form.Group>
+      
+      <Form.Group className="mb-3">
+        <Form.Label>{t('treatments.modals.rescheduleReason') || 'Reschedule Reason'} *</Form.Label>
+        <Form.Control
+          as="textarea"
+          rows={3}
+          name="note"
+          value={formData.note}
+          onChange={handleChange}
+          isInvalid={!!formErrors.note}
+          placeholder={t('treatments.modals.rescheduleReasonPlaceholder') || 'Enter reason for rescheduling...'}
+        />
+        <Form.Control.Feedback type="invalid">
+          {formErrors.note}
+        </Form.Control.Feedback>
+        <Form.Text className="text-muted">
+          {t('treatments.modals.rescheduleNoteHelp') || 'This note will be added to the treatment notes with type "RESCHEDULE"'}
+        </Form.Text>
+      </Form.Group>
+      
+      <div className="d-flex justify-content-end">
+        <Button 
+          variant="secondary" 
+          onClick={onCancel}
+          className="me-2"
+          disabled={saving}
+        >
+          <FontAwesomeIcon icon={faTimes} className="me-2" />
+          {t('common.cancel')}
+        </Button>
+        <Button 
+          variant="primary" 
+          type="submit"
+          disabled={saving}
+        >
+          <FontAwesomeIcon icon={faSave} className="me-2" />
+          {saving ? t('common.saving') : (t('treatments.modals.rescheduleButton') || 'Reschedule Treatment')}
+        </Button>
+      </div>
+    </Form>
+  );
+};
+
+// Helper component for status changes that require notes
+const StatusChangeForm = ({ statusType, onSave, onCancel }) => {
+  const { t } = useTranslation();
+  const [formData, setFormData] = useState({
+    note: ''
+  });
+  const [formErrors, setFormErrors] = useState({});
+  const [saving, setSaving] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    
+    if (formErrors[name]) {
+      setFormErrors(prev => ({
+        ...prev,
+        [name]: undefined
+      }));
+    }
+  };
+
+  const validateForm = () => {
+    const errors = {};
+    
+    if (!formData.note.trim()) {
+      errors.note = t('validation.required');
+    }
+    
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!validateForm()) return;
+    
+    try {
+      setSaving(true);
+      const statusData = {
+        status: statusType,
+        note: formData.note.trim()
+      };
+      
+      await onSave(statusData);
+    } catch (err) {
+      console.error('Error changing status:', err);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const getAlertText = () => {
+    if (statusType === 'COMPLETED') {
+      return {
+        message: t('treatments.modals.completeMessage') || 'This will mark the treatment as completed.',
+        instruction: t('treatments.modals.completeInstruction') || 'Please provide a note explaining the completion.'
+      };
+    } else {
+      return {
+        message: t('treatments.modals.cancelMessage') || 'This will cancel the treatment.',
+        instruction: t('treatments.modals.cancelInstruction') || 'Please provide a note explaining the cancellation.'
+      };
+    }
+  };
+
+  const getFieldLabel = () => {
+    return statusType === 'COMPLETED' ? 
+      (t('treatments.modals.completionNotes') || 'Completion Notes') : 
+      (t('treatments.modals.cancellationReason') || 'Cancellation Reason');
+  };
+
+  const getPlaceholder = () => {
+    return statusType === 'COMPLETED' ? 
+      (t('treatments.modals.completionPlaceholder') || 'Enter completion notes, final observations, or recommendations...') :
+      (t('treatments.modals.cancellationPlaceholder') || 'Enter reason for cancellation...');
+  };
+
+  const getButtonText = () => {
+    if (saving) return t('common.saving');
+    return statusType === 'COMPLETED' ? 
+      (t('treatments.modals.completeButton') || 'Complete Treatment') :
+      (t('treatments.modals.cancelButton') || 'Cancel Treatment');
+  };
+
+  const alertText = getAlertText();
+
+  return (
+    <Form onSubmit={handleSubmit}>
+      <Alert variant={statusType === 'COMPLETED' ? 'success' : 'warning'} className="mb-3">
+        <strong>{alertText.message}</strong>
+        <br />
+        {alertText.instruction}
+      </Alert>
+      
+      <Form.Group className="mb-3">
+        <Form.Label>{getFieldLabel()} *</Form.Label>
+        <Form.Control
+          as="textarea"
+          rows={4}
+          name="note"
+          value={formData.note}
+          onChange={handleChange}
+          isInvalid={!!formErrors.note}
+          placeholder={getPlaceholder()}
+        />
+        <Form.Control.Feedback type="invalid">
+          {formErrors.note}
+        </Form.Control.Feedback>
+        <Form.Text className="text-muted">
+          {t('treatments.modals.noteWillBeAdded') || 'This note will be added to the treatment notes.'}
+        </Form.Text>
+      </Form.Group>
+      
+      <div className="d-flex justify-content-end">
+        <Button 
+          variant="secondary" 
+          onClick={onCancel}
+          className="me-2"
+          disabled={saving}
+        >
+          <FontAwesomeIcon icon={faTimes} className="me-2" />
+          {t('common.cancel')}
+        </Button>
+        <Button 
+          variant={statusType === 'COMPLETED' ? 'success' : 'danger'}
+          type="submit"
+          disabled={saving}
+        >
+          <FontAwesomeIcon icon={statusType === 'COMPLETED' ? faCheck : faTimes} className="me-2" />
+          {getButtonText()}
         </Button>
       </div>
     </Form>

@@ -590,6 +590,7 @@
       "updateNote": "Update Note",
       "noteLabel": "Note",
       "note": "Note",
+      "type": "Note Type",
       "dateTime": "Date & Time",
       "createdBy": "Created By",
       "notePlaceholder": "Enter treatment note...",
@@ -605,15 +606,43 @@
       "deleteSuccess": "Note deleted successfully",
       "errorLoading": "Error loading treatment notes",
       "errorSaving": "Error saving note",
-      "errorDeleting": "Error deleting note"
+      "errorDeleting": "Error deleting note",
+      "types": {
+        "billing": "Billing",
+        "medical": "Medical"
+      }
     },
     "status": {
       "SCHEDULED": "Scheduled",
+      "RESCHEDULED": "Rescheduled",
       "IN_PROGRESS": "In Progress", 
       "COMPLETED": "Completed",
       "CANCELED": "Canceled"
     },
     
+    "modals": {
+      "completeTitle": "Complete Treatment",
+      "cancelTitle": "Cancel Treatment", 
+      "rescheduleTitle": "Reschedule Treatment",
+      "completeMessage": "This will mark the treatment as completed.",
+      "completeInstruction": "Please provide a note explaining the completion.",
+      "cancelMessage": "This will cancel the treatment.",
+      "cancelInstruction": "Please provide a note explaining the cancellation.",
+      "completionNotes": "Completion Notes",
+      "cancellationReason": "Cancellation Reason",
+      "completionPlaceholder": "Enter completion notes, final observations, or recommendations...",
+      "cancellationPlaceholder": "Enter reason for cancellation...",
+      "completeButton": "Complete Treatment",
+      "cancelButton": "Cancel Treatment",
+      "rescheduleButton": "Reschedule Treatment",
+      "noteWillBeAdded": "This note will be added to the treatment notes.",
+      "currentScheduledDate": "Current scheduled date",
+      "newScheduledDateTime": "New Scheduled Date & Time",
+      "rescheduleReason": "Reschedule Reason",
+      "rescheduleReasonPlaceholder": "Enter reason for rescheduling...",
+      "rescheduleNoteHelp": "This note will be added to the treatment notes with type \"RESCHEDULE\""
+    },
+
     "billing": {
       "PENDING": "Pending",
       "PARTIAL": "Partial",
@@ -636,10 +665,12 @@
     },
     
     "actions": {
+      "startProgress": "Start Treatment",
       "view": "View Details",
       "edit": "Edit",
-      "complete": "Mark Complete",
+      "complete": "Complete Treatment",
       "cancel": "Cancel Treatment",
+      "reschedule": "Reschedule",
       "addNote": "Add Note"
     },
     
@@ -655,13 +686,23 @@
       "filtersActive": "Filters are active"
 
     },
+
+    "schedule": {
+      "currentSchedule": "Current Schedule",
+      "previousSchedules": "Previous Schedules",
+      "rescheduled": "Rescheduled",
+      "changedOn": "Changed on"
+    },
     
     "messages": {
       "treatmentCreated": "Treatment created successfully",
       "treatmentUpdated": "Treatment updated successfully", 
       "treatmentDeleted": "Treatment deleted successfully",
       "statusUpdated": "Treatment status updated successfully",
-      "noteAdded": "Note added successfully"
+      "noteAdded": "Note added successfully",
+      "rescheduleSuccess": "Treatment rescheduled successfully",
+      "completedSuccess": "Treatment completed successfully",
+      "canceledSuccess": "Treatment canceled successfully"
     }
   }
 }

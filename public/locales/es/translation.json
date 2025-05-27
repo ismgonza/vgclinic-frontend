@@ -591,6 +591,7 @@
       "updateNote": "Actualizar Nota",
       "noteLabel": "Nota",
       "note": "Nota",
+      "type": "Tipo de nota",
       "dateTime": "Fecha y Hora",
       "createdBy": "Creado Por",
       "notePlaceholder": "Ingrese nota del tratamiento...",
@@ -606,15 +607,43 @@
       "deleteSuccess": "Nota eliminada exitosamente", 
       "errorLoading": "Error al cargar las notas del tratamiento",
       "errorSaving": "Error al guardar la nota",
-      "errorDeleting": "Error al eliminar la nota"
+      "errorDeleting": "Error al eliminar la nota",
+      "types": {
+        "billing": "Facturación",
+        "medical": "Médica"
+      }
     },
     "status": {
       "SCHEDULED": "Programado",
+      "RESCHEDULED": "Reprogramado",
       "IN_PROGRESS": "En Progreso",
       "COMPLETED": "Completado",
       "CANCELED": "Cancelado"
     },
     
+    "modals": {
+      "completeTitle": "Completar Tratamiento",
+      "cancelTitle": "Cancelar Tratamiento",
+      "rescheduleTitle": "Reprogramar Tratamiento", 
+      "completeMessage": "Esto marcará el tratamiento como completado.",
+      "completeInstruction": "Por favor proporcione una nota explicando la finalización.",
+      "cancelMessage": "Esto cancelará el tratamiento.",
+      "cancelInstruction": "Por favor proporcione una nota explicando la cancelación.",
+      "completionNotes": "Notas de Finalización",
+      "cancellationReason": "Razón de Cancelación",
+      "completionPlaceholder": "Ingrese notas de finalización, observaciones finales o recomendaciones...",
+      "cancellationPlaceholder": "Ingrese razón para la cancelación...",
+      "completeButton": "Completar Tratamiento",
+      "cancelButton": "Cancelar Tratamiento",
+      "rescheduleButton": "Reprogramar Tratamiento",
+      "noteWillBeAdded": "Esta nota será agregada a las notas del tratamiento.",
+      "currentScheduledDate": "Fecha programada actual",
+      "newScheduledDateTime": "Nueva Fecha y Hora Programada",
+      "rescheduleReason": "Razón de Reprogramación",
+      "rescheduleReasonPlaceholder": "Ingrese razón para reprogramar...",
+      "rescheduleNoteHelp": "Esta nota será agregada a las notas del tratamiento con tipo \"REPROGRAMADO\""
+    },
+
     "billing": {
       "PENDING": "Pendiente",
       "PARTIAL": "Parcial",
@@ -637,9 +666,11 @@
     },
     
     "actions": {
+      "startProgress": "Iniciar Tratamiento",
       "view": "Ver Detalles",
       "edit": "Editar",
-      "complete": "Marcar Completado",
+      "complete": "Completar Tratamiento",
+      "reschedule": "Reprogramar",
       "cancel": "Cancelar Tratamiento",
       "addNote": "Agregar Nota"
     },
@@ -656,12 +687,22 @@
       "filtersActive": "Filtros activos"
     },
     
+    "schedule": {
+      "currentSchedule": "Horario Actual",
+      "previousSchedules": "Horarios Anteriores",
+      "rescheduled": "Reprogramado",
+      "changedOn": "Cambiado el"
+    },
+    
     "messages": {
       "treatmentCreated": "Tratamiento creado exitosamente",
       "treatmentUpdated": "Tratamiento actualizado exitosamente",
       "treatmentDeleted": "Tratamiento eliminado exitosamente",
       "statusUpdated": "Estado del tratamiento actualizado exitosamente",
-      "noteAdded": "Nota agregada exitosamente"
+      "noteAdded": "Nota agregada exitosamente",
+      "rescheduleSuccess": "Tratamiento reprogramado exitosamente",
+      "completedSuccess": "Tratamiento completado exitosamente",
+      "canceledSuccess": "Tratamiento cancelado exitosamente"
     }
   }
 }
