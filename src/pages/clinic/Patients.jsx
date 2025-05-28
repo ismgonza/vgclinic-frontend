@@ -1,4 +1,4 @@
-// src/pages/clinic/Patients.jsx - Updated version
+// src/pages/clinic/Patients.jsx - Simplified without permission hook
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate, useParams, useLocation } from 'react-router-dom';
 import { Container, Row, Col, Card, Table, Button, Badge, Spinner, Alert, Modal } from 'react-bootstrap';
@@ -63,7 +63,11 @@ const Patients = () => {
       
     } catch (err) {
       console.error('Error fetching patients:', err);
-      setError(t('patients.errorLoading'));
+      if (err.response?.status === 403) {
+        setError(t('permissions.insufficientPermissions') || 'Access denied. You need "view_patients_list" permission to view patients.');
+      } else {
+        setError(t('patients.errorLoading'));
+      }
     } finally {
       setLoading(false);
     }
@@ -116,7 +120,11 @@ const Patients = () => {
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
       console.error('Error deleting patient:', err);
-      setError(t('patients.errorDeleting'));
+      if (err.response?.status === 403) {
+        setError(t('permissions.insufficientPermissions') || 'Access denied');
+      } else {
+        setError(t('patients.errorDeleting'));
+      }
     }
   };
 
@@ -146,7 +154,11 @@ const Patients = () => {
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
       console.error('Error saving patient:', err);
-      setError(t('patients.errorSaving'));
+      if (err.response?.status === 403) {
+        setError(t('permissions.insufficientPermissions') || 'Access denied');
+      } else {
+        setError(t('patients.errorSaving'));
+      }
       throw err; // Re-throw to let the form component handle it
     }
   };

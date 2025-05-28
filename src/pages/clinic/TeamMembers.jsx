@@ -1,12 +1,14 @@
 // src/pages/clinic/TeamMembers.jsx
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Container, Row, Col, Card, Table, Button, Badge, Spinner, Alert, Modal } from 'react-bootstrap';
+import { Container, Row, Col, Card, Table, Button, Badge, Spinner, Alert, Modal, Form } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrash, faEye, faUsers, faArrowLeft, faUserMinus, faUserCheck } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
 import { AccountContext } from '../../contexts/AccountContext';
 import teamMembersService from '../../services/teamMembers.service';
+import catalogService from '../../services/catalog.service';
+
 
 const TeamMembers = () => {
   const navigate = useNavigate();
@@ -19,14 +21,25 @@ const TeamMembers = () => {
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const [memberToRemove, setMemberToRemove] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [memberToEdit, setMemberToEdit] = useState(null);
+  const [editForm, setEditForm] = useState({
+    role: '',
+    specialty: '',
+    phone_number: '',
+    color: '#3498db' // default blue color
+  });
+  const [specialties, setSpecialties] = useState([]);
 
   // Reload members when account changes
   useEffect(() => {
     if (selectedAccount) {
       fetchMembers();
+      fetchSpecialties();
     } else {
       // Clear members if no account selected
       setMembers([]);
+      setSpecialties([]);
       setLoading(false);
     }
   }, [selectedAccount]);
@@ -54,6 +67,21 @@ const TeamMembers = () => {
       setError(t('team.members.errorLoading'));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchSpecialties = async () => {
+    if (!selectedAccount) return;
+    
+    try {
+      const accountHeaders = {
+        'X-Account-Context': selectedAccount.account_id
+      };
+      
+      const data = await catalogService.getSpecialties(accountHeaders);
+      setSpecialties(data.results || data);
+    } catch (err) {
+      console.error('Error fetching specialties:', err);
     }
   };
 
@@ -111,6 +139,61 @@ const TeamMembers = () => {
     }
   };
 
+  const handleEditClick = (member) => {
+    if (!selectedAccount) {
+      setError(t('team.selectAccountFirst') || 'Please select a clinic first');
+      return;
+    }
+    
+    setMemberToEdit(member);
+    // Pre-populate the form with current member data
+    setEditForm({
+      role: member.role || '',
+      specialty: member.specialty_details?.id || '',
+      phone_number: member.phone_number || '',
+      color: member.color || '#3498db'
+    });
+    setShowEditModal(true);
+  };
+  
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedAccount || !memberToEdit) return;
+  
+    // Simple validation: if role is doctor, specialty should be selected
+    if (editForm.role === 'doc' && !editForm.specialty) {
+      setError(t('team.members.edit.doctorNeedsSpecialty') || 'Doctors must have a specialty selected');
+      return;
+    }
+  
+    try {
+      const accountHeaders = {
+        'X-Account-Context': selectedAccount.account_id
+      };
+  
+      const updateData = {
+        role: editForm.role,
+        specialty: editForm.specialty || null,
+        phone_number: editForm.phone_number,
+        color: editForm.color
+      };
+  
+      await teamMembersService.updateTeamMember(memberToEdit.id, updateData, accountHeaders);
+      
+      setShowEditModal(false);
+      setMemberToEdit(null);
+      setSuccessMessage(t('team.members.memberUpdated') || 'Team member updated successfully');
+      
+      // Refresh members list
+      await fetchMembers();
+      setTimeout(() => setSuccessMessage(''), 3000);
+      
+    } catch (err) {
+      console.error('Error updating team member:', err);
+      setError(t('team.members.errorUpdating') || 'Error updating team member');
+    }
+  };
+  
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleDateString();
@@ -214,6 +297,7 @@ const TeamMembers = () => {
                   <th>{t('team.members.email')}</th>
                   <th>{t('team.members.role')}</th>
                   <th>{t('team.members.specialty')}</th>
+                  <th>{t('team.members.color')}</th>
                   <th>{t('team.members.status')}</th>
                   <th>{t('team.members.joinDate')}</th>
                   <th>{t('common.actions')}</th>
@@ -237,6 +321,23 @@ const TeamMembers = () => {
                     </td>
                     <td>{member.specialty_details?.name || '-'}</td>
                     <td>
+                      <div className="d-flex align-items-center">
+                        <div 
+                          style={{
+                            width: '20px',
+                            height: '20px',
+                            backgroundColor: member.color || '#3498db',
+                            borderRadius: '4px',
+                            marginRight: '8px',
+                            border: '1px solid #ddd'
+                          }}
+                        ></div>
+                        <small className="text-muted" style={{ fontFamily: 'monospace' }}>
+                          {member.color || '#3498db'}
+                        </small>
+                      </div>
+                    </td>
+                    <td>
                       <Badge bg={member.is_active_in_account ? "success" : "secondary"}>
                         {member.is_active_in_account ? t('team.members.active') : t('team.members.inactive')}
                       </Badge>
@@ -257,7 +358,7 @@ const TeamMembers = () => {
                         size="sm" 
                         className="me-1"
                         title={t('team.members.edit')}
-                        onClick={() => {/* TODO: Edit functionality */}}
+                        onClick={() => handleEditClick(member)}
                       >
                         <FontAwesomeIcon icon={faEdit} />
                       </Button>
@@ -299,6 +400,116 @@ const TeamMembers = () => {
             {t('common.confirm')}
           </Button>
         </Modal.Footer>
+      </Modal>
+
+      {/* Edit Member Modal */}
+      <Modal show={showEditModal} onHide={() => setShowEditModal(false)} size="lg">
+        <Modal.Header closeButton>
+          <Modal.Title>{t('team.members.edit.title') || 'Edit Team Member'}</Modal.Title>
+        </Modal.Header>
+        <Form onSubmit={handleEditSubmit}>
+          <Modal.Body>
+            {memberToEdit && (
+              <div className="mb-3">
+                <strong>{memberToEdit.user_details?.full_name || `${memberToEdit.user_details?.first_name} ${memberToEdit.user_details?.last_name}`}</strong>
+                <br />
+                <small className="text-muted">{memberToEdit.user_details?.email}</small>
+              </div>
+            )}
+            
+            <Row>
+              <Col md={6} className="mb-3">
+                <Form.Group>
+                  <Form.Label>{t('team.members.role') || 'Role'} *</Form.Label>
+                  <Form.Select
+                    value={editForm.role}
+                    onChange={(e) => setEditForm({...editForm, role: e.target.value})}
+                    required
+                  >
+                    <option value="">{t('team.members.edit.selectRole') || 'Select Role'}</option>
+                    <option value="adm">{t('team.members.roles.adm') || 'Administrator'}</option>
+                    <option value="doc">{t('team.members.roles.doc') || 'Doctor'}</option>
+                    <option value="ast">{t('team.members.roles.ast') || 'Assistant'}</option>
+                    <option value="rdo">{t('team.members.roles.rdo') || 'Radiologist'}</option>
+                  </Form.Select>
+                </Form.Group>
+              </Col>
+              
+              <Col md={6} className="mb-3">
+                <Form.Group>
+                  <Form.Label>{t('team.members.specialty') || 'Specialty'}</Form.Label>
+                  <Form.Select
+                    value={editForm.specialty}
+                    onChange={(e) => setEditForm({...editForm, specialty: e.target.value})}
+                    disabled={editForm.role !== 'doc'}
+                  >
+                    <option value="">{t('team.members.edit.selectSpecialty') || 'Select Specialty'}</option>
+                    {specialties.map(specialty => (
+                      <option key={specialty.id} value={specialty.id}>
+                        {specialty.name}
+                      </option>
+                    ))}
+                  </Form.Select>
+                  {editForm.role === 'doc' && (
+                    <Form.Text className="text-muted">
+                      {t('team.members.edit.specialtyRequired') || 'Specialty is required for doctors'}
+                    </Form.Text>
+                  )}
+                </Form.Group>
+              </Col>
+              
+              <Col md={6} className="mb-3">
+                <Form.Group>
+                  <Form.Label>{t('team.members.edit.phoneNumber') || 'Phone Number'}</Form.Label>
+                  <Form.Control
+                    type="tel"
+                    value={editForm.phone_number}
+                    onChange={(e) => setEditForm({...editForm, phone_number: e.target.value})}
+                    placeholder={t('team.members.edit.phoneNumberPlaceholder') || 'Enter phone number'}
+                  />
+                </Form.Group>
+              </Col>
+              
+              <Col md={6} className="mb-3">
+                <Form.Group>
+                  <Form.Label>{t('team.members.edit.displayColor') || 'Display Color'}</Form.Label>
+                  <div className="d-flex align-items-center">
+                    <Form.Control
+                      type="color"
+                      value={editForm.color}
+                      onChange={(e) => setEditForm({...editForm, color: e.target.value})}
+                      style={{ width: '60px', height: '38px', marginRight: '10px' }}
+                    />
+                    <Form.Control
+                      type="text"
+                      value={editForm.color}
+                      onChange={(e) => setEditForm({...editForm, color: e.target.value})}
+                      placeholder="#3498db"
+                      style={{ fontFamily: 'monospace' }}
+                    />
+                  </div>
+                  <Form.Text className="text-muted">
+                    {t('team.members.edit.colorHelp') || 'Color used for calendar and appointments'}
+                  </Form.Text>
+                </Form.Group>
+              </Col>
+            </Row>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button 
+              variant="secondary" 
+              onClick={() => setShowEditModal(false)}
+            >
+              {t('common.cancel') || 'Cancel'}
+            </Button>
+            <Button 
+              variant="primary" 
+              type="submit"
+            >
+              {t('common.save') || 'Save Changes'}
+            </Button>
+          </Modal.Footer>
+        </Form>
       </Modal>
     </Container>
   );

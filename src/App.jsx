@@ -27,6 +27,7 @@ import InvitationAcceptance from './pages/InvitationAcceptance';
 import Team from './pages/clinic/Team';
 import TeamMembers from './pages/clinic/TeamMembers';
 import TeamInvitations from './pages/clinic/TeamInvitations';
+import TeamPermissions from './pages/clinic/TeamPermissions';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
@@ -96,6 +97,7 @@ function App() {
             <Route path="/clinic/team" element={<ProtectedRoute><Team /></ProtectedRoute>} />
             <Route path="/clinic/team/members" element={<ProtectedRoute><TeamMembers /></ProtectedRoute>} />
             <Route path="/clinic/team/invitations" element={<ProtectedRoute><TeamInvitations /></ProtectedRoute>} />
+            <Route path="/clinic/team/permissions" element={<ProtectedRoute><TeamPermissions /></ProtectedRoute>} />
 
             {/* Redirect root to dashboard or login */}
             <Route path="/" element={<Navigate to="/dashboard" />} />

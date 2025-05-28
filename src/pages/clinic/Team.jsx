@@ -4,7 +4,7 @@ import { Container, Row, Col, Card } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUsers, faEnvelope } from '@fortawesome/free-solid-svg-icons';
+import { faUsers, faEnvelope, faShieldAlt } from '@fortawesome/free-solid-svg-icons';
 import { AccountContext } from '../../contexts/AccountContext';
 
 const Team = () => {
@@ -45,7 +45,7 @@ const Team = () => {
       </Row>
 
       <Row>
-        <Col md={6} className="mb-4">
+        <Col lg={4} md={6} className="mb-4">
           <Card className="h-100">
             <Card.Body className="d-flex flex-column text-center">
               <div className="mb-3">
@@ -62,7 +62,7 @@ const Team = () => {
           </Card>
         </Col>
 
-        <Col md={6} className="mb-4">
+        <Col lg={4} md={6} className="mb-4">
           <Card className="h-100">
             <Card.Body className="d-flex flex-column text-center">
               <div className="mb-3">
@@ -73,6 +73,23 @@ const Team = () => {
               <div className="mt-auto">
                 <Link to="/clinic/team/invitations" className="btn btn-primary">
                   {t('team.manageInvitations')}
+                </Link>
+              </div>
+            </Card.Body>
+          </Card>
+        </Col>
+
+        <Col lg={4} md={6} className="mb-4">
+          <Card className="h-100">
+            <Card.Body className="d-flex flex-column text-center">
+              <div className="mb-3">
+                <FontAwesomeIcon icon={faShieldAlt} size="4x" className="text-success" />
+              </div>
+              <h5 className="card-title">{t('team.permissionsTitle')}</h5>
+              <p className="card-text">{t('team.permissionsDescription')}</p>
+              <div className="mt-auto">
+                <Link to="/clinic/team/permissions" className="btn btn-success">
+                  {t('team.managePermissions')}
                 </Link>
               </div>
             </Card.Body>

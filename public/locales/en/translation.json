@@ -122,7 +122,11 @@
     "passwordMatch": "Passwords do not match"
   },
   "common": {
+    "refresh": "Refresh",
     "loading": "Loading",
+    "error": "Error",
+    "tryAgain": "Try Again",
+    "saveChanges": "Save Changes",
     "save": "Save",
     "saving": "Saving...",
     "cancel": "Cancel",
@@ -782,6 +786,9 @@
     "invitationsDescription": "Send and manage team invitations",
     "manageInvitations": "Manage Invitations",
     "selectAccountFirst": "Please select a clinic first to manage team",
+    "permissionsTitle": "Team Permissions",
+    "permissionsDescription": "Manage granular permissions and access controls for team members.",
+    "managePermissions": "Manage Permissions",
     "members": {
       "title": "Team Members",
       "description": "View and manage current team members",
@@ -790,6 +797,7 @@
       "email": "Email",
       "role": "Role",
       "specialty": "Specialty",
+      "color": "Color",
       "status": "Status",
       "joinDate": "Join Date",
       "actions": "Actions",
@@ -803,15 +811,105 @@
       "memberRemoved": "Team member removed successfully",
       "memberDeactivated": "Team member deactivated successfully",
       "memberReactivated": "Team member reactivated successfully",
+      "memberUpdated": "Team member updated successfully",
       "errorLoading": "Error loading team members. Please try again.",
-      "errorRemoving": "Error removing team member. Please try again.",
+      "errorRemoving": "Error deactivate team member. Please try again.",
+      "errorUpdating": "Error updating team member",
       "back": "Back to Team",
       "roles": {
         "adm": "Administrator",
         "doc": "Doctor",
-        "ast": "Assistant", 
+        "ast": "Assistant",
         "rdo": "Read Only"
+      },
+      "edit": {
+        "title": "Edit Team Member",
+        "selectRole": "Select Role",
+        "selectSpecialty": "Select Specialty",
+        "specialtyRequired": "Specialty is required for doctors",
+        "doctorNeedsSpecialty": "Doctors must have a specialty selected",
+        "phoneNumber": "Phone Number",
+        "phoneNumberPlaceholder": "Enter phone number",
+        "displayColor": "Display Color",
+        "colorHelp": "Color used for calendar and appointments"
       }
     }
+  },
+  "teamPermissions": {
+    "title": "Team Permissions",
+    "noMembers": {
+      "title": "No team members found",
+      "description": "Add team members first to manage their permissions."
+    },
+    "table": {
+      "member": "Team Member",
+      "role": "Role", 
+      "status": "Status",
+      "permissionsCount": "Permissions Count",
+      "actions": "Actions"
+    },
+    "status": {
+      "owner": "Owner",
+      "member": "Member"
+    },
+    "allPermissions": "All Permissions",
+    "of": "of",
+    "manage": "Manage",
+    "ownerCannotEdit": "Owner (cannot edit)",
+    "modal": {
+      "title": "Manage Permissions",
+      "description": "Select the permissions you want to grant to this user. Changes will take effect immediately.",
+      "currentRole": "Current Role",
+      "roleNote": "Role-based permissions are automatically inherited and cannot be disabled. Individual permissions can override or add to role permissions.",
+      "inheritedFromRole": "Inherited from role"
+    },
+    "quickActions": {
+      "title": "Quick Actions",
+      "selectAll": "Select All",
+      "clearAll": "Clear All", 
+      "viewOnly": "View Only",
+      "clearIndividual": "Clear Individual",
+      "addViewOnly": "Add View Only",
+      "note": "Note: Role-based permissions cannot be removed individually."
+    },
+    "errors": {
+      "loadData": "Failed to load permissions data. Please try again.",
+      "savePermissions": "Failed to save permissions. Please try again."
+    },
+    "legend": {
+      "title": "Permission Types",
+      "role": "Inherited",
+      "individual": "Granted",
+      "owner": "Account owner (all permissions)"
+    }
+  },
+  "permissions": {
+    "view_patients": "View Patients",
+    "manage_patients": "Manage Patients", 
+    "view_patient_history": "View Patient History",
+    "view_treatments": "View Treatments",
+    "view_all_treatments": "View All Treatments",
+    "manage_treatments": "Manage Treatments",
+    "manage_treatment_notes": "Manage Treatment Notes",
+    "view_catalog": "View Catalog",
+    "manage_catalog": "Manage Catalog",
+    "manage_locations": "Manage Locations",
+    "manage_procedures": "Manage Procedures",
+    "view_team": "View Team",
+    "invite_users": "Invite Users",
+    "manage_users": "Manage Users",
+    "remove_users": "Remove Users",
+    "manage_permissions": "Manage Permissions",
+    "view_appointments": "View Appointments",
+    "view_all_appointments": "View All Appointments",
+    "manage_appointments": "Manage Appointments",
+    "manage_schedule": "Manage Schedule",
+    "view_billing": "View Billing",
+    "manage_billing": "Manage Billing",
+    "view_financial_reports": "View Financial Reports",
+    "manage_pricing": "Manage Pricing",
+    "view_reports": "View Reports",
+    "view_analytics": "View Analytics",
+    "export_reports": "Export Reports"
   }
 }

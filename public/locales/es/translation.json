@@ -122,6 +122,10 @@
     "passwordMatch": "Las contraseñas no coinciden"
   },
   "common": {
+    "refresh": "Actualizar",
+    "error": "Error",
+    "tryAgain": "Intentar de Nuevo",
+    "saveChanges": "Guardar Cambios",
     "loading": "Cargando",
     "save": "Guardar",
     "saving": "Guardando...",
@@ -782,6 +786,9 @@
     "invitationsDescription": "Enviar y administrar invitaciones del equipo",
     "manageInvitations": "Administrar Invitaciones",
     "selectAccountFirst": "Por favor seleccione una clínica primero para administrar el equipo",
+    "permissionsTitle": "Permisos del Equipo", 
+    "permissionsDescription": "Gestione permisos granulares y controles de acceso para los miembros del equipo.",
+    "managePermissions": "Gestionar Permisos",
     "members": {
       "title": "Miembros del Equipo",
       "description": "Ver y administrar los miembros actuales del equipo",
@@ -790,6 +797,7 @@
       "email": "Correo Electrónico",
       "role": "Rol",
       "specialty": "Especialidad",
+      "color": "Color",
       "status": "Estado",
       "joinDate": "Fecha de Ingreso",
       "actions": "Acciones",
@@ -803,14 +811,27 @@
       "memberRemoved": "Miembro del equipo eliminado exitosamente",
       "memberDeactivated": "Miembro del equipo desactivado exitosamente",
       "memberReactivated": "Miembro del equipo reactivado exitosamente",
+      "memberUpdated": "Miembro del equipo actualizado exitosamente",
       "errorLoading": "Error al cargar los miembros del equipo. Por favor, intente nuevamente.",
-      "errorRemoving": "Error al eliminar el miembro del equipo. Por favor, intente nuevamente.",
+      "errorRemoving": "Error al desactivar el miembro del equipo. Por favor, intente nuevamente.",
+      "errorUpdating": "Error al actualizar el miembro del equipo",
       "back": "Volver al Equipo",
       "roles": {
         "adm": "Administrador",
         "doc": "Doctor",
         "ast": "Asistente",
         "rdo": "Solo Lectura"
+      },
+      "edit": {
+        "title": "Editar Miembro del Equipo",
+        "selectRole": "Seleccionar Rol",
+        "selectSpecialty": "Seleccionar Especialidad",
+        "specialtyRequired": "La especialidad es requerida para doctores",
+        "doctorNeedsSpecialty": "Los doctores deben tener una especialidad seleccionada",
+        "phoneNumber": "Número de Teléfono",
+        "phoneNumberPlaceholder": "Ingrese número de teléfono",
+        "displayColor": "Color de Visualización",
+        "colorHelp": "Color usado para calendario y citas"
       }
     },
     "invitations": {
@@ -851,5 +872,82 @@
         "errorLoading": "Error al cargar las invitaciones. Por favor, intente nuevamente."
       }
     }
+  },
+  "teamPermissions": {
+    "title": "Permisos del Equipo",
+    "noMembers": {
+      "title": "No se encontraron miembros del equipo",
+      "description": "Agregue miembros del equipo primero para gestionar sus permisos."
+    },
+    "table": {
+      "member": "Miembro del Equipo",
+      "role": "Rol",
+      "status": "Estado", 
+      "permissionsCount": "Cantidad de Permisos",
+      "actions": "Acciones"
+    },
+    "status": {
+      "owner": "Propietario",
+      "member": "Miembro"
+    },
+    "allPermissions": "Todos los Permisos",
+    "of": "de",
+    "manage": "Gestionar",
+    "ownerCannotEdit": "Propietario (no se puede editar)",
+    "modal": {
+      "title": "Gestionar Permisos",
+      "description": "Seleccione los permisos que desea otorgar a este usuario. Los cambios tendrán efecto inmediatamente.",
+      "currentRole": "Rol Actual",
+      "roleNote": "Los permisos basados en rol se heredan automáticamente y no se pueden desactivar. Los permisos individuales pueden anular o agregar a los permisos de rol.",
+      "inheritedFromRole": "Heredado del rol"
+    },
+    "quickActions": {
+      "title": "Acciones Rápidas",
+      "selectAll": "Seleccionar Todo",
+      "clearAll": "Limpiar Todo",
+      "viewOnly": "Solo Ver",
+      "clearIndividual": "Limpiar Individuales",
+      "addViewOnly": "Agregar Solo Lectura",
+      "note": "Nota: Los permisos basados en rol no se pueden eliminar individualmente."
+    },
+    "errors": {
+      "loadData": "Error al cargar los datos de permisos. Por favor, inténtelo de nuevo.",
+      "savePermissions": "Error al guardar los permisos. Por favor, inténtelo de nuevo."
+    },
+    "legend": {
+      "title": "Tipos de Permisos",
+      "role": "Heredado",
+      "individual": "Otorgado",
+      "owner": "Propietario de cuenta (todos los permisos)"
+    }
+  },
+  "permissions": {
+    "view_patients": "Ver Pacientes",
+    "manage_patients": "Gestionar Pacientes",
+    "view_patient_history": "Ver Historial de Pacientes", 
+    "view_treatments": "Ver Tratamientos",
+    "view_all_treatments": "Ver Todos los Tratamientos",
+    "manage_treatments": "Gestionar Tratamientos",
+    "manage_treatment_notes": "Gestionar Notas de Tratamiento",
+    "view_catalog": "Ver Catálogo",
+    "manage_catalog": "Gestionar Catálogo",
+    "manage_locations": "Gestionar Ubicaciones",
+    "manage_procedures": "Gestionar Procedimientos",
+    "view_team": "Ver Equipo",
+    "invite_users": "Invitar Usuarios",
+    "manage_users": "Gestionar Usuarios",
+    "remove_users": "Remover Usuarios",
+    "manage_permissions": "Gestionar Permisos",
+    "view_appointments": "Ver Citas",
+    "view_all_appointments": "Ver Todas las Citas",
+    "manage_appointments": "Gestionar Citas",
+    "manage_schedule": "Gestionar Horarios",
+    "view_billing": "Ver Facturación",
+    "manage_billing": "Gestionar Facturación",
+    "view_financial_reports": "Ver Reportes Financieros",
+    "manage_pricing": "Gestionar Precios",
+    "view_reports": "Ver Reportes",
+    "view_analytics": "Ver Analíticos",
+    "export_reports": "Exportar Reportes"
   }
 }
