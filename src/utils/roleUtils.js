@@ -1,13 +1,13 @@
-// src/utils/roleUtils.js
+// src/utils/roleUtils.js - CORRECT JavaScript version
 import { useTranslation } from 'react-i18next';
 
-// Role definitions
+// Role definitions - keeping your existing structure
 export const ROLES = {
   ADM: 'adm',
   DOC: 'doc', 
   AST: 'ast',
   RDO: 'rdo',
-  CUS: 'cus'
+  CUS: 'cus'  // Custom role added
 };
 
 // Role display names (fallback if translations not available)
@@ -16,7 +16,7 @@ export const ROLE_NAMES = {
   [ROLES.DOC]: 'Doctor',
   [ROLES.AST]: 'Assistant', 
   [ROLES.RDO]: 'Read Only',
-  [ROLES.CUS]: 'Custom'
+  [ROLES.CUS]: 'Custom'  // Custom role added
 };
 
 // Role badge colors for consistent UI
@@ -25,7 +25,7 @@ export const ROLE_COLORS = {
   [ROLES.DOC]: 'bg-primary',
   [ROLES.AST]: 'bg-info',
   [ROLES.RDO]: 'bg-secondary',
-  [ROLES.CUS]: 'bg-warning'
+  [ROLES.CUS]: 'bg-warning'  // Custom role added
 };
 
 // Get role display name with translation support

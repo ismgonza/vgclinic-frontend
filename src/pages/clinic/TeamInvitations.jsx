@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { AccountContext } from '../../contexts/AccountContext';
 import invitationsService from '../../services/invitations.service';
 import catalogService from '../../services/catalog.service';
+import { useRoles } from '../../utils/roleUtils';
 
 const TeamInvitations = () => {
   const navigate = useNavigate();
@@ -30,13 +31,8 @@ const TeamInvitations = () => {
     personal_message: ''
   });
 
-  // Hardcoded role options (matching your backend)
-  const roleOptions = [
-    { value: 'adm', label: t('invitations.form.roles.adm') },
-    { value: 'doc', label: t('invitations.form.roles.doc') },
-    { value: 'ast', label: t('invitations.form.roles.ast') },
-    { value: 'rdo', label: t('invitations.form.roles.rdo') }
-  ];
+  const { getAllRoles, getRoleBadgeColor } = useRoles();
+  const roleOptions = getAllRoles();
 
   // Using actual specialties from API
   const specialtyOptions = specialties;

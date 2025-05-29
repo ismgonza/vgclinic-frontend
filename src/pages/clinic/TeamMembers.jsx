@@ -1,4 +1,4 @@
-// src/pages/clinic/TeamMembers.jsx
+// src/pages/clinic/TeamMembers.jsx - FIXED to use centralized roles
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Card, Table, Button, Badge, Spinner, Alert, Modal, Form } from 'react-bootstrap';
@@ -6,14 +6,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faTrash, faEye, faUsers, faArrowLeft, faUserMinus, faUserCheck } from '@fortawesome/free-solid-svg-icons';
 import { useTranslation } from 'react-i18next';
 import { AccountContext } from '../../contexts/AccountContext';
+import { useRoles } from '../../utils/roleUtils'; // ADDED: Import centralized roles
 import teamMembersService from '../../services/teamMembers.service';
 import catalogService from '../../services/catalog.service';
-
 
 const TeamMembers = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { selectedAccount } = useContext(AccountContext);
+  const { getAllRoles, getRoleBadgeColor } = useRoles(); // ADDED: Use centralized roles
   
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -30,6 +31,9 @@ const TeamMembers = () => {
     color: '#3498db' // default blue color
   });
   const [specialties, setSpecialties] = useState([]);
+
+  // ADDED: Get all roles from centralized utility
+  const roleOptions = getAllRoles();
 
   // Reload members when account changes
   useEffect(() => {
@@ -199,14 +203,11 @@ const TeamMembers = () => {
     return new Date(dateString).toLocaleDateString();
   };
 
+  // UPDATED: Use centralized role badge function
   const getRoleBadgeVariant = (role) => {
-    switch (role) {
-      case 'adm': return 'primary';
-      case 'doc': return 'success';
-      case 'ast': return 'info';
-      case 'rdo': return 'secondary';
-      default: return 'secondary';
-    }
+    const bootstrapClass = getRoleBadgeColor(role);
+    // Convert bg-danger to danger, bg-primary to primary, etc.
+    return bootstrapClass.replace('bg-', '');
   };
 
   // Show message if no account selected
@@ -316,7 +317,7 @@ const TeamMembers = () => {
                     </td>
                     <td>
                       <Badge bg={getRoleBadgeVariant(member.role)}>
-                        {t(`team.members.roles.${member.role}`)}
+                        {t(`roles.${member.role}`, member.role)}
                       </Badge>
                     </td>
                     <td>{member.specialty_details?.name || '-'}</td>
@@ -402,7 +403,7 @@ const TeamMembers = () => {
         </Modal.Footer>
       </Modal>
 
-      {/* Edit Member Modal */}
+      {/* FIXED Edit Member Modal - Using centralized roles */}
       <Modal show={showEditModal} onHide={() => setShowEditModal(false)} size="lg">
         <Modal.Header closeButton>
           <Modal.Title>{t('team.members.edit.title') || 'Edit Team Member'}</Modal.Title>
@@ -427,10 +428,12 @@ const TeamMembers = () => {
                     required
                   >
                     <option value="">{t('team.members.edit.selectRole') || 'Select Role'}</option>
-                    <option value="adm">{t('team.members.roles.adm') || 'Administrator'}</option>
-                    <option value="doc">{t('team.members.roles.doc') || 'Doctor'}</option>
-                    <option value="ast">{t('team.members.roles.ast') || 'Assistant'}</option>
-                    <option value="rdo">{t('team.members.roles.rdo') || 'Radiologist'}</option>
+                    {/* FIXED: Use centralized role options */}
+                    {roleOptions.map(role => (
+                      <option key={role.value} value={role.value}>
+                        {role.label}
+                      </option>
+                    ))}
                   </Form.Select>
                 </Form.Group>
               </Col>
