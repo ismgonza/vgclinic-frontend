@@ -1,4 +1,4 @@
-// src/pages/clinic/TeamPermissions.jsx - ENHANCED VERSION
+// src/pages/clinic/TeamPermissions.jsx - UPDATED WITH CUSTOM ROLE SUPPORT
 import React, { useState, useEffect, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AccountContext } from '../../contexts/AccountContext';
@@ -135,22 +135,40 @@ const TeamPermissions = () => {
     return 'none';
   };
 
-  const getPermissionBadge = (permissionKey) => {
-    const source = getPermissionSource(permissionKey);
-    switch (source) {
-      case 'role':
-        return <span className="badge bg-info ms-2">Role</span>;
-      case 'individual':
-        return <span className="badge bg-warning ms-2">Individual</span>;
-      default:
-        return null;
+  // NEW: Get role display with proper Custom role handling
+  const getRoleDisplay = (user) => {
+    // Handle custom role display
+    if (user.role === 'cus') {
+      return t('roles.cus', 'Custom');
+    }
+    return user.role_display;
+  };
+
+  // NEW: Get role badge color based on role
+  const getRoleBadgeColor = (role) => {
+    switch (role) {
+      case 'adm': return 'bg-danger';
+      case 'doc': return 'bg-primary';
+      case 'ast': return 'bg-info';
+      case 'rdo': return 'bg-secondary';
+      case 'cus': return 'bg-warning'; // Custom role gets warning color
+      default: return 'bg-secondary';
     }
   };
 
-  // NEW: Calculate permission summary for table
+  // NEW: Calculate permission summary for table with Custom role consideration
   const getPermissionSummary = (user) => {
     if (user.is_owner) {
       return { total: availablePermissions.length, individual: 0, role: availablePermissions.length };
+    }
+    
+    // For Custom roles, all permissions are individual (no role-based defaults)
+    if (user.role === 'cus') {
+      return { 
+        total: user.permissions.length, 
+        individual: user.permissions.length, 
+        role: 0 
+      };
     }
     
     const individualCount = user.permission_details?.filter(p => !p.granted_by_role)?.length || 0;
@@ -202,7 +220,7 @@ const TeamPermissions = () => {
             </button>
           </div>
 
-          {/* NEW: Legend for permission types */}
+          {/* UPDATED: Legend for permission types with Custom role info */}
           <div className="alert alert-info mb-4">
             <div className="d-flex align-items-center flex-wrap gap-3">
               <strong>{t('teamPermissions.legend.title')}:</strong>
@@ -217,6 +235,10 @@ const TeamPermissions = () => {
               <div className="d-flex align-items-center">
                 <span className="badge bg-success me-2">Owner</span>
                 <small>{t('teamPermissions.legend.owner')}</small>
+              </div>
+              <div className="d-flex align-items-center">
+                <span className="badge bg-warning me-2">Custom</span>
+                <small>{t('teamPermissions.legend.custom', 'Custom roles have no default permissions')}</small>
               </div>
             </div>
           </div>
@@ -253,7 +275,14 @@ const TeamPermissions = () => {
                               </div>
                             </td>
                             <td>
-                              <span className="badge bg-primary">{user.role_display}</span>
+                              <span className={`badge ${getRoleBadgeColor(user.role)}`}>
+                                {getRoleDisplay(user)}
+                              </span>
+                              {user.role === 'cus' && (
+                                <small className="d-block text-muted mt-1">
+                                  {t('teamPermissions.customRoleNote', 'All permissions individually assigned')}
+                                </small>
+                              )}
                             </td>
                             <td>
                               {user.is_owner ? (
@@ -280,7 +309,7 @@ const TeamPermissions = () => {
                                         </span>
                                       )}
                                       {permSummary.individual > 0 && (
-                                        <span className="ms-2">
+                                        <span className={permSummary.role > 0 ? "ms-2" : ""}>
                                           <span className="badge bg-warning me-1">Individual</span>
                                           {permSummary.individual}
                                         </span>
@@ -338,10 +367,15 @@ const TeamPermissions = () => {
                   </p>
                   <div className="alert alert-light">
                     <strong>{t('teamPermissions.modal.currentRole', 'Current Role')}:</strong> 
-                    <span className="badge bg-primary ms-2">{selectedUser.role_display}</span>
+                    <span className={`badge ${getRoleBadgeColor(selectedUser.role)} ms-2`}>
+                      {getRoleDisplay(selectedUser)}
+                    </span>
                     <br />
                     <small className="text-muted mt-1 d-block">
-                      {t('teamPermissions.modal.roleNote', 'Role-based permissions are automatically inherited. Individual permissions can override or add to role permissions.')}
+                      {selectedUser.role === 'cus' 
+                        ? t('teamPermissions.modal.customRoleNote', 'Custom roles have no default permissions. All permissions must be individually assigned.')
+                        : t('teamPermissions.modal.roleNote', 'Role-based permissions are automatically inherited. Individual permissions can override or add to role permissions.')
+                      }
                     </small>
                   </div>
                 </div>
@@ -373,7 +407,7 @@ const TeamPermissions = () => {
                               >
                                 <span>{getPermissionDisplay(permission.key)}</span>
                                 <div>
-                                  {isFromRole && (
+                                  {isFromRole && selectedUser.role !== 'cus' && (
                                     <span className="badge bg-info ms-2">
                                       {t('teamPermissions.legend.role', 'Role')}
                                     </span>
@@ -406,10 +440,18 @@ const TeamPermissions = () => {
                       className="btn btn-sm btn-outline-danger"
                       onClick={() => {
                         // Keep role-based permissions, clear only individual ones
-                        setEditingPermissions([...roleBasedPermissions]);
+                        // For Custom roles, clear everything since they have no role-based permissions
+                        if (selectedUser.role === 'cus') {
+                          setEditingPermissions([]);
+                        } else {
+                          setEditingPermissions([...roleBasedPermissions]);
+                        }
                       }}
                     >
-                      {t('teamPermissions.quickActions.clearIndividual', 'Clear Individual')}
+                      {selectedUser.role === 'cus' 
+                        ? t('teamPermissions.quickActions.clearAll', 'Clear All')
+                        : t('teamPermissions.quickActions.clearIndividual', 'Clear Individual')
+                      }
                     </button>
                     <button
                       className="btn btn-sm btn-outline-primary"
@@ -417,14 +459,24 @@ const TeamPermissions = () => {
                         const viewPermissions = availablePermissions
                           .filter(p => p.key.startsWith('view_'))
                           .map(p => p.key);
-                        setEditingPermissions([...roleBasedPermissions, ...viewPermissions]);
+                        if (selectedUser.role === 'cus') {
+                          setEditingPermissions(viewPermissions);
+                        } else {
+                          setEditingPermissions([...roleBasedPermissions, ...viewPermissions]);
+                        }
                       }}
                     >
-                      {t('teamPermissions.quickActions.addViewOnly', 'Add View Only')}
+                      {selectedUser.role === 'cus'
+                        ? t('teamPermissions.quickActions.setViewOnly', 'Set View Only')
+                        : t('teamPermissions.quickActions.addViewOnly', 'Add View Only')
+                      }
                     </button>
                   </div>
                   <small className="text-muted d-block mt-2">
-                    {t('teamPermissions.quickActions.note', 'Note: Role-based permissions cannot be removed individually.')}
+                    {selectedUser.role === 'cus'
+                      ? t('teamPermissions.quickActions.customNote', 'Note: Custom roles start with no permissions.')
+                      : t('teamPermissions.quickActions.note', 'Note: Role-based permissions cannot be removed individually.')
+                    }
                   </small>
                 </div>
               </div>

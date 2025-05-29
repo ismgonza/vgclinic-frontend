@@ -525,11 +525,6 @@ const TreatmentDetail = () => {
               <p className="mb-1">
                 <strong>ID:</strong> {treatment.patient_details?.id_number}
               </p>
-              {treatment.patient_details?.email && (
-                <p className="mb-1">
-                  <strong>Email:</strong> {treatment.patient_details?.email}
-                </p>
-              )}
               <p className="mb-0">
                 <strong>Gender:</strong> {treatment.patient_details?.gender === 'M' ? 'Male' : 'Female'}
               </p>

@@ -1,4 +1,4 @@
-// src/hooks/usePermissions.js - UPDATED VERSION
+// src/hooks/usePermissions.js - UPDATED WITH GRANULAR PERMISSIONS
 import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import { AccountContext } from '../contexts/AccountContext';
@@ -47,7 +47,7 @@ export const usePermissions = () => {
         return;
       }
 
-      // Get user's permissions from the new backend endpoint
+      // Get user's permissions from the backend endpoint
       const userPermData = await PermissionsService.getUserPermissions(currentUser.id);
       
       setUserPermissions(userPermData.permissions || []);
@@ -89,46 +89,79 @@ export const usePermissions = () => {
     return permissions.every(permission => userPermissions.includes(permission));
   };
 
-  // UPDATED: Patient-specific permission checks with correct names
-  const canViewPatients = () => hasPermission('view_patients_list');
-  const canViewPatientDetail = () => hasPermission('view_patient_detail');
-  const canViewPatientHistory = () => hasPermission('view_patient_history');
-  const canManagePatientBasic = () => hasPermission('manage_patient_basic');
-  const canManagePatientHistory = () => hasPermission('manage_patient_history');
+  // UPDATED: Patient-specific permission checks
+  const canViewPatientsList = () => hasPermission('view_patients_list');
+  const canViewPatientsDetail = () => hasPermission('view_patients_detail');
+  const canViewPatientsHistory = () => hasPermission('view_patients_history');
+  const canManagePatientsBasic = () => hasPermission('manage_patients_basic');
+  const canManagePatientsHistory = () => hasPermission('manage_patients_history');
   
-  // UPDATED: Treatment-specific permission checks
-  const canViewTreatments = () => hasPermission('view_treatments');
-  const canViewAllTreatments = () => hasPermission('view_all_treatments');
-  const canManageTreatments = () => hasPermission('manage_treatments');
-  const canManageTreatmentNotes = () => hasPermission('manage_treatment_notes');
+  // NEW: Treatment-specific permission checks with granular permissions
+  const canViewTreatmentsList = () => hasPermission('view_treatments_list');
+  const canViewTreatmentsDetail = () => hasPermission('view_treatments_detail');
+  const canViewTreatmentsAssigned = () => hasPermission('view_treatments_assigned');
+  const canCreateTreatments = () => hasPermission('create_treatments');
+  const canEditTreatments = () => hasPermission('edit_treatments');
   
-  // UPDATED: Team-specific permission checks
-  const canViewTeam = () => hasPermission('view_team');
-  const canInviteUsers = () => hasPermission('invite_users');
-  const canManageUsers = () => hasPermission('manage_users');
-  const canRemoveUsers = () => hasPermission('remove_users');
-  const canManagePermissions = () => hasPermission('manage_permissions');
+  // Treatment History permissions
+  const canViewTreatmentHistoryList = () => hasPermission('view_treatment_history_list');
+  const canViewTreatmentHistoryDetail = () => hasPermission('view_treatment_history_detail');
+  const canCreateTreatmentHistory = () => hasPermission('create_treatment_history');
+  const canEditTreatmentHistory = () => hasPermission('edit_treatment_history');
   
-  // UPDATED: Catalog-specific permission checks
-  const canViewCatalog = () => hasPermission('view_catalog');
-  const canManageCatalog = () => hasPermission('manage_catalog');
+  // Treatment Notes permissions
+  const canViewTreatmentNotesList = () => hasPermission('view_treatment_notes_list');
+  const canViewTreatmentNotesDetail = () => hasPermission('view_treatment_notes_detail');
+  const canCreateTreatmentNotes = () => hasPermission('create_treatment_notes');
+  const canEditTreatmentNotes = () => hasPermission('edit_treatment_notes');
+  
+  // Helper: Can view any treatments (either all or assigned)
+  const canViewAnyTreatments = () => canViewTreatmentsList() || canViewTreatmentsAssigned();
+  
+  // NEW: Location-specific permission checks
+  const canViewLocationsList = () => hasPermission('view_locations_list');
+  const canViewLocationsDetail = () => hasPermission('view_locations_detail');
   const canManageLocations = () => hasPermission('manage_locations');
+  const canViewRoomsList = () => hasPermission('view_rooms_list');
+  const canViewRoomsDetail = () => hasPermission('view_rooms_detail');
+  const canManageRooms = () => hasPermission('manage_rooms');
+  
+  // NEW: Catalog-specific permission checks
+  const canViewSpecialtiesList = () => hasPermission('view_specialties_list');
+  const canViewSpecialtiesDetail = () => hasPermission('view_specialties_detail');
+  const canManageSpecialties = () => hasPermission('manage_specialties');
+  const canViewProceduresList = () => hasPermission('view_procedures_list');
+  const canViewProceduresDetail = () => hasPermission('view_procedures_detail');
   const canManageProcedures = () => hasPermission('manage_procedures');
+  
+  // UPDATED: Team-specific permission checks with granular permissions
+  const canViewTeamMembersList = () => hasPermission('view_team_members_list');
+  const canViewTeamMembersDetail = () => hasPermission('view_team_members_detail');
+  const canManageTeamMembers = () => hasPermission('manage_team_members');
+  const canViewInvitationsList = () => hasPermission('view_invitations_list');
+  const canViewInvitationsDetail = () => hasPermission('view_invitations_detail');
+  const canManageInvitations = () => hasPermission('manage_invitations');
+  const canViewPermissionsList = () => hasPermission('view_permissions_list');
+  const canViewPermissionsDetail = () => hasPermission('view_permissions_detail');
+  const canManagePermissions = () => hasPermission('manage_permissions');
 
   // UPDATED: Appointment-specific permission checks
-  const canViewAppointments = () => hasPermission('view_appointments');
-  const canViewAllAppointments = () => hasPermission('view_all_appointments');
+  const canViewAppointmentsList = () => hasPermission('view_appointments_list');
+  const canViewAppointmentsDetail = () => hasPermission('view_appointments_detail');
+  const canViewAppointmentsAssigned = () => hasPermission('view_appointments_assigned');
   const canManageAppointments = () => hasPermission('manage_appointments');
   const canManageSchedule = () => hasPermission('manage_schedule');
 
   // UPDATED: Billing-specific permission checks
-  const canViewBilling = () => hasPermission('view_billing');
+  const canViewBillingList = () => hasPermission('view_billing_list');
+  const canViewBillingDetail = () => hasPermission('view_billing_detail');
   const canManageBilling = () => hasPermission('manage_billing');
   const canViewFinancialReports = () => hasPermission('view_financial_reports');
   const canManagePricing = () => hasPermission('manage_pricing');
 
   // UPDATED: Report-specific permission checks
-  const canViewReports = () => hasPermission('view_reports');
+  const canViewReportsList = () => hasPermission('view_reports_list');
+  const canViewReportsDetail = () => hasPermission('view_reports_detail');
   const canViewAnalytics = () => hasPermission('view_analytics');
   const canExportReports = () => hasPermission('export_reports');
 
@@ -147,45 +180,76 @@ export const usePermissions = () => {
     hasAllPermissions,
     
     // Patient permissions
-    canViewPatients,
-    canViewPatientDetail,
-    canViewPatientHistory,
-    canManagePatientBasic,
-    canManagePatientHistory,
+    canViewPatientsList,
+    canViewPatientsDetail,
+    canViewPatientsHistory,
+    canManagePatientsBasic,
+    canManagePatientsHistory,
     
-    // Treatment permissions
-    canViewTreatments,
-    canViewAllTreatments,
-    canManageTreatments,
-    canManageTreatmentNotes,
+    // Treatment permissions (granular)
+    canViewTreatmentsList,
+    canViewTreatmentsDetail,
+    canViewTreatmentsAssigned,
+    canCreateTreatments,
+    canEditTreatments,
+    canViewAnyTreatments, // Helper function
     
-    // Team permissions
-    canViewTeam,
-    canInviteUsers,
-    canManageUsers,
-    canRemoveUsers,
-    canManagePermissions,
+    // Treatment History permissions
+    canViewTreatmentHistoryList,
+    canViewTreatmentHistoryDetail,
+    canCreateTreatmentHistory,
+    canEditTreatmentHistory,
+    
+    // Treatment Notes permissions
+    canViewTreatmentNotesList,
+    canViewTreatmentNotesDetail,
+    canCreateTreatmentNotes,
+    canEditTreatmentNotes,
+    
+    // Location permissions
+    canViewLocationsList,
+    canViewLocationsDetail,
+    canManageLocations,
+    canViewRoomsList,
+    canViewRoomsDetail,
+    canManageRooms,
     
     // Catalog permissions
-    canViewCatalog,
-    canManageCatalog,
-    canManageLocations,
+    canViewSpecialtiesList,
+    canViewSpecialtiesDetail,
+    canManageSpecialties,
+    canViewProceduresList,
+    canViewProceduresDetail,
     canManageProcedures,
+    
+    // Team permissions (granular)
+    canViewTeamMembersList,
+    canViewTeamMembersDetail,
+    canManageTeamMembers,
+    canViewInvitationsList,
+    canViewInvitationsDetail,
+    canManageInvitations,
+    canViewPermissionsList,
+    canViewPermissionsDetail,
+    canManagePermissions,
 
     // Appointment permissions
-    canViewAppointments,
-    canViewAllAppointments,
+    canViewAppointmentsList,
+    canViewAppointmentsDetail,
+    canViewAppointmentsAssigned,
     canManageAppointments,
     canManageSchedule,
 
     // Billing permissions
-    canViewBilling,
+    canViewBillingList,
+    canViewBillingDetail,
     canManageBilling,
     canViewFinancialReports,
     canManagePricing,
 
     // Report permissions
-    canViewReports,
+    canViewReportsList,
+    canViewReportsDetail,
     canViewAnalytics,
     canExportReports,
     
