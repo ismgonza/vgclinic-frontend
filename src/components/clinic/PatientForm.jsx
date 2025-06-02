@@ -331,7 +331,7 @@ const PatientForm = ({ patient, onSave, onCancel }) => {
             </Col>
             <Col md={6}>
               <Form.Group>
-                <Form.Label>{t('patients.email')}</Form.Label>
+                <Form.Label>{t('common.email')}</Form.Label>
                 <Form.Control
                   type="email"
                   name="email"
@@ -419,7 +419,7 @@ const PatientForm = ({ patient, onSave, onCancel }) => {
           />
           
           <Form.Group className="mb-3">
-            <Form.Label>{t('patients.address')}</Form.Label>
+            <Form.Label>{t('common.address')}</Form.Label>
             <Form.Control
               as="textarea"
               rows={2}
@@ -533,7 +533,7 @@ const PatientForm = ({ patient, onSave, onCancel }) => {
             </Col>
             <Col md={2}>
               <Form.Group>
-                <Form.Label>{t('patients.phone')}</Form.Label>
+                <Form.Label>{t('common.phone')}</Form.Label>
                 <Form.Control
                   type="text"
                   name="phone"
@@ -564,8 +564,8 @@ const PatientForm = ({ patient, onSave, onCancel }) => {
             <Table className="mb-4" size="sm">
               <thead>
                 <tr>
-                  <th>{t('patients.name')}</th>
-                  <th>{t('patients.phone')}</th>
+                  <th>{t('common.name')}</th>
+                  <th>{t('common.phone')}</th>
                   <th>{t('patients.relationship')}</th>
                   <th>{t('common.actions')}</th>
                 </tr>
@@ -592,7 +592,7 @@ const PatientForm = ({ patient, onSave, onCancel }) => {
           )}
           
           {/* Clinic Information - Hidden clinic field, just show additional info */}
-          <h5 className="mb-3 mt-4">{t('patients.additionalInfo')}</h5>
+          <h5 className="mb-3 mt-4">{t('common.additionalInfo')}</h5>
           
           <Row className="mb-3">
             <Col md={6}>

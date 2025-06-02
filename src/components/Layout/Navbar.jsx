@@ -38,23 +38,23 @@ const AppNavbar = () => {
             {currentUser && (
               <>
                 <Nav.Link as={Link} to="/dashboard">
-                  {t('navigation.dashboard')}
+                  {t('common.dashboard')}
                 </Nav.Link>
                 
                {/* Regular clinic menu items */}
                {!isStaff && (
                   <>
                     <Nav.Link as={Link} to="/clinic/locations">
-                      {t('navigation.locations')}
+                      {t('common.locations')}
                     </Nav.Link>
                     <Nav.Link as={Link} to="/clinic/catalog">
-                      {t('navigation.catalog')}
+                      {t('common.catalog')}
                     </Nav.Link>
                     <Nav.Link as={Link} to="/clinic/patients">
-                      {t('navigation.patients')}
+                      {t('common.patients')}
                     </Nav.Link>
                     <Nav.Link as={Link} to="/clinic/treatments">
-                      {t('navigation.treatments')}
+                      {t('common.treatments')}
                     </Nav.Link>
                     <Nav.Link as={Link} to="/clinic/team">
                       {t('team.title')}
@@ -120,7 +120,7 @@ const AppNavbar = () => {
                 className="user-dropdown"
               >
                 <NavDropdown.Item as={Link} to="/profile">
-                  {t('navigation.profile')}
+                  {t('common.profile')}
                 </NavDropdown.Item>
                 <NavDropdown.Divider />
                 <NavDropdown.Item onClick={handleLogout}>

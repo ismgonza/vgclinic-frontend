@@ -47,17 +47,21 @@ const PermissionGuard = ({
       return fallback;
     }
 
-    return (
-      <Alert variant="warning" className="text-center">
-        <h5>{t('permissions.accessDenied')}</h5>
-        <p>{t('permissions.insufficientPermissions')}</p>
-        {permission && (
-          <small className="text-muted">
-            {t('permissions.requiredPermission')}: {t(`permissions.${permission}`, permission)}
-          </small>
-        )}
-      </Alert>
-    );
+    // Just return null to hide the component completely
+    return null;
+    
+    // Return message warning
+    // return (
+    //   <Alert variant="warning" className="text-center">
+    //     <h5>{t('permissions.accessDenied')}</h5>
+    //     <p>{t('permissions.insufficientPermissions')}</p>
+    //     {permission && (
+    //       <small className="text-muted">
+    //         {t('permissions.requiredPermission')}: {t(`permissions.${permission}`, permission)}
+    //       </small>
+    //     )}
+    //   </Alert>
+    // );
   }
 
   // Has access - render children

@@ -150,23 +150,11 @@ const CatalogItemForm = ({ item, onSave, onCancel, specialtyId = null }) => {
       <Card.Body>
         {error && <Alert variant="danger">{error}</Alert>}
         
-        {/* Show current clinic info */}
-        <Alert variant="info" className="mb-3">
-          <strong>{t('catalog.clinic')}:</strong> {selectedAccount.account_name}
-          {item && (
-            <div className="mt-1">
-              <small className="text-muted">
-                {t('catalog.editNote') || 'Note: Catalog items belong to their original clinic and cannot be transferred.'}
-              </small>
-            </div>
-          )}
-        </Alert>
-        
         <Form onSubmit={handleSubmit}>
           {/* Hide account selection for editing, show as disabled for creating */}
           {!item && (
             <Form.Group as={Row} className="mb-3">
-              <Form.Label column sm={3}>{t('catalog.account')}</Form.Label>
+              <Form.Label column sm={3}>{t('common.account')}</Form.Label>
               <Col sm={9}>
                 <Form.Control
                   type="text"
@@ -175,14 +163,14 @@ const CatalogItemForm = ({ item, onSave, onCancel, specialtyId = null }) => {
                   className="bg-light"
                 />
                 <Form.Text className="text-muted">
-                  {t('catalog.autoSelectedClinic') || 'This catalog item will be created for the currently selected clinic.'}
+                  {/* {t('catalog.autoSelectedClinic') || 'This catalog item will be created for the currently selected clinic.'} */}
                 </Form.Text>
               </Col>
             </Form.Group>
           )}
 
           <Form.Group as={Row} className="mb-3">
-            <Form.Label column sm={3}>{t('catalog.specialty')}</Form.Label>
+            <Form.Label column sm={3}>{t('common.specialty')}</Form.Label>
             <Col sm={9}>
               <Form.Select
                 name="specialty"
@@ -231,7 +219,7 @@ const CatalogItemForm = ({ item, onSave, onCancel, specialtyId = null }) => {
           </Form.Group>
 
           <Form.Group as={Row} className="mb-3">
-            <Form.Label column sm={3}>{t('catalog.name')}</Form.Label>
+            <Form.Label column sm={3}>{t('common.name')}</Form.Label>
             <Col sm={9}>
               <Form.Control
                 type="text"
@@ -301,7 +289,7 @@ const CatalogItemForm = ({ item, onSave, onCancel, specialtyId = null }) => {
                 type="checkbox"
                 id="is_active"
                 name="is_active"
-                label={t('catalog.active')}
+                label={t('common.active')}
                 checked={formData.is_active}
                 onChange={handleChange}
               />

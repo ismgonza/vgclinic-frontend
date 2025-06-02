@@ -117,12 +117,12 @@ const TreatmentsList = ({ treatments, onStatusChange, onViewTreatment, loading }
     <Table responsive hover className="treatments-table">
       <thead>
         <tr>
-          <th>{t('treatments.fields.patient')}</th>
-          <th>{t('treatments.fields.treatment')}</th>
-          <th>{t('treatments.fields.doctor')}</th>
-          <th>{t('treatments.fields.branch')}</th>
-          <th>{t('treatments.fields.status')}</th>
-          <th>{t('treatments.fields.billing')}</th>
+          <th>{t('common.patient')}</th>
+          <th>{t('common.treatment')}</th>
+          <th>{t('common.doctor')}</th>
+          <th>{t('common.branch')}</th>
+          <th>{t('common.status')}</th>
+          <th>{t('common.billing')}</th>
           <th>{t('common.actions')}</th>
         </tr>
       </thead>
@@ -218,7 +218,7 @@ const TreatmentsList = ({ treatments, onStatusChange, onViewTreatment, loading }
                 variant="outline-primary"
                 size="sm"
                 onClick={() => onViewTreatment(treatment)}
-                title={t('treatments.actions.view')}
+                title={t('common.view')}
               >
                 <FontAwesomeIcon icon={faEye} />
               </Button>

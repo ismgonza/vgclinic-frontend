@@ -222,7 +222,7 @@ const TeamMembers = () => {
               onClick={() => navigate('/clinic/team')}
             >
               <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
-              {t('team.members.back')}
+              {t('common.back')}
             </Button>
             <h1 className="h3">{t('team.members.title')}</h1>
             <p className="text-muted">{t('team.members.description')}</p>
@@ -251,13 +251,10 @@ const TeamMembers = () => {
             onClick={() => navigate('/clinic/team')}
           >
             <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
-            {t('team.members.back')}
+            {t('common.back')}
           </Button>
           <h1 className="h3">{t('team.members.title')}</h1>
           <p className="text-muted">{t('team.members.description')}</p>
-          <small className="text-muted">
-            {t('navigation.acctSelector.current')}: <strong>{selectedAccount.account_name}</strong>
-          </small>
         </Col>
       </Row>
 
@@ -294,12 +291,12 @@ const TeamMembers = () => {
             <Table responsive hover>
               <thead>
                 <tr>
-                  <th>{t('team.members.name')}</th>
-                  <th>{t('team.members.email')}</th>
-                  <th>{t('team.members.role')}</th>
-                  <th>{t('team.members.specialty')}</th>
+                  <th>{t('common.name')}</th>
+                  <th>{t('common.email')}</th>
+                  <th>{t('common.role')}</th>
+                  <th>{t('common.specialty')}</th>
                   <th>{t('team.members.color')}</th>
-                  <th>{t('team.members.status')}</th>
+                  <th>{t('common.status')}</th>
                   <th>{t('team.members.joinDate')}</th>
                   <th>{t('common.actions')}</th>
                 </tr>
@@ -358,7 +355,7 @@ const TeamMembers = () => {
                         variant="outline-secondary" 
                         size="sm" 
                         className="me-1"
-                        title={t('team.members.edit')}
+                        title={t('common.edit')}
                         onClick={() => handleEditClick(member)}
                       >
                         <FontAwesomeIcon icon={faEdit} />
@@ -366,7 +363,7 @@ const TeamMembers = () => {
                       <Button 
                         variant="outline-danger" 
                         size="sm"
-                        title={t('team.members.remove')}
+                        title={t('common.remove')}
                         onClick={() => handleRemoveClick(member)}
                       >
                         <FontAwesomeIcon icon={faTrash} />
@@ -383,7 +380,7 @@ const TeamMembers = () => {
       {/* Remove Confirmation Modal */}
       <Modal show={showRemoveModal} onHide={() => setShowRemoveModal(false)}>
         <Modal.Header closeButton>
-          <Modal.Title>{t('team.members.remove')}</Modal.Title>
+          <Modal.Title>{t('common.remove')}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {t('team.members.confirmRemove')}
@@ -421,7 +418,7 @@ const TeamMembers = () => {
             <Row>
               <Col md={6} className="mb-3">
                 <Form.Group>
-                  <Form.Label>{t('team.members.role') || 'Role'} *</Form.Label>
+                  <Form.Label>{t('common.role') || 'Role'} *</Form.Label>
                   <Form.Select
                     value={editForm.role}
                     onChange={(e) => setEditForm({...editForm, role: e.target.value})}
@@ -440,7 +437,7 @@ const TeamMembers = () => {
               
               <Col md={6} className="mb-3">
                 <Form.Group>
-                  <Form.Label>{t('team.members.specialty') || 'Specialty'}</Form.Label>
+                  <Form.Label>{t('common.specialty') || 'Specialty'}</Form.Label>
                   <Form.Select
                     value={editForm.specialty}
                     onChange={(e) => setEditForm({...editForm, specialty: e.target.value})}

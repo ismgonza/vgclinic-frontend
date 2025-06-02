@@ -378,7 +378,7 @@ const TreatmentDetail = () => {
           {error}
           <div className="mt-3">
             <Button variant="outline-primary" onClick={handleBack}>
-              {t('treatments.back') || 'Back to Treatments'}
+              {t('common.back') || 'Back to Treatments'}
             </Button>
           </div>
         </Alert>
@@ -393,7 +393,7 @@ const TreatmentDetail = () => {
           Treatment not found
           <div className="mt-3">
             <Button variant="outline-primary" onClick={handleBack}>
-              {t('treatments.back') || 'Back to Treatments'}
+              {t('common.back') || 'Back to Treatments'}
             </Button>
           </div>
         </Alert>
@@ -407,7 +407,7 @@ const TreatmentDetail = () => {
         <Col>
           <Button variant="outline-secondary" onClick={handleBack} className="me-2">
             <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
-            {t('treatments.back') || 'Back to Treatments'}
+            {t('common.back') || 'Back to Treatments'}
           </Button>
           <Button variant="outline-primary" onClick={handleEdit} className="me-2">
             <FontAwesomeIcon icon={faEdit} className="me-2" />
@@ -433,7 +433,7 @@ const TreatmentDetail = () => {
           {(treatment.status !== 'CANCELED' && treatment.status !== 'COMPLETED') && (
             <Button variant="danger" onClick={() => setShowCancelModal(true)} className="me-2">
               <FontAwesomeIcon icon={faTimes} className="me-2" />
-              {t('treatments.actions.cancel') || 'Cancel Treatment'}
+              {t('common.cancel') || 'Cancel Treatment'}
             </Button>
           )}
 
@@ -470,7 +470,7 @@ const TreatmentDetail = () => {
             <Card.Body>
               <Row className="mb-3">
                 <Col md={6}>
-                  <h6>{t('treatments.fields.procedure') || 'Procedure'}</h6>
+                  <h6>{t('common.procedure') || 'Procedure'}</h6>
                   <p className="mb-1 fw-bold">
                     {treatment.catalog_item_details?.name}
                   </p>
@@ -479,14 +479,14 @@ const TreatmentDetail = () => {
                   </small>
                 </Col>
                 <Col md={6}>
-                  <h6>{t('treatments.fields.specialty') || 'Specialty'}</h6>
+                  <h6>{t('common.specialty') || 'Specialty'}</h6>
                   <p>{treatment.specialty_details?.name}</p>
                 </Col>
               </Row>
 
               <Row className="mb-3">
                 <Col md={6}>
-                  <h6>{t('treatments.fields.status') || 'Status'}</h6>
+                  <h6>{t('common.status') || 'Status'}</h6>
                   <Badge bg={getStatusVariant(treatment.status)} className="fs-6">
                     {t(`treatments.status.${treatment.status}`) || treatment.status}
                   </Badge>
@@ -515,7 +515,7 @@ const TreatmentDetail = () => {
             <Card.Header>
               <h6 className="mb-0">
                 <FontAwesomeIcon icon={faUser} className="me-2" />
-                {t('treatments.fields.patient') || 'Patient'}
+                {t('common.patient') || 'Patient'}
               </h6>
             </Card.Header>
             <Card.Body>
@@ -587,7 +587,7 @@ const TreatmentDetail = () => {
 
               {/* Doctor */}
               <div className="mb-0">
-                <strong>{t('treatments.fields.doctor') || 'Doctor'}:</strong><br />
+                <strong>{t('common.doctor') || 'Doctor'}:</strong><br />
                 {treatment.doctor_details?.first_name} {treatment.doctor_details?.last_name}
               </div>
             </Card.Body>
@@ -634,7 +634,7 @@ const TreatmentDetail = () => {
                   <tr>
                     <th width="120">{t('treatments.notes.dateTime')}</th>
                     <th width="80">Type</th>
-                    <th>{t('treatments.notes.note')}</th>
+                    <th>{t('common.note')}</th>
                     <th width="120">{t('treatments.notes.createdBy')}</th>
                     <th width="120">Assigned Doctor</th>
                     <th width="100">{t('common.actions')}</th>
@@ -707,14 +707,14 @@ const TreatmentDetail = () => {
                         >
                           <FontAwesomeIcon icon={faEdit} />
                         </Button>
-                        <Button
+                        {/* <Button
                           variant="outline-danger"
                           size="sm"
                           onClick={() => handleDeleteNote(note)}
                           title={t('treatments.notes.deleteNote')}
                         >
                           <FontAwesomeIcon icon={faTrash} />
-                        </Button>
+                        </Button> */}
                       </td>
                     </tr>
                   ))}
@@ -1079,7 +1079,7 @@ const NoteAddForm = ({ onSave, onCancel, treatment }) => {
   return (
     <Form onSubmit={handleSubmit}>
       <Form.Group className="mb-3">
-        <Form.Label>{t('treatments.notes.type') || 'Note Type'} *</Form.Label>
+        <Form.Label>{t('common.type') || 'Note Type'} *</Form.Label>
         <Form.Select
           name="type"
           value={formData.type}
@@ -1229,7 +1229,7 @@ const NoteEditForm = ({ note, onSave, onCancel }) => {
   return (
     <Form onSubmit={handleSubmit}>
       <Form.Group className="mb-3">
-        <Form.Label>{t('treatments.notes.type') || 'Note Type'} *</Form.Label>
+        <Form.Label>{t('common.type') || 'Note Type'} *</Form.Label>
         <Form.Select
           name="type"
           value={formData.type}

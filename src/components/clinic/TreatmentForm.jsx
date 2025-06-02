@@ -390,7 +390,7 @@ const TreatmentForm = ({ treatment, onSave, onCancel, preSelectedPatient }) => {
           <Form onSubmit={handleSubmit}>
             {/* Patient Search */}
             <Form.Group as={Row} className="mb-3">
-              <Form.Label column sm={3}>{t('treatments.fields.patient')} *</Form.Label>
+              <Form.Label column sm={3}>{t('common.patient')} *</Form.Label>
               <Col sm={9}>
                 <div className="position-relative">
                   <InputGroup>
@@ -436,7 +436,7 @@ const TreatmentForm = ({ treatment, onSave, onCancel, preSelectedPatient }) => {
 
             {/* Specialty Selection */}
             <Form.Group as={Row} className="mb-3">
-              <Form.Label column sm={3}>{t('catalog.specialty')}</Form.Label>
+              <Form.Label column sm={3}>{t('common.specialty')}</Form.Label>
               <Col sm={9}>
                 <Form.Select
                   name="specialty"
@@ -455,7 +455,7 @@ const TreatmentForm = ({ treatment, onSave, onCancel, preSelectedPatient }) => {
 
             {/* Catalog Item Selection */}
             <Form.Group as={Row} className="mb-3">
-              <Form.Label column sm={3}>{t('treatments.procedure')} *</Form.Label>
+              <Form.Label column sm={3}>{t('common.procedure')} *</Form.Label>
               <Col sm={9}>
                 <Form.Select
                   name="catalog_item"
@@ -480,7 +480,7 @@ const TreatmentForm = ({ treatment, onSave, onCancel, preSelectedPatient }) => {
             {/* Doctor Selection */}
             <Form.Group as={Row} className="mb-3">
               <Form.Label column sm={3}>
-                {t('treatments.fields.doctor')} *
+                {t('common.doctor')} *
                 {loadingDoctors && (
                   <small className="text-muted d-block">Loading doctors...</small>
                 )}
@@ -516,7 +516,7 @@ const TreatmentForm = ({ treatment, onSave, onCancel, preSelectedPatient }) => {
 
             {/* Branch Selection */}
             <Form.Group as={Row} className="mb-3">
-              <Form.Label column sm={3}>{t('treatments.fields.branch')}</Form.Label>
+              <Form.Label column sm={3}>{t('common.branch')}</Form.Label>
               <Col sm={9}>
                 <Form.Select
                   name="location"
@@ -575,7 +575,7 @@ const TreatmentForm = ({ treatment, onSave, onCancel, preSelectedPatient }) => {
 
             {/* Notes */}
             <Form.Group as={Row} className="mb-3">
-              <Form.Label column sm={3}>{t('treatments.fields.notes')}</Form.Label>
+              <Form.Label column sm={3}>{t('common.notes')}</Form.Label>
               <Col sm={9}>
                 <Form.Control
                   as="textarea"

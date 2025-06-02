@@ -193,7 +193,7 @@ const LocationForm = ({ location, onSave, onCancel }) => {
           </Form.Group>
 
           <Form.Group as={Row} className="mb-3">
-            <Form.Label column sm={3}>{t('locations.email')}</Form.Label>
+            <Form.Label column sm={3}>{t('common.email')}</Form.Label>
             <Col sm={9}>
               <Form.Control
                 type="email"
@@ -209,7 +209,7 @@ const LocationForm = ({ location, onSave, onCancel }) => {
           </Form.Group>
 
           <Form.Group as={Row} className="mb-3">
-            <Form.Label column sm={3}>{t('locations.phone')}</Form.Label>
+            <Form.Label column sm={3}>{t('common.phone')}</Form.Label>
             <Col sm={9}>
               <Form.Control
                 type="text"
@@ -236,7 +236,7 @@ const LocationForm = ({ location, onSave, onCancel }) => {
           />
 
           <Form.Group className="mb-3">
-            <Form.Label>{t('locations.address')}</Form.Label>
+            <Form.Label>{t('common.address')}</Form.Label>
             <Form.Control
               as="textarea"
               rows={3}
@@ -255,7 +255,7 @@ const LocationForm = ({ location, onSave, onCancel }) => {
               type="checkbox"
               id="is_active"
               name="is_active"
-              label={t('locations.active')}
+              label={t('common.active')}
               checked={formData.is_active}
               onChange={handleChange}
             />

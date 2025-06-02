@@ -30,11 +30,11 @@ const CatalogItemsList = ({ items, onEdit, onDelete }) => {
       <thead>
         <tr>
           <th>{t('catalog.code')}</th>
-          <th>{t('catalog.name')}</th>
-          <th>{t('catalog.specialty')}</th>
+          <th>{t('common.name')}</th>
+          <th>{t('common.specialty')}</th>
           <th>{t('catalog.price')}</th>
           <th>{t('catalog.variablePrice')}</th>
-          <th>{t('catalog.status')}</th>
+          <th>{t('common.status')}</th>
           <th>{t('common.actions')}</th>
         </tr>
       </thead>

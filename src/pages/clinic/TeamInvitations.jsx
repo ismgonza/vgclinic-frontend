@@ -1,4 +1,4 @@
-// src/pages/clinic/TeamInvitations.jsx
+// src/pages/clinic/TeamInvitations.jsx - Fixed to use centralized roles
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Row, Col, Card, Table, Button, Badge, Spinner, Alert, Modal, Form } from 'react-bootstrap';
@@ -31,7 +31,7 @@ const TeamInvitations = () => {
     personal_message: ''
   });
 
-  const { getAllRoles, getRoleBadgeColor } = useRoles();
+  const { getAllRoles, getRoleBadgeColor, getRoleDisplay } = useRoles();
   const roleOptions = getAllRoles();
 
   // Using actual specialties from API
@@ -183,12 +183,17 @@ const TeamInvitations = () => {
     }
   };
 
+  // FIXED: Remove hardcoded role badge variants, use centralized system
   const getRoleBadgeVariant = (role) => {
-    switch (role) {
-      case 'adm': return 'primary';
-      case 'doc': return 'success';
-      case 'ast': return 'info';
-      case 'rdo': return 'secondary';
+    const colorClass = getRoleBadgeColor(role);
+    // Convert bg-* classes to badge variants
+    switch (colorClass) {
+      case 'bg-primary': return 'primary';
+      case 'bg-danger': return 'danger';
+      case 'bg-info': return 'info';
+      case 'bg-secondary': return 'secondary';
+      case 'bg-warning': return 'warning';
+      case 'bg-success': return 'success';
       default: return 'secondary';
     }
   };
@@ -210,10 +215,10 @@ const TeamInvitations = () => {
               onClick={() => navigate('/clinic/team')}
             >
               <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
-              {t('team.invitations.back')}
+              {t('common.back')}
             </Button>
-            <h1 className="h3">{t('team.invitations.title')}</h1>
-            <p className="text-muted">{t('team.invitations.description')}</p>
+            <h1 className="h3">{t('team.invitationsTitle')}</h1>
+            <p className="text-muted">{t('team.invitationsDescription')}</p>
           </Col>
         </Row>
         
@@ -239,18 +244,15 @@ const TeamInvitations = () => {
             onClick={() => navigate('/clinic/team')}
           >
             <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
-            {t('team.invitations.back')}
+            {t('common.back')}
           </Button>
-          <h1 className="h3">{t('team.invitations.title')}</h1>
-          <p className="text-muted">{t('team.invitations.description')}</p>
-          <small className="text-muted">
-            {t('navigation.acctSelector.current')}: <strong>{selectedAccount.account_name}</strong>
-          </small>
+          <h1 className="h3">{t('team.invitationsTitle')}</h1>
+          <p className="text-muted">{t('team.invitationsDescription')}</p>
         </Col>
         <Col xs="auto">
           <Button variant="primary" onClick={() => setShowInviteForm(true)}>
             <FontAwesomeIcon icon={faPlus} className="me-2" />
-            {t('team.invitations.sendInvitation')}
+            {t('invitations.sendInvitation')}
           </Button>
         </Col>
       </Row>
@@ -270,7 +272,7 @@ const TeamInvitations = () => {
       <Card>
         <Card.Header>
           <div className="d-flex justify-content-between align-items-center">
-            <span>{t('team.invitations.title')}</span>
+            <span>{t('team.invitationsTitle')}</span>
             <small className="text-muted">
               {loading ? t('common.loading') : `${invitations.length} invitations`}
             </small>
@@ -283,17 +285,17 @@ const TeamInvitations = () => {
               <p className="mt-3">{t('common.loading')}...</p>
             </div>
           ) : invitations.length === 0 ? (
-            <Alert variant="info">{t('team.invitations.noInvitations')}</Alert>
+            <Alert variant="info">{t('team.noInvitations')}</Alert>
           ) : (
             <Table responsive hover>
               <thead>
                 <tr>
-                  <th>{t('team.invitations.email')}</th>
-                  <th>{t('team.invitations.role')}</th>
-                  <th>{t('team.invitations.specialty')}</th>
-                  <th>{t('team.invitations.status')}</th>
-                  <th>{t('team.invitations.sentDate')}</th>
-                  <th>{t('team.invitations.expiresDate')}</th>
+                  <th>{t('common.email')}</th>
+                  <th>{t('common.role')}</th>
+                  <th>{t('common.specialty')}</th>
+                  <th>{t('common.status')}</th>
+                  <th>{t('invitations.list.sentDate')}</th>
+                  <th>{t('invitations.list.expiresDate')}</th>
                   <th>{t('common.actions')}</th>
                 </tr>
               </thead>
@@ -303,13 +305,13 @@ const TeamInvitations = () => {
                     <td>{invitation.email}</td>
                     <td>
                       <Badge bg={getRoleBadgeVariant(invitation.role)}>
-                        {t(`invitations.form.roles.${invitation.role}`)}
+                        {getRoleDisplay(invitation.role)}
                       </Badge>
                     </td>
                     <td>{invitation.specialty?.name || '-'}</td>
                     <td>
                       <Badge bg={getStatusBadgeVariant(invitation.status)}>
-                        {t(`team.invitations.${invitation.status}`)}
+                        {t(`invitations.list.${invitation.status}`)}
                       </Badge>
                     </td>
                     <td>{formatDate(invitation.created_at)}</td>
@@ -321,7 +323,7 @@ const TeamInvitations = () => {
                             variant="outline-info"
                             size="sm" 
                             className="me-1"
-                            title={t('team.invitations.resend')}
+                            title={t('invitations.list.resend')}
                             onClick={() => handleResendInvitation(invitation)}
                           >
                             <FontAwesomeIcon icon={faRedo} />
@@ -329,7 +331,7 @@ const TeamInvitations = () => {
                           <Button 
                             variant="outline-warning"
                             size="sm"
-                            title={t('team.invitations.revoke')}
+                            title={t('invitations.list.revoke')}
                             onClick={() => handleRevokeInvitation(invitation)}
                           >
                             <FontAwesomeIcon icon={faTimes} />
@@ -351,14 +353,14 @@ const TeamInvitations = () => {
       {/* Send Invitation Modal */}
       <Modal show={showInviteForm} onHide={() => setShowInviteForm(false)} size="lg">
         <Modal.Header closeButton>
-          <Modal.Title>{t('team.invitations.newInvitation')}</Modal.Title>
+          <Modal.Title>{t('invitations.newInvitation')}</Modal.Title>
         </Modal.Header>
         <Form onSubmit={handleSendInvitation}>
           <Modal.Body>
             <Row>
               <Col md={12} className="mb-3">
                 <Form.Group>
-                  <Form.Label>{t('team.invitations.email')} *</Form.Label>
+                  <Form.Label>{t('common.email')} *</Form.Label>
                   <Form.Control
                     type="email"
                     value={inviteForm.email}
@@ -366,19 +368,19 @@ const TeamInvitations = () => {
                     required
                   />
                   <Form.Text className="text-muted">
-                    {t('team.invitations.form.emailHelp')}
+                    {t('invitations.form.emailHelp')}
                   </Form.Text>
                 </Form.Group>
               </Col>
               <Col md={6} className="mb-3">
                 <Form.Group>
-                  <Form.Label>{t('team.invitations.role')} *</Form.Label>
+                  <Form.Label>{t('common.role')} *</Form.Label>
                   <Form.Select
                     value={inviteForm.role}
                     onChange={(e) => setInviteForm({...inviteForm, role: e.target.value})}
                     required
                   >
-                    <option value="">{t('team.invitations.form.selectRole')}</option>
+                    <option value="">{t('invitations.form.selectRole')}</option>
                     {roleOptions.map(role => (
                       <option key={role.value} value={role.value}>
                         {role.label}
@@ -389,12 +391,12 @@ const TeamInvitations = () => {
               </Col>
               <Col md={6} className="mb-3">
                 <Form.Group>
-                  <Form.Label>{t('team.invitations.specialty')}</Form.Label>
+                  <Form.Label>{t('common.specialty')}</Form.Label>
                   <Form.Select
                     value={inviteForm.specialty}
                     onChange={(e) => setInviteForm({...inviteForm, specialty: e.target.value})}
                   >
-                    <option value="">{t('team.invitations.form.selectSpecialty')}</option>
+                    <option value="">{t('invitations.form.selectSpecialty')}</option>
                     {specialtyOptions.map(specialty => (
                       <option key={specialty.id} value={specialty.id}>
                         {specialty.name}
@@ -402,13 +404,13 @@ const TeamInvitations = () => {
                     ))}
                   </Form.Select>
                   <Form.Text className="text-muted">
-                    {t('team.invitations.form.selectSpecialty')}
+                    {t('invitations.form.selectSpecialty')}
                   </Form.Text>
                 </Form.Group>
               </Col>
               <Col md={12} className="mb-3">
                 <Form.Group>
-                  <Form.Label>{t('team.invitations.personalMessage')}</Form.Label>
+                  <Form.Label>{t('invitations.acceptance.personalMessage')}</Form.Label>
                   <Form.Control
                     as="textarea"
                     rows={3}
@@ -416,7 +418,7 @@ const TeamInvitations = () => {
                     onChange={(e) => setInviteForm({...inviteForm, personal_message: e.target.value})}
                   />
                   <Form.Text className="text-muted">
-                    {t('team.invitations.form.personalMessageHelp')}
+                    {t('invitations.form.personalMessageHelp')}
                   </Form.Text>
                 </Form.Group>
               </Col>
@@ -443,7 +445,7 @@ const TeamInvitations = () => {
               ) : (
                 <>
                   <FontAwesomeIcon icon={faEnvelope} className="me-2" />
-                  {t('team.invitations.form.send')}
+                  {t('invitations.form.send')}
                 </>
               )}
             </Button>

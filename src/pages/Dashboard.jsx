@@ -264,7 +264,7 @@ const Dashboard = () => {
                 <FontAwesomeIcon icon={faUsers} />
               </div>
               <div className="stat-content">
-                <h4>{t('dashboard.patients')}</h4>
+                <h4>{t('common.patients')}</h4>
                 <div className="stat-value">{stats.patients || 0}</div>
                 <div className="stat-label">{t('dashboard.totalPatients')}</div>
               </div>
@@ -278,7 +278,7 @@ const Dashboard = () => {
                 <FontAwesomeIcon icon={faStethoscope} />
               </div>
               <div className="stat-content">
-                <h4>{t('dashboard.treatments')}</h4>
+                <h4>{t('common.treatments')}</h4>
                 <div className="stat-value">{stats.treatments || 0}</div>
                 <div className="stat-label">{t('dashboard.activeTreatments')}</div>
               </div>
@@ -292,7 +292,7 @@ const Dashboard = () => {
                 <FontAwesomeIcon icon={faCalendarAlt} />
               </div>
               <div className="stat-content">
-                <h4>{t('dashboard.appointments')}</h4>
+                <h4>{t('common.appointments')}</h4>
                 <div className="stat-value">{stats.upcomingAppointments || 0}</div>
                 <div className="stat-label">{t('dashboard.upcomingAppointments')}</div>
               </div>
@@ -306,11 +306,11 @@ const Dashboard = () => {
                 <FontAwesomeIcon icon={faMoneyBillWave} />
               </div>
               <div className="stat-content">
-                <h4>{t('dashboard.payments')}</h4>
+                <h4>{t('common.payments')}</h4>
                 <div className="stat-value">
                   ₡{(stats.pendingPaymentsAmount || 0).toLocaleString()}
                 </div>
-                <div className="stat-label">Pending amount</div>
+                <div className="stat-label">{t('dashboard.pendingAmounts')}</div>
               </div>
             </Card.Body>
           </Card>
@@ -335,7 +335,7 @@ const Dashboard = () => {
                 </ListGroup.Item>
               ) : upcomingAppointments.length === 0 ? (
                 <ListGroup.Item className="text-center py-3 text-muted">
-                  No upcoming appointments found
+                  {t('dashboard.noUpcomingAppointments')}
                 </ListGroup.Item>
               ) : (
                 upcomingAppointments.map(appointment => (

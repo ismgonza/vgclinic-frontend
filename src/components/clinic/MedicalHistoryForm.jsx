@@ -123,7 +123,7 @@ const MedicalHistoryForm = ({ patientId, onSave, onCancel }) => {
       {error && <Alert variant="danger">{error}</Alert>}
       
       {/* Medical Treatment Questions */}
-      <h5 className="mb-3">{t('patients.anamnesis.treatmentDetails')}</h5>
+      <h5 className="mb-3">{t('patients.medicalHistory.treatmentDetails')}</h5>
       
       <Form.Group as={Row} className="mb-3">
         <Col sm={12}>
@@ -131,7 +131,7 @@ const MedicalHistoryForm = ({ patientId, onSave, onCancel }) => {
             type="checkbox"
             id="under_treatment"
             name="under_treatment"
-            label={t('patients.anamnesis.details.underTreatment')}
+            label={t('patients.medicalHistory.details.underTreatment')}
             checked={formData.under_treatment}
             onChange={handleChange}
           />
@@ -143,7 +143,7 @@ const MedicalHistoryForm = ({ patientId, onSave, onCancel }) => {
               value={formData.under_treatment_text}
               onChange={handleChange}
               isInvalid={!!errors.under_treatment_text}
-              placeholder={t('patients.anamnesis.details.underTreatmentHelp')}
+              placeholder={t('patients.medicalHistory.details.underTreatmentHelp')}
               className="mt-2"
             />
           )}
@@ -159,7 +159,7 @@ const MedicalHistoryForm = ({ patientId, onSave, onCancel }) => {
             type="checkbox"
             id="current_medication"
             name="current_medication"
-            label={t('patients.anamnesis.details.currentMedication')}
+            label={t('patients.medicalHistory.details.currentMedication')}
             checked={formData.current_medication}
             onChange={handleChange}
           />
@@ -171,7 +171,7 @@ const MedicalHistoryForm = ({ patientId, onSave, onCancel }) => {
               value={formData.current_medication_text}
               onChange={handleChange}
               isInvalid={!!errors.current_medication_text}
-              placeholder={t('patients.anamnesis.details.currentMedicationHelp')}
+              placeholder={t('patients.medicalHistory.details.currentMedicationHelp')}
               className="mt-2"
             />
           )}
@@ -187,7 +187,7 @@ const MedicalHistoryForm = ({ patientId, onSave, onCancel }) => {
             type="checkbox"
             id="serious_illnesses"
             name="serious_illnesses"
-            label={t('patients.anamnesis.details.seriousIllnesses')}
+            label={t('patients.medicalHistory.details.seriousIllnesses')}
             checked={formData.serious_illnesses}
             onChange={handleChange}
           />
@@ -199,7 +199,7 @@ const MedicalHistoryForm = ({ patientId, onSave, onCancel }) => {
               value={formData.serious_illnesses_text}
               onChange={handleChange}
               isInvalid={!!errors.serious_illnesses_text}
-              placeholder={t('patients.anamnesis.details.seriousIllnessesHelp')}
+              placeholder={t('patients.medicalHistory.details.seriousIllnessesHelp')}
               className="mt-2"
             />
           )}
@@ -215,7 +215,7 @@ const MedicalHistoryForm = ({ patientId, onSave, onCancel }) => {
             type="checkbox"
             id="surgeries"
             name="surgeries"
-            label={t('patients.anamnesis.details.surgeries')}
+            label={t('patients.medicalHistory.details.surgeries')}
             checked={formData.surgeries}
             onChange={handleChange}
           />
@@ -227,7 +227,7 @@ const MedicalHistoryForm = ({ patientId, onSave, onCancel }) => {
               value={formData.surgeries_text}
               onChange={handleChange}
               isInvalid={!!errors.surgeries_text}
-              placeholder={t('patients.anamnesis.details.surgeriesHelp')}
+              placeholder={t('patients.medicalHistory.details.surgeriesHelp')}
               className="mt-2"
             />
           )}
@@ -243,7 +243,7 @@ const MedicalHistoryForm = ({ patientId, onSave, onCancel }) => {
             type="checkbox"
             id="allergies"
             name="allergies"
-            label={t('patients.anamnesis.details.allergies')}
+            label={t('patients.medicalHistory.details.allergies')}
             checked={formData.allergies}
             onChange={handleChange}
           />
@@ -255,7 +255,7 @@ const MedicalHistoryForm = ({ patientId, onSave, onCancel }) => {
               value={formData.allergies_text}
               onChange={handleChange}
               isInvalid={!!errors.allergies_text}
-              placeholder={t('patients.anamnesis.details.allergiesHelp')}
+              placeholder={t('patients.medicalHistory.details.allergiesHelp')}
               className="mt-2"
             />
           )}
@@ -266,7 +266,7 @@ const MedicalHistoryForm = ({ patientId, onSave, onCancel }) => {
       </Form.Group>
       
       {/* Medical Status */}
-      <h5 className="mb-3 mt-4">{t('patients.anamnesis.medicalStatus')}</h5>
+      <h5 className="mb-3 mt-4">{t('patients.medicalHistory.medicalStatus')}</h5>
       
       <Row className="mb-3">
         <Col md={6}>
@@ -274,7 +274,7 @@ const MedicalHistoryForm = ({ patientId, onSave, onCancel }) => {
             type="checkbox"
             id="anesthesia_issues"
             name="anesthesia_issues"
-            label={t('patients.anamnesis.status.anesthesiaIssues')}
+            label={t('patients.medicalHistory.status.anesthesiaIssues')}
             checked={formData.anesthesia_issues}
             onChange={handleChange}
           />
@@ -284,7 +284,7 @@ const MedicalHistoryForm = ({ patientId, onSave, onCancel }) => {
             type="checkbox"
             id="bleeding_issues"
             name="bleeding_issues"
-            label={t('patients.anamnesis.status.bleedingIssues')}
+            label={t('patients.medicalHistory.status.bleedingIssues')}
             checked={formData.bleeding_issues}
             onChange={handleChange}
           />
@@ -297,7 +297,7 @@ const MedicalHistoryForm = ({ patientId, onSave, onCancel }) => {
             type="checkbox"
             id="pregnant_or_lactating"
             name="pregnant_or_lactating"
-            label={t('patients.anamnesis.status.pregnantOrLactating')}
+            label={t('patients.medicalHistory.status.pregnantOrLactating')}
             checked={formData.pregnant_or_lactating}
             onChange={handleChange}
           />
@@ -307,7 +307,7 @@ const MedicalHistoryForm = ({ patientId, onSave, onCancel }) => {
             type="checkbox"
             id="contraceptives"
             name="contraceptives"
-            label={t('patients.anamnesis.status.contraceptives')}
+            label={t('patients.medicalHistory.status.contraceptives')}
             checked={formData.contraceptives}
             onChange={handleChange}
           />
@@ -315,7 +315,7 @@ const MedicalHistoryForm = ({ patientId, onSave, onCancel }) => {
       </Row>
       
       {/* Medical Conditions */}
-      <h5 className="mb-3 mt-4">{t('patients.anamnesis.medicalConditions')}</h5>
+      <h5 className="mb-3 mt-4">{t('patients.medicalHistory.medicalConditions')}</h5>
       
       <Row className="mb-3">
         <Col md={4}>
@@ -323,7 +323,7 @@ const MedicalHistoryForm = ({ patientId, onSave, onCancel }) => {
             type="checkbox"
             id="high_blood_pressure"
             name="high_blood_pressure"
-            label={t('patients.anamnesis.conditions.highBloodPressure')}
+            label={t('patients.medicalHistory.conditions.highBloodPressure')}
             checked={formData.high_blood_pressure}
             onChange={handleChange}
           />
@@ -333,7 +333,7 @@ const MedicalHistoryForm = ({ patientId, onSave, onCancel }) => {
             type="checkbox"
             id="rheumatic_fever"
             name="rheumatic_fever"
-            label={t('patients.anamnesis.conditions.rheumaticFever')}
+            label={t('patients.medicalHistory.conditions.rheumaticFever')}
             checked={formData.rheumatic_fever}
             onChange={handleChange}
           />
@@ -343,7 +343,7 @@ const MedicalHistoryForm = ({ patientId, onSave, onCancel }) => {
             type="checkbox"
             id="drug_addiction"
             name="drug_addiction"
-            label={t('patients.anamnesis.conditions.drugAddiction')}
+            label={t('patients.medicalHistory.conditions.drugAddiction')}
             checked={formData.drug_addiction}
             onChange={handleChange}
           />
@@ -356,7 +356,7 @@ const MedicalHistoryForm = ({ patientId, onSave, onCancel }) => {
             type="checkbox"
             id="diabetes"
             name="diabetes"
-            label={t('patients.anamnesis.conditions.diabetes')}
+            label={t('patients.medicalHistory.conditions.diabetes')}
             checked={formData.diabetes}
             onChange={handleChange}
           />
@@ -366,7 +366,7 @@ const MedicalHistoryForm = ({ patientId, onSave, onCancel }) => {
             type="checkbox"
             id="anemia"
             name="anemia"
-            label={t('patients.anamnesis.conditions.anemia')}
+            label={t('patients.medicalHistory.conditions.anemia')}
             checked={formData.anemia}
             onChange={handleChange}
           />
@@ -376,7 +376,7 @@ const MedicalHistoryForm = ({ patientId, onSave, onCancel }) => {
             type="checkbox"
             id="thyroid"
             name="thyroid"
-            label={t('patients.anamnesis.conditions.thyroid')}
+            label={t('patients.medicalHistory.conditions.thyroid')}
             checked={formData.thyroid}
             onChange={handleChange}
           />
@@ -389,7 +389,7 @@ const MedicalHistoryForm = ({ patientId, onSave, onCancel }) => {
             type="checkbox"
             id="asthma"
             name="asthma"
-            label={t('patients.anamnesis.conditions.asthma')}
+            label={t('patients.medicalHistory.conditions.asthma')}
             checked={formData.asthma}
             onChange={handleChange}
           />
@@ -399,7 +399,7 @@ const MedicalHistoryForm = ({ patientId, onSave, onCancel }) => {
             type="checkbox"
             id="arthritis"
             name="arthritis"
-            label={t('patients.anamnesis.conditions.arthritis')}
+            label={t('patients.medicalHistory.conditions.arthritis')}
             checked={formData.arthritis}
             onChange={handleChange}
           />
@@ -409,7 +409,7 @@ const MedicalHistoryForm = ({ patientId, onSave, onCancel }) => {
             type="checkbox"
             id="cancer"
             name="cancer"
-            label={t('patients.anamnesis.conditions.cancer')}
+            label={t('patients.medicalHistory.conditions.cancer')}
             checked={formData.cancer}
             onChange={handleChange}
           />
@@ -422,7 +422,7 @@ const MedicalHistoryForm = ({ patientId, onSave, onCancel }) => {
             type="checkbox"
             id="heart_problems"
             name="heart_problems"
-            label={t('patients.anamnesis.conditions.heartProblems')}
+            label={t('patients.medicalHistory.conditions.heartProblems')}
             checked={formData.heart_problems}
             onChange={handleChange}
           />
@@ -432,7 +432,7 @@ const MedicalHistoryForm = ({ patientId, onSave, onCancel }) => {
             type="checkbox"
             id="smoker"
             name="smoker"
-            label={t('patients.anamnesis.conditions.smoker')}
+            label={t('patients.medicalHistory.conditions.smoker')}
             checked={formData.smoker}
             onChange={handleChange}
           />
@@ -442,7 +442,7 @@ const MedicalHistoryForm = ({ patientId, onSave, onCancel }) => {
             type="checkbox"
             id="ulcers"
             name="ulcers"
-            label={t('patients.anamnesis.conditions.ulcers')}
+            label={t('patients.medicalHistory.conditions.ulcers')}
             checked={formData.ulcers}
             onChange={handleChange}
           />
@@ -455,7 +455,7 @@ const MedicalHistoryForm = ({ patientId, onSave, onCancel }) => {
             type="checkbox"
             id="gastritis"
             name="gastritis"
-            label={t('patients.anamnesis.conditions.gastritis')}
+            label={t('patients.medicalHistory.conditions.gastritis')}
             checked={formData.gastritis}
             onChange={handleChange}
           />
@@ -465,7 +465,7 @@ const MedicalHistoryForm = ({ patientId, onSave, onCancel }) => {
             type="checkbox"
             id="hepatitis"
             name="hepatitis"
-            label={t('patients.anamnesis.conditions.hepatitis')}
+            label={t('patients.medicalHistory.conditions.hepatitis')}
             checked={formData.hepatitis}
             onChange={handleChange}
           />
@@ -475,7 +475,7 @@ const MedicalHistoryForm = ({ patientId, onSave, onCancel }) => {
             type="checkbox"
             id="kidney_diseases"
             name="kidney_diseases"
-            label={t('patients.anamnesis.conditions.kidneyDiseases')}
+            label={t('patients.medicalHistory.conditions.kidneyDiseases')}
             checked={formData.kidney_diseases}
             onChange={handleChange}
           />
@@ -488,7 +488,7 @@ const MedicalHistoryForm = ({ patientId, onSave, onCancel }) => {
             type="checkbox"
             id="hormonal_problems"
             name="hormonal_problems"
-            label={t('patients.anamnesis.conditions.hormonalProblems')}
+            label={t('patients.medicalHistory.conditions.hormonalProblems')}
             checked={formData.hormonal_problems}
             onChange={handleChange}
           />
@@ -498,7 +498,7 @@ const MedicalHistoryForm = ({ patientId, onSave, onCancel }) => {
             type="checkbox"
             id="epilepsy"
             name="epilepsy"
-            label={t('patients.anamnesis.conditions.epilepsy')}
+            label={t('patients.medicalHistory.conditions.epilepsy')}
             checked={formData.epilepsy}
             onChange={handleChange}
           />
@@ -508,7 +508,7 @@ const MedicalHistoryForm = ({ patientId, onSave, onCancel }) => {
             type="checkbox"
             id="aids"
             name="aids"
-            label={t('patients.anamnesis.conditions.aids')}
+            label={t('patients.medicalHistory.conditions.aids')}
             checked={formData.aids}
             onChange={handleChange}
           />
@@ -521,7 +521,7 @@ const MedicalHistoryForm = ({ patientId, onSave, onCancel }) => {
             type="checkbox"
             id="psychiatric_treatment"
             name="psychiatric_treatment"
-            label={t('patients.anamnesis.conditions.psychiatricTreatment')}
+            label={t('patients.medicalHistory.conditions.psychiatricTreatment')}
             checked={formData.psychiatric_treatment}
             onChange={handleChange}
           />
@@ -534,7 +534,7 @@ const MedicalHistoryForm = ({ patientId, onSave, onCancel }) => {
           type="checkbox"
           id="information_confirmed"
           name="information_confirmed"
-          label={t('patients.anamnesis.confirmation')}
+          label={t('patients.medicalHistory.confirmation')}
           checked={formData.information_confirmed}
           onChange={handleChange}
           className="fw-bold"

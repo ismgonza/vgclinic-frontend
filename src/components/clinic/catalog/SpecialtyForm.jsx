@@ -127,7 +127,7 @@ const SpecialtyForm = ({ specialty, onSave, onCancel }) => {
           {/* Hide account selection for editing, show as disabled for creating */}
           {!specialty && (
             <Form.Group as={Row} className="mb-3">
-              <Form.Label column sm={3}>{t('catalog.account')}</Form.Label>
+              <Form.Label column sm={3}>{t('common.account')}</Form.Label>
               <Col sm={9}>
                 <Form.Control
                   type="text"
@@ -140,7 +140,7 @@ const SpecialtyForm = ({ specialty, onSave, onCancel }) => {
           )}
 
           <Form.Group as={Row} className="mb-3">
-            <Form.Label column sm={3}>{t('catalog.name')}</Form.Label>
+            <Form.Label column sm={3}>{t('common.name')}</Form.Label>
             <Col sm={9}>
               <Form.Control
                 type="text"
@@ -195,7 +195,7 @@ const SpecialtyForm = ({ specialty, onSave, onCancel }) => {
                 type="checkbox"
                 id="is_active"
                 name="is_active"
-                label={t('catalog.active')}
+                label={t('common.active')}
                 checked={formData.is_active}
                 onChange={handleChange}
               />

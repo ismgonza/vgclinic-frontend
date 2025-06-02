@@ -58,7 +58,7 @@ const Login = () => {
             <Form.Control
               type="email"
               name="email"
-              placeholder={t('login.email')}
+              placeholder={t('common.email')}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               value={formik.values.email}

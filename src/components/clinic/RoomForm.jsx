@@ -91,7 +91,7 @@ const RoomForm = ({ show, room, branchId, onSave, onClose }) => {
               name="is_active"
               type="checkbox"
               id="is-active-checkbox"
-              label={t('rooms.active')}
+              label={t('common.active')}
               checked={formData.is_active}
               onChange={handleChange}
             />
@@ -102,7 +102,7 @@ const RoomForm = ({ show, room, branchId, onSave, onClose }) => {
               name="is_private"
               type="checkbox"
               id="is-private-checkbox"
-              label={t('rooms.private')}
+              label={t('common.private')}
               checked={formData.is_private}
               onChange={handleChange}
             />

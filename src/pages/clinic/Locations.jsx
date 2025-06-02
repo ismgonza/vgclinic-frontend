@@ -105,9 +105,9 @@ const Locations = () => {
 
   const getStatusBadge = (isActive) => {
     return isActive ? (
-      <Badge bg="success">{t('locations.active')}</Badge>
+      <Badge bg="success">{t('common.active')}</Badge>
     ) : (
-      <Badge bg="secondary">{t('locations.inactive')}</Badge>
+      <Badge bg="secondary">{t('common.inactive')}</Badge>
     );
   };
 
@@ -141,7 +141,7 @@ const Locations = () => {
             className="mb-3"
             onClick={handleFormCancel}
           >
-            {t('locations.back')}
+            {t('common.back')}
           </Button>
           <LocationForm 
             location={currentBranch} 
@@ -200,10 +200,10 @@ const Locations = () => {
                     <tr>
                       <th>{t('locations.locationName')}</th>
                       <th>{t('locations.contact')}</th>
-                      <th>{t('locations.address')}</th>
-                      <th>{t('locations.room')}</th>
-                      <th>{t('locations.status')}</th>
-                      <th>{t('locations.actions')}</th>
+                      <th>{t('common.address')}</th>
+                      <th>{t('common.room')}</th>
+                      <th>{t('common.status')}</th>
+                      <th>{t('common.actions')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -243,7 +243,7 @@ const Locations = () => {
                         <td>
                           <span className="badge bg-secondary">
                             <FontAwesomeIcon icon={faDoorOpen} className="me-1" />
-                            {branch.rooms ? branch.rooms.length : 0} {t('locations.room')}
+                            {branch.rooms ? branch.rooms.length : 0} {t('common.room')}
                           </span>
                         </td>
                         <td>{getStatusBadge(branch.is_active)}</td>
@@ -261,7 +261,7 @@ const Locations = () => {
                             variant="outline-secondary" 
                             size="sm" 
                             className="me-1"
-                            title="Edit Location"
+                            title={t('common.edit')}
                             onClick={() => handleEditClick(branch)}
                           >
                             <FontAwesomeIcon icon={faEdit} />
@@ -269,7 +269,7 @@ const Locations = () => {
                           <Button 
                             variant="outline-danger" 
                             size="sm"
-                            title="Delete Location"
+                            title={t('common.delete')}
                             onClick={() => handleDeleteClick(branch)}
                           >
                             <FontAwesomeIcon icon={faTrash} />

@@ -21,9 +21,9 @@ const SpecialtiesList = ({ specialties, onEdit, onDelete, onManageItems }) => {
       <thead>
         <tr>
           <th>{t('catalog.code')}</th>
-          <th>{t('catalog.name')}</th>
-          <th>{t('catalog.account')}</th>
-          <th>{t('catalog.status')}</th>
+          <th>{t('common.name')}</th>
+          <th>{t('common.account')}</th>
+          <th>{t('common.status')}</th>
           <th>{t('common.actions')}</th>
         </tr>
       </thead>

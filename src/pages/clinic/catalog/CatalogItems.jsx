@@ -160,7 +160,7 @@ const CatalogItems = () => {
             className="mb-3"
             onClick={handleFormCancel}
           >
-            {t('catalog.back')}
+            {t('common.back')}
           </Button>
           <CatalogItemForm 
             item={currentItem} 
@@ -198,12 +198,6 @@ const CatalogItems = () => {
                 </ol>
               </nav>
               <p className="text-muted">{t('catalog.itemsDescription')}</p>
-              {selectedAccount && (
-                <p className="text-muted">
-                  <strong>Clinic:</strong> {selectedAccount.account_name}
-                  {specialty && <span> | <strong>Specialty:</strong> {specialty.name}</span>}
-                </p>
-              )}
             </Col>
             <Col xs="auto">
               {specialty && (

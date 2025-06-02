@@ -1,4 +1,4 @@
-// src/services/permissions.service.js
+// src/services/permissions.service.js - FIXED
 import api from './api';
 
 const PermissionsService = {
@@ -13,7 +13,7 @@ const PermissionsService = {
     }
   },
 
-  // Get permissions summary for all users in current account
+  // Get permissions summary for all users in current account (requires manage_permissions)
   getUsersPermissions: async () => {
     try {
       const response = await api.get('/accounts/permissions/users/');
@@ -24,7 +24,18 @@ const PermissionsService = {
     }
   },
 
-  // Get detailed permissions for a specific user
+  // FIXED: Get current user's own permissions (no special permissions required)
+  getMyPermissions: async () => {
+    try {
+      const response = await api.get('/accounts/permissions/my-permissions/');
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching my permissions:', error);
+      throw error;
+    }
+  },
+
+  // Get detailed permissions for a specific user (requires manage_permissions)
   getUserPermissions: async (userId) => {
     try {
       const response = await api.get(`/accounts/permissions/user/${userId}/`);
@@ -35,7 +46,7 @@ const PermissionsService = {
     }
   },
 
-  // Update permissions for a specific user
+  // Update permissions for a specific user (requires manage_permissions)
   updateUserPermissions: async (userId, permissions, notes = '', accountId = null) => {
     try {
       const payload = {

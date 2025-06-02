@@ -22,7 +22,7 @@ const RoomsList = ({ rooms, onEdit, onDelete }) => {
         <tr>
           <th>{t('rooms.roomName')}</th>
           <th>{t('common.status')}</th>
-          <th>{t('rooms.private')}</th>
+          <th>{t('common.private')}</th>
           <th>{t('common.actions')}</th>
         </tr>
       </thead>

@@ -74,7 +74,7 @@ const CostaRicaGeoSelector = ({
       <Col {...colSize}>
         <Form.Group className="mb-3">
           <Form.Label>
-            {t('location.province')}
+            {t('locations.province')}
             {required && <span className="text-danger"> *</span>}
           </Form.Label>
           <Form.Select
@@ -84,7 +84,7 @@ const CostaRicaGeoSelector = ({
             isInvalid={!!errors.province}
             required={required}
           >
-            <option value="">{t('location.selectProvince')}</option>
+            <option value="">{t('locations.selectProvince')}</option>
             {geoData && Object.keys(geoData).map(province => (
               <option key={province} value={province}>
                 {province}
@@ -100,7 +100,7 @@ const CostaRicaGeoSelector = ({
       <Col {...colSize}>
         <Form.Group className="mb-3">
           <Form.Label>
-            {t('location.canton')}
+            {t('locations.canton')}
             {required && <span className="text-danger"> *</span>}
           </Form.Label>
           <Form.Select
@@ -111,7 +111,7 @@ const CostaRicaGeoSelector = ({
             required={required}
             disabled={!formData.province}
           >
-            <option value="">{t('location.selectCanton')}</option>
+            <option value="">{t('locations.selectCanton')}</option>
             {cantons.map(canton => (
               <option key={canton} value={canton}>
                 {canton}
@@ -127,7 +127,7 @@ const CostaRicaGeoSelector = ({
       <Col {...colSize}>
         <Form.Group className="mb-3">
           <Form.Label>
-            {t('location.district')}
+            {t('locations.district')}
             {required && <span className="text-danger"> *</span>}
           </Form.Label>
           <Form.Select
@@ -138,7 +138,7 @@ const CostaRicaGeoSelector = ({
             required={required}
             disabled={!formData.canton}
           >
-            <option value="">{t('location.selectDistrict')}</option>
+            <option value="">{t('locations.selectDistrict')}</option>
             {districts.map(district => (
               <option key={district} value={district}>
                 {district}

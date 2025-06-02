@@ -149,7 +149,7 @@ const Specialties = () => {
             className="mb-3"
             onClick={handleFormCancel}
           >
-            {t('catalog.back')}
+            {t('common.back')}
           </Button>
           <SpecialtyForm 
             specialty={currentSpecialty} 
@@ -173,11 +173,6 @@ const Specialties = () => {
                 </ol>
               </nav>
               <p className="text-muted">{t('catalog.specialtiesDescription')}</p>
-              {selectedAccount && (
-                <p className="text-muted">
-                  <strong>Clinic:</strong> {selectedAccount.account_name}
-                </p>
-              )}
             </Col>
             <Col xs="auto">
               <Button variant="primary" onClick={handleAddClick}>

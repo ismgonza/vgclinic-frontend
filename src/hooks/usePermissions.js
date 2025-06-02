@@ -1,4 +1,4 @@
-// src/hooks/usePermissions.js - UPDATED WITH GRANULAR PERMISSIONS
+// src/hooks/usePermissions.js - FIXED to use my-permissions endpoint
 import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../contexts/AuthContext';
 import { AccountContext } from '../contexts/AccountContext';
@@ -47,8 +47,8 @@ export const usePermissions = () => {
         return;
       }
 
-      // Get user's permissions from the backend endpoint
-      const userPermData = await PermissionsService.getUserPermissions(currentUser.id);
+      // FIXED: Use the new my-permissions endpoint
+      const userPermData = await PermissionsService.getMyPermissions();
       
       setUserPermissions(userPermData.permissions || []);
       setIsOwner(userPermData.is_owner || false);

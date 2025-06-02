@@ -1,4 +1,4 @@
-// src/pages/clinic/PatientDetail.jsx - Restructured version
+// src/pages/clinic/PatientDetail.jsx - CLEAN FIXED VERSION
 import React, { useState, useEffect, useContext } from 'react';
 import { Container, Row, Col, Card, Button, Badge, Spinner, Alert, Table, Tabs, Tab, Modal } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -6,6 +6,7 @@ import { faArrowLeft, faEdit, faPlus, faPhone, faEnvelope, faUser, faMapMarkerAl
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AccountContext } from '../../contexts/AccountContext';
+import { usePermissions } from '../../hooks/usePermissions';
 import patientsService from '../../services/patients.service';
 import treatmentsService from '../../services/treatments.service';
 import MedicalHistoryForm from '../../components/clinic/MedicalHistoryForm';
@@ -15,6 +16,18 @@ const PatientDetail = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { selectedAccount } = useContext(AccountContext);
+  
+  // Permission hooks
+  const { 
+    canViewPatientsDetail,
+    canViewPatientsHistory,
+    canManagePatientsBasic,
+    canManagePatientsHistory,
+    canViewAnyTreatments,
+    canCreateTreatments,
+    loading: permissionsLoading
+  } = usePermissions();
+  
   const [patient, setPatient] = useState(null);
   const [medicalHistories, setMedicalHistories] = useState([]);
   const [patientTreatments, setPatientTreatments] = useState([]);
@@ -35,17 +48,31 @@ const PatientDetail = () => {
       setLoading(true);
       setError(null);
       
-      // Fetch patient details
+      // Fetch patient details (basic info)
       const patientData = await patientsService.getPatient(id);
       setPatient(patientData);
       
-      // Fetch medical histories
-      const medicalData = await patientsService.getPatientMedicalHistory(id);
-      setMedicalHistories(medicalData);
+      // Always try to fetch medical histories, let the backend decide permissions
+      try {
+        const medicalData = await patientsService.getPatientMedicalHistory(id);
+        setMedicalHistories(medicalData);
+      } catch (historyErr) {
+        if (historyErr.response?.status === 403) {
+          console.warn('User does not have permission to view medical history');
+          setMedicalHistories([]);
+        } else {
+          console.error('Error fetching medical history:', historyErr);
+          setMedicalHistories([]);
+        }
+      }
       
     } catch (err) {
       console.error('Error fetching patient data:', err);
-      setError(t('patients.errorLoadingDetails'));
+      if (err.response?.status === 403) {
+        setError(t('permissions.insufficientPermissions') || 'Access denied. You need proper permissions to view patient details.');
+      } else {
+        setError(t('patients.errorLoadingDetails'));
+      }
     } finally {
       setLoading(false);
     }
@@ -53,6 +80,13 @@ const PatientDetail = () => {
 
   const fetchPatientTreatments = async () => {
     if (!selectedAccount || !patient) return;
+    
+    // Only fetch treatments if user has permission
+    if (!canViewAnyTreatments()) {
+      console.warn('User does not have permission to view treatments');
+      setPatientTreatments([]);
+      return;
+    }
     
     try {
       setTreatmentsLoading(true);
@@ -68,7 +102,10 @@ const PatientDetail = () => {
       
     } catch (err) {
       console.error('Error fetching patient treatments:', err);
-      // Don't set global error for treatments, just log it
+      if (err.response?.status === 403) {
+        console.warn('User does not have permission to view treatments');
+        setPatientTreatments([]);
+      }
     } finally {
       setTreatmentsLoading(false);
     }
@@ -107,19 +144,16 @@ const PatientDetail = () => {
 
   const handleMedicalHistorySave = async (historyData) => {
     try {
-      // Prepare the payload
       const payload = {
         ...historyData,
-        patient_account: patient.clinic_memberships[0]?.id // Use the first membership if available
+        patient_account: patient.clinic_memberships[0]?.id
       };
       
       await patientsService.addMedicalHistory(id, payload);
       setSuccessMessage(t('patients.anamnesis.addSuccess'));
       setShowMedicalHistoryForm(false);
       
-      // Refresh medical histories
       fetchPatientData();
-      
       setTimeout(() => setSuccessMessage(''), 3000);
     } catch (err) {
       console.error('Error saving medical history:', err);
@@ -142,6 +176,18 @@ const PatientDetail = () => {
     return new Date(dateString).toLocaleString();
   };
 
+  // Show loading while permissions are being checked
+  if (permissionsLoading) {
+    return (
+      <Container fluid className="py-4">
+        <div className="text-center py-5">
+          <Spinner animation="border" role="status" variant="primary" />
+          <p className="mt-3">{t('common.loading')}...</p>
+        </div>
+      </Container>
+    );
+  }
+
   if (loading) {
     return (
       <Container fluid className="py-4">
@@ -160,7 +206,7 @@ const PatientDetail = () => {
           {error}
           <div className="mt-3">
             <Button variant="outline-primary" onClick={handleBack}>
-              {t('patients.back')}
+              {t('common.back')}
             </Button>
           </div>
         </Alert>
@@ -175,10 +221,28 @@ const PatientDetail = () => {
           {t('patients.patientNotFound')}
           <div className="mt-3">
             <Button variant="outline-primary" onClick={handleBack}>
-              {t('patients.back')}
+              {t('common.back')}
             </Button>
           </div>
         </Alert>
+      </Container>
+    );
+  }
+
+  // Check if user can view patient details
+  if (!canViewPatientsDetail()) {
+    return (
+      <Container fluid className="py-4">
+        <Card>
+          <Card.Body>
+            <div className="text-center py-4 text-muted">
+              <p>You don't have access to view patient details.</p>
+              <Button variant="outline-primary" onClick={handleBack}>
+                {t('common.back')}
+              </Button>
+            </div>
+          </Card.Body>
+        </Card>
       </Container>
     );
   }
@@ -189,12 +253,15 @@ const PatientDetail = () => {
         <Col>
           <Button variant="outline-secondary" onClick={handleBack} className="me-2">
             <FontAwesomeIcon icon={faArrowLeft} className="me-2" />
-            {t('patients.back')}
+            {t('common.back')}
           </Button>
-          <Button variant="outline-primary" onClick={handleEditPatient}>
-            <FontAwesomeIcon icon={faEdit} className="me-2" />
-            {t('patients.editPatient')}
-          </Button>
+          
+          {canManagePatientsBasic() && (
+            <Button variant="outline-primary" onClick={handleEditPatient}>
+              <FontAwesomeIcon icon={faEdit} className="me-2" />
+              {t('patients.editPatient')}
+            </Button>
+          )}
         </Col>
       </Row>
 
@@ -245,7 +312,7 @@ const PatientDetail = () => {
                 </Col>
               </Row>
               <Row className="mb-3">
-                <Col xs={4} className="fw-bold">{t('patients.email')}</Col>
+                <Col xs={4} className="fw-bold">{t('common.email')}</Col>
                 <Col xs={8}>
                   {patient.email ? (
                     <a href={`mailto:${patient.email}`}>
@@ -284,7 +351,7 @@ const PatientDetail = () => {
               )}
               
               {/* Address */}
-              <h6 className="mt-4 mb-3">{t('patients.address')}</h6>
+              <h6 className="mt-4 mb-3">{t('common.address')}</h6>
               <div className="d-flex">
                 <FontAwesomeIcon icon={faMapMarkerAlt} className="me-2 mt-1" />
                 <div>
@@ -295,14 +362,14 @@ const PatientDetail = () => {
                 </div>
               </div>
 
-              {/* Emergency Contacts - Moved here */}
+              {/* Emergency Contacts */}
               <h6 className="mt-4 mb-3">{t('patients.emergencyContacts')}</h6>
               {patient.emergency_contacts && patient.emergency_contacts.length > 0 ? (
                 <Table size="sm" responsive>
                   <thead>
                     <tr>
-                      <th>{t('patients.name')}</th>
-                      <th>{t('patients.phone')}</th>
+                      <th>{t('common.name')}</th>
+                      <th>{t('common.phone')}</th>
                       <th>{t('patients.relationship')}</th>
                     </tr>
                   </thead>
@@ -340,66 +407,77 @@ const PatientDetail = () => {
                 <Tab eventKey="anamnesis" title={
                   <span>
                     <FontAwesomeIcon icon={faClipboardList} className="me-2" />
-                    {t('patients.anamnesis.title')}
+                    {t('patients.medicalHistory.anamnesis')}
                   </span>
                 }>
-                  <div className="d-flex justify-content-between align-items-center mb-3">
-                    <h5 className="mb-0">{t('patients.anamnesis.title')}</h5>
-                    <Button variant="primary" size="sm" onClick={handleAddMedicalHistory}>
-                      <FontAwesomeIcon icon={faPlus} className="me-2" />
-                      {t('patients.anamnesis.add')}
-                    </Button>
-                  </div>
-                  
-                  {medicalHistories.length === 0 ? (
-                    <Alert variant="info">
-                      {t('patients.anamnesis.noRecords')}
-                    </Alert>
-                  ) : (
+                  {canViewPatientsHistory() ? (
                     <>
-                      {/* Latest Anamnesis */}
-                      <div className="mb-4">
-                        <h6 className="border-bottom pb-2">{t('patients.anamnesis.latest')}</h6>
-                        <MedicalHistoryDisplay history={medicalHistories[0]} />
+                      <div className="d-flex justify-content-between align-items-center mb-3">
+                        <h5 className="mb-0">{t('patients.medicalHistory.title')}</h5>
+                        
+                        {canManagePatientsHistory() && (
+                          <Button variant="primary" size="sm" onClick={handleAddMedicalHistory}>
+                            <FontAwesomeIcon icon={faPlus} className="me-2" />
+                            {t('patients.medicalHistory.add')}
+                          </Button>
+                        )}
                       </div>
                       
-                      {/* All Anamnesis Entries */}
-                      <div>
-                        <h6 className="border-bottom pb-2">{t('patients.anamnesis.all')}</h6>
-                        <Table responsive hover>
-                          <thead>
-                            <tr>
-                              <th>{t('patients.anamnesis.date')}</th>
-                              <th>{t('patients.anamnesis.confirmed')}</th>
-                              <th>{t('common.actions')}</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {medicalHistories.map((history, index) => (
-                              <tr key={history.id || index}>
-                                <td>{formatDate(history.created_at)}</td>
-                                <td>
-                                  {history.information_confirmed ? (
-                                    <Badge bg="success">{t('common.yes')}</Badge>
-                                  ) : (
-                                    <Badge bg="warning">{t('common.no')}</Badge>
-                                  )}
-                                </td>
-                                <td>
-                                  <Button 
-                                    variant="outline-info" 
-                                    size="sm"
-                                    onClick={() => handleViewMedicalHistory(history.id)}
-                                  >
-                                    {t('common.view')}
-                                  </Button>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </Table>
-                      </div>
+                      {medicalHistories.length === 0 ? (
+                        <Alert variant="info">
+                          {t('patients.medicalHistory.noRecords')}
+                        </Alert>
+                      ) : (
+                        <>
+                          {/* Latest Anamnesis */}
+                          <div className="mb-4">
+                            <h6 className="border-bottom pb-2">{t('patients.medicalHistory.latest')}</h6>
+                            <MedicalHistoryDisplay history={medicalHistories[0]} />
+                          </div>
+                          
+                          {/* All Anamnesis Entries */}
+                          <div>
+                            <h6 className="border-bottom pb-2">{t('patients.medicalHistory.all')}</h6>
+                            <Table responsive hover>
+                              <thead>
+                                <tr>
+                                  <th>{t('patients.medicalHistory.date')}</th>
+                                  <th>{t('patients.medicalHistory.confirmed')}</th>
+                                  <th>{t('common.actions')}</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {medicalHistories.map((history, index) => (
+                                  <tr key={history.id || index}>
+                                    <td>{formatDate(history.created_at)}</td>
+                                    <td>
+                                      {history.information_confirmed ? (
+                                        <Badge bg="success">{t('common.yes')}</Badge>
+                                      ) : (
+                                        <Badge bg="warning">{t('common.no')}</Badge>
+                                      )}
+                                    </td>
+                                    <td>
+                                      <Button 
+                                        variant="outline-info" 
+                                        size="sm"
+                                        onClick={() => handleViewMedicalHistory(history.id)}
+                                      >
+                                        {t('common.view')}
+                                      </Button>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </Table>
+                          </div>
+                        </>
+                      )}
                     </>
+                  ) : (
+                    <div className="text-center py-4 text-muted">
+                      <p>You don't have access to view patient history.</p>
+                    </div>
                   )}
                 </Tab>
 
@@ -410,68 +488,79 @@ const PatientDetail = () => {
                     {t('treatments.title')}
                   </span>
                 }>
-                  <div className="d-flex justify-content-between align-items-center mb-3">
-                    <h5 className="mb-0">{t('treatments.title')}</h5>
-                    <Button variant="primary" size="sm" onClick={() => navigate('/clinic/treatments/new', { state: { selectedPatient: patient } })}>
-                      <FontAwesomeIcon icon={faPlus} className="me-2" />
-                      {t('treatments.newTreatment')}
-                    </Button>
-                  </div>
-                  
-                  {treatmentsLoading ? (
-                    <div className="text-center py-3">
-                      <Spinner animation="border" size="sm" />
-                      <p className="mt-2">{t('common.loading')}...</p>
-                    </div>
-                  ) : patientTreatments.length === 0 ? (
-                    <Alert variant="info">
-                      {t('treatments.noTreatments')}
-                    </Alert>
+                  {canViewAnyTreatments() ? (
+                    <>
+                      <div className="d-flex justify-content-between align-items-center mb-3">
+                        <h5 className="mb-0">{t('treatments.title')}</h5>
+                        
+                        {canCreateTreatments() && (
+                          <Button variant="primary" size="sm" onClick={() => navigate('/clinic/treatments/new', { state: { selectedPatient: patient } })}>
+                            <FontAwesomeIcon icon={faPlus} className="me-2" />
+                            {t('treatments.newTreatment')}
+                          </Button>
+                        )}
+                      </div>
+                      
+                      {treatmentsLoading ? (
+                        <div className="text-center py-3">
+                          <Spinner animation="border" size="sm" />
+                          <p className="mt-2">{t('common.loading')}...</p>
+                        </div>
+                      ) : patientTreatments.length === 0 ? (
+                        <Alert variant="info">
+                          {t('treatments.noTreatments')}
+                        </Alert>
+                      ) : (
+                        <Table responsive hover>
+                          <thead>
+                            <tr>
+                              <th>{t('treatments.scheduledDate')}</th>
+                              <th>{t('common.specialty')}</th>
+                              <th>{t('common.procedure')}</th>
+                              <th>{t('common.doctor')}</th>
+                              <th>{t('common.status')}</th>
+                              <th>{t('common.actions')}</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {patientTreatments
+                              .filter(treatment => ['SCHEDULED', 'IN_PROGRESS'].includes(treatment.status))
+                              .map((treatment) => (
+                              <tr key={treatment.id}>
+                                <td>{formatDateTime(treatment.scheduled_date)}</td>
+                                <td>{treatment.specialty_details?.name || '-'}</td>
+                                <td>{treatment.catalog_item_details?.name || '-'}</td>
+                                <td>{treatment.doctor_details?.first_name && treatment.doctor_details?.last_name1 
+                                  ? `${treatment.doctor_details.first_name} ${treatment.doctor_details.last_name1}` 
+                                  : '-'}</td>
+                                <td>
+                                  <Badge bg={
+                                    treatment.status === 'COMPLETED' ? 'success' :
+                                    treatment.status === 'IN_PROGRESS' ? 'primary' :
+                                    treatment.status === 'CANCELED' ? 'danger' : 'secondary'
+                                  }>
+                                    {t(`treatments.status.${treatment.status}`)}
+                                  </Badge>
+                                </td>
+                                <td>
+                                  <Button 
+                                    variant="outline-info" 
+                                    size="sm"
+                                    onClick={() => handleViewTreatment(treatment)}
+                                  >
+                                    {t('common.view')}
+                                  </Button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </Table>
+                      )}
+                    </>
                   ) : (
-                    <Table responsive hover>
-                      <thead>
-                        <tr>
-                          <th>{t('treatments.fields.scheduledDate')}</th>
-                          <th>{t('treatments.fields.specialty')}</th>
-                          <th>{t('treatments.fields.procedure')}</th>
-                          <th>{t('treatments.fields.doctor')}</th>
-                          <th>{t('treatments.fields.status')}</th>
-                          <th>{t('common.actions')}</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {patientTreatments
-                          .filter(treatment => ['SCHEDULED', 'IN_PROGRESS'].includes(treatment.status))
-                          .map((treatment) => (
-                          <tr key={treatment.id}>
-                            <td>{formatDateTime(treatment.scheduled_date)}</td>
-                            <td>{treatment.specialty_details?.name || '-'}</td>
-                            <td>{treatment.catalog_item_details?.name || '-'}</td>
-                            <td>{treatment.doctor_details?.first_name && treatment.doctor_details?.last_name1 
-                              ? `${treatment.doctor_details.first_name} ${treatment.doctor_details.last_name1}` 
-                              : '-'}</td>
-                            <td>
-                              <Badge bg={
-                                treatment.status === 'COMPLETED' ? 'success' :
-                                treatment.status === 'IN_PROGRESS' ? 'primary' :
-                                treatment.status === 'CANCELED' ? 'danger' : 'secondary'
-                              }>
-                                {t(`treatments.status.${treatment.status}`)}
-                              </Badge>
-                            </td>
-                            <td>
-                              <Button 
-                                variant="outline-info" 
-                                size="sm"
-                                onClick={() => handleViewTreatment(treatment)}
-                              >
-                                {t('common.view')}
-                              </Button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </Table>
+                    <div className="text-center py-4 text-muted">
+                      <p>You don't have access to view treatments.</p>
+                    </div>
                   )}
                 </Tab>
 
@@ -479,12 +568,12 @@ const PatientDetail = () => {
                 <Tab eventKey="finances" title={
                   <span>
                     <FontAwesomeIcon icon={faDollarSign} className="me-2" />
-                    {t('patients.finances.title')}
+                    {t('common.finances')}
                   </span>
                 }>
                   <div className="text-center py-5 text-muted">
                     <FontAwesomeIcon icon={faDollarSign} size="3x" className="mb-3" />
-                    <p>{t('patients.finances.comingSoon')}</p>
+                    <p>{t('common.finances.comingSoon')}</p>
                   </div>
                 </Tab>
               </Tabs>
@@ -494,22 +583,24 @@ const PatientDetail = () => {
       </Row>
       
       {/* Medical History Form Modal */}
-      <Modal 
-        show={showMedicalHistoryForm} 
-        onHide={() => setShowMedicalHistoryForm(false)}
-        size="lg"
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>{t('patients.anamnesis.add')}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <MedicalHistoryForm 
-            patientId={id}
-            onSave={handleMedicalHistorySave}
-            onCancel={() => setShowMedicalHistoryForm(false)}
-          />
-        </Modal.Body>
-      </Modal>
+      {canManagePatientsHistory() && (
+        <Modal 
+          show={showMedicalHistoryForm} 
+          onHide={() => setShowMedicalHistoryForm(false)}
+          size="lg"
+        >
+          <Modal.Header closeButton>
+            <Modal.Title>{t('patients.medicalHistory.add')}</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <MedicalHistoryForm 
+              patientId={id}
+              onSave={handleMedicalHistorySave}
+              onCancel={() => setShowMedicalHistoryForm(false)}
+            />
+          </Modal.Body>
+        </Modal>
+      )}
       
       <Modal 
         show={showMedicalHistoryDetails} 
@@ -517,7 +608,7 @@ const PatientDetail = () => {
         size="lg"
       >
         <Modal.Header closeButton>
-          <Modal.Title>{t('patients.anamnesis.viewDetails')}</Modal.Title>
+          <Modal.Title>{t('patients.medicalHistory.viewDetails')}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {selectedMedicalHistory ? (
@@ -542,7 +633,7 @@ const PatientDetail = () => {
 const MedicalHistoryDisplay = ({ history }) => {
   const { t } = useTranslation();
   
-  if (!history) return <Alert variant="info">{t('patients.anamnesis.noRecords')}</Alert>;
+  if (!history) return <Alert variant="info">{t('patients.medicalHistory.noRecords')}</Alert>;
   
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
@@ -553,11 +644,11 @@ const MedicalHistoryDisplay = ({ history }) => {
     <div>
       <Row className="mb-4">
         <Col md={6}>
-          <h6>{t('patients.anamnesis.date')}</h6>
+          <h6>{t('patients.medicalHistory.date')}</h6>
           <p>{formatDate(history.created_at)}</p>
         </Col>
         <Col md={6}>
-          <h6>{t('patients.anamnesis.confirmed')}</h6>
+          <h6>{t('patients.medicalHistory.confirmed')}</h6>
           <p>
             {history.information_confirmed ? (
               <Badge bg="success">{t('common.yes')}</Badge>
@@ -568,17 +659,17 @@ const MedicalHistoryDisplay = ({ history }) => {
         </Col>
       </Row>
       
-      <h6 className="border-bottom pb-2 mb-3">{t('patients.anamnesis.medicalConditions')}</h6>
+      <h6 className="border-bottom pb-2 mb-3">{t('patients.medicalHistory.medicalConditions')}</h6>
       <Row className="mb-4">
         {renderMedicalConditions(history, t)}
       </Row>
       
-      <h6 className="border-bottom pb-2 mb-3">{t('patients.anamnesis.medicalStatus')}</h6>
+      <h6 className="border-bottom pb-2 mb-3">{t('patients.medicalHistory.medicalStatus')}</h6>
       <Row className="mb-4">
         {renderMedicalStatus(history, t)}
       </Row>
       
-      <h6 className="border-bottom pb-2 mb-3">{t('patients.anamnesis.treatmentDetails')}</h6>
+      <h6 className="border-bottom pb-2 mb-3">{t('patients.medicalHistory.treatmentDetails')}</h6>
       {renderTreatmentDetails(history, t)}
     </div>
   );
@@ -587,25 +678,25 @@ const MedicalHistoryDisplay = ({ history }) => {
 // Helper functions to render different sections of medical history
 const renderMedicalConditions = (history, t) => {
   const conditions = [
-    { field: 'high_blood_pressure', label: t('patients.anamnesis.conditions.highBloodPressure') },
-    { field: 'diabetes', label: t('patients.anamnesis.conditions.diabetes') },
-    { field: 'asthma', label: t('patients.anamnesis.conditions.asthma') },
-    { field: 'heart_problems', label: t('patients.anamnesis.conditions.heartProblems') },
-    { field: 'gastritis', label: t('patients.anamnesis.conditions.gastritis') },
-    { field: 'hormonal_problems', label: t('patients.anamnesis.conditions.hormonalProblems') },
-    { field: 'rheumatic_fever', label: t('patients.anamnesis.conditions.rheumaticFever') },
-    { field: 'anemia', label: t('patients.anamnesis.conditions.anemia') },
-    { field: 'arthritis', label: t('patients.anamnesis.conditions.arthritis') },
-    { field: 'smoker', label: t('patients.anamnesis.conditions.smoker') },
-    { field: 'hepatitis', label: t('patients.anamnesis.conditions.hepatitis') },
-    { field: 'epilepsy', label: t('patients.anamnesis.conditions.epilepsy') },
-    { field: 'drug_addiction', label: t('patients.anamnesis.conditions.drugAddiction') },
-    { field: 'thyroid', label: t('patients.anamnesis.conditions.thyroid') },
-    { field: 'cancer', label: t('patients.anamnesis.conditions.cancer') },
-    { field: 'ulcers', label: t('patients.anamnesis.conditions.ulcers') },
-    { field: 'kidney_diseases', label: t('patients.anamnesis.conditions.kidneyDiseases') },
-    { field: 'aids', label: t('patients.anamnesis.conditions.aids') },
-    { field: 'psychiatric_treatment', label: t('patients.anamnesis.conditions.psychiatricTreatment') },
+    { field: 'high_blood_pressure', label: t('patients.medicalHistory.conditions.highBloodPressure') },
+    { field: 'diabetes', label: t('patients.medicalHistory.conditions.diabetes') },
+    { field: 'asthma', label: t('patients.medicalHistory.conditions.asthma') },
+    { field: 'heart_problems', label: t('patients.medicalHistory.conditions.heartProblems') },
+    { field: 'gastritis', label: t('patients.medicalHistory.conditions.gastritis') },
+    { field: 'hormonal_problems', label: t('patients.medicalHistory.conditions.hormonalProblems') },
+    { field: 'rheumatic_fever', label: t('patients.medicalHistory.conditions.rheumaticFever') },
+    { field: 'anemia', label: t('patients.medicalHistory.conditions.anemia') },
+    { field: 'arthritis', label: t('patients.medicalHistory.conditions.arthritis') },
+    { field: 'smoker', label: t('patients.medicalHistory.conditions.smoker') },
+    { field: 'hepatitis', label: t('patients.medicalHistory.conditions.hepatitis') },
+    { field: 'epilepsy', label: t('patients.medicalHistory.conditions.epilepsy') },
+    { field: 'drug_addiction', label: t('patients.medicalHistory.conditions.drugAddiction') },
+    { field: 'thyroid', label: t('patients.medicalHistory.conditions.thyroid') },
+    { field: 'cancer', label: t('patients.medicalHistory.conditions.cancer') },
+    { field: 'ulcers', label: t('patients.medicalHistory.conditions.ulcers') },
+    { field: 'kidney_diseases', label: t('patients.medicalHistory.conditions.kidneyDiseases') },
+    { field: 'aids', label: t('patients.medicalHistory.conditions.aids') },
+    { field: 'psychiatric_treatment', label: t('patients.medicalHistory.conditions.psychiatricTreatment') },
   ];
   
   return conditions.map((condition, index) => (
@@ -623,10 +714,10 @@ const renderMedicalConditions = (history, t) => {
 
 const renderMedicalStatus = (history, t) => {
   const statuses = [
-    { field: 'anesthesia_issues', label: t('patients.anamnesis.status.anesthesiaIssues') },
-    { field: 'bleeding_issues', label: t('patients.anamnesis.status.bleedingIssues') },
-    { field: 'pregnant_or_lactating', label: t('patients.anamnesis.status.pregnantOrLactating') },
-    { field: 'contraceptives', label: t('patients.anamnesis.status.contraceptives') },
+    { field: 'anesthesia_issues', label: t('patients.medicalHistory.status.anesthesiaIssues') },
+    { field: 'bleeding_issues', label: t('patients.medicalHistory.status.bleedingIssues') },
+    { field: 'pregnant_or_lactating', label: t('patients.medicalHistory.status.pregnantOrLactating') },
+    { field: 'contraceptives', label: t('patients.medicalHistory.status.contraceptives') },
   ];
   
   return statuses.map((status, index) => (
@@ -644,11 +735,11 @@ const renderMedicalStatus = (history, t) => {
 
 const renderTreatmentDetails = (history, t) => {
   const details = [
-    { field: 'under_treatment', textField: 'under_treatment_text', label: t('patients.anamnesis.details.underTreatment') },
-    { field: 'current_medication', textField: 'current_medication_text', label: t('patients.anamnesis.details.currentMedication') },
-    { field: 'serious_illnesses', textField: 'serious_illnesses_text', label: t('patients.anamnesis.details.seriousIllnesses') },
-    { field: 'surgeries', textField: 'surgeries_text', label: t('patients.anamnesis.details.surgeries') },
-    { field: 'allergies', textField: 'allergies_text', label: t('patients.anamnesis.details.allergies') },
+    { field: 'under_treatment', textField: 'under_treatment_text', label: t('patients.medicalHistory.details.underTreatment') },
+    { field: 'current_medication', textField: 'current_medication_text', label: t('patients.medicalHistory.details.currentMedication') },
+    { field: 'serious_illnesses', textField: 'serious_illnesses_text', label: t('patients.medicalHistory.details.seriousIllnesses') },
+    { field: 'surgeries', textField: 'surgeries_text', label: t('patients.medicalHistory.details.surgeries') },
+    { field: 'allergies', textField: 'allergies_text', label: t('patients.medicalHistory.details.allergies') },
   ];
   
   return details.map((detail, index) => (

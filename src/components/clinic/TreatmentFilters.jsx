@@ -157,7 +157,7 @@ const TreatmentFilters = ({ filters, onFiltersChange, onClearFilters }) => {
       <Row className="g-3">
         {/* Patient Search */}
         <Col lg={2} md={3}>
-          <Form.Label className="small fw-bold">{t('treatments.fields.patient')}</Form.Label>
+          <Form.Label className="small fw-bold">{t('common.patient')}</Form.Label>
           <div className="position-relative">
             <InputGroup>
               <InputGroup.Text>
@@ -207,7 +207,7 @@ const TreatmentFilters = ({ filters, onFiltersChange, onClearFilters }) => {
 
         {/* Specialty Multi-Select */}
         <Col lg={2} md={3}>
-          <Form.Label className="small fw-bold">{t('treatments.fields.specialty')}</Form.Label>
+          <Form.Label className="small fw-bold">{t('common.specialty')}</Form.Label>
           <div className="border rounded p-2" style={{ maxHeight: '120px', overflowY: 'auto' }}>
             {loadingOptions ? (
               <small className="text-muted">{t('common.loading')}...</small>
@@ -229,7 +229,7 @@ const TreatmentFilters = ({ filters, onFiltersChange, onClearFilters }) => {
 
         {/* Status Multi-Select */}
         <Col lg={2} md={3}>
-          <Form.Label className="small fw-bold">{t('treatments.fields.status')}</Form.Label>
+          <Form.Label className="small fw-bold">{t('common.status')}</Form.Label>
           <div className="border rounded p-2" style={{ maxHeight: '120px', overflowY: 'auto' }}>
             {statusOptions.map(option => (
               <Form.Check
@@ -247,7 +247,7 @@ const TreatmentFilters = ({ filters, onFiltersChange, onClearFilters }) => {
 
         {/* Doctor Multi-Select */}
         <Col lg={2} md={3}>
-          <Form.Label className="small fw-bold">{t('treatments.fields.doctor')}</Form.Label>
+          <Form.Label className="small fw-bold">{t('common.doctor')}</Form.Label>
           <div className="border rounded p-2" style={{ maxHeight: '120px', overflowY: 'auto' }}>
             {loadingOptions ? (
               <small className="text-muted">{t('common.loading')}...</small>
@@ -269,7 +269,7 @@ const TreatmentFilters = ({ filters, onFiltersChange, onClearFilters }) => {
 
         {/* Branch Select */}
         <Col lg={2} md={3}>
-          <Form.Label className="small fw-bold">{t('treatments.fields.branch')}</Form.Label>
+          <Form.Label className="small fw-bold">{t('common.branch')}</Form.Label>
           <Form.Select
             value={filters.branch || ''}
             onChange={(e) => handleFilterChange('branch', e.target.value)}

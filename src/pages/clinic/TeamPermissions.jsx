@@ -225,7 +225,7 @@ const TeamPermissions = () => {
             <div className="d-flex align-items-center flex-wrap gap-3">
               <strong>{t('teamPermissions.legend.title')}:</strong>
               <div className="d-flex align-items-center">
-                <span className="badge bg-info me-2">Role</span>
+                <span className="badge bg-info me-2">{t('common.role')}</span>
                 <small>{t('teamPermissions.legend.role')}</small>
               </div>
               <div className="d-flex align-items-center">
@@ -233,11 +233,11 @@ const TeamPermissions = () => {
                 <small>{t('teamPermissions.legend.individual')}</small>
               </div>
               <div className="d-flex align-items-center">
-                <span className="badge bg-success me-2">Owner</span>
+                <span className="badge bg-success me-2">{t('common.owner')}</span>
                 <small>{t('teamPermissions.legend.owner')}</small>
               </div>
               <div className="d-flex align-items-center">
-                <span className="badge bg-warning me-2">Custom</span>
+                <span className="badge bg-warning me-2">{t('common.custom')}</span>
                 <small>{t('teamPermissions.legend.custom', 'Custom roles have no default permissions')}</small>
               </div>
             </div>
@@ -256,10 +256,10 @@ const TeamPermissions = () => {
                     <thead>
                       <tr>
                         <th>{t('teamPermissions.table.member')}</th>
-                        <th>{t('teamPermissions.table.role')}</th>
-                        <th>{t('teamPermissions.table.status')}</th>
+                        <th>{t('common.role')}</th>
+                        <th>{t('common.status')}</th>
                         <th>{t('teamPermissions.table.permissionsCount')}</th>
-                        <th>{t('teamPermissions.table.actions')}</th>
+                        <th>{t('common.actions')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -286,9 +286,9 @@ const TeamPermissions = () => {
                             </td>
                             <td>
                               {user.is_owner ? (
-                                <span className="badge bg-success">{t('teamPermissions.status.owner')}</span>
+                                <span className="badge bg-success">{t('common.owner')}</span>
                               ) : (
-                                <span className="badge bg-secondary">{t('teamPermissions.status.member')}</span>
+                                <span className="badge bg-secondary">{t('common.member')}</span>
                               )}
                             </td>
                             <td>
