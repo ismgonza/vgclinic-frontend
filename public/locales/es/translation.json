@@ -487,6 +487,9 @@
     "selectClinic": "Seleccione una clínica",
     "referralSource": "Fuente de Referencia",
     "selectReferral": "Seleccione una fuente de referencia",
+    "permissions": {
+      "noAccess": "No tiene acceso a la gestión de pacientes"
+    },
     "referralSources": {
       "internet": "Búsqueda en Internet",
       "socialMedia": "Redes Sociales",

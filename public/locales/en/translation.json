@@ -487,6 +487,9 @@
     "selectClinic": "Select a clinic",
     "referralSource": "Referral Source",
     "selectReferral": "Select a referral source",
+    "permissions": {
+      "noAccess": "You don't have access to view patients."
+    },
     "referralSources": {
       "internet": "Internet Search",
       "socialMedia": "Social Media",

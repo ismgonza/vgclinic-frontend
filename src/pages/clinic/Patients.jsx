@@ -214,7 +214,7 @@ const Patients = () => {
           <Card.Body>
             <div className="text-center py-4 text-muted">
               <FontAwesomeIcon icon={faUserInjured} size="3x" className="mb-3" />
-              <p>You don't have access to view patients.</p>
+              <p>{t('patients.permissions.noAccess')}</p>
             </div>
           </Card.Body>
         </Card>
