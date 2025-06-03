@@ -13,7 +13,6 @@ const Profile = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
   const [profileData, setProfileData] = useState(null);
-  const [teamMemberships, setTeamMemberships] = useState([]);
   const [userPermissions, setUserPermissions] = useState([]);
   const [showPermissionsModal, setShowPermissionsModal] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
@@ -21,7 +20,7 @@ const Profile = () => {
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
-    phone: '',
+    phone_number: '', // CHANGED: Use phone_number instead of phone
   });
 
   const [passwordData, setPasswordData] = useState({
@@ -43,32 +42,19 @@ const Profile = () => {
       setFormData({
         first_name: profile.first_name || '',
         last_name: profile.last_name || '',
-        phone: profile.phone || '',
+        phone_number: profile.phone_number || '', // CHANGED: Use phone_number from AccountUser
       });
-
-      // Load team memberships for clinic users
-      if (!profile.is_staff) {
-        try {
-          const memberships = await usersService.getMyTeamMemberships();
-          setTeamMemberships(memberships);
-        } catch (err) {
-          console.warn('Could not load team memberships:', err);
-          setTeamMemberships([]);
-        }
-      }
 
       // Load user permissions
       try {
         const permissions = await permissionsService.getMyPermissions();
         setUserPermissions(permissions);
       } catch (err) {
-        console.warn('Could not load permissions:', err);
         setUserPermissions([]);
       }
 
     } catch (err) {
       setError(t('profile.updateError'));
-      console.error('Error loading profile:', err);
     } finally {
       setLoading(false);
     }
@@ -105,7 +91,6 @@ const Profile = () => {
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
       setError(t('profile.updateError'));
-      console.error('Error updating profile:', err);
     } finally {
       setSaving(false);
     }
@@ -138,7 +123,6 @@ const Profile = () => {
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
       setError(t('profile.passwordError'));
-      console.error('Error changing password:', err);
     } finally {
       setSaving(false);
     }
@@ -242,21 +226,29 @@ const Profile = () => {
                     </small>
                   </div>
                   <div className="col-md-6 mb-3">
-                    <label htmlFor="phone" className="form-label">
+                    <label htmlFor="phone_number" className="form-label">
                       {t('common.phone')}
                     </label>
                     <input
                       type="tel"
                       className="form-control"
-                      id="phone"
-                      name="phone"
-                      value={formData.phone}
+                      id="phone_number"
+                      name="phone_number"
+                      value={formData.phone_number}
                       onChange={handleInputChange}
                     />
                   </div>
                 </div>
 
-                <div className="d-flex justify-content-end gap-2">
+                <div className="d-flex justify-content-between align-items-center">
+                  <button
+                    type="button"
+                    className="btn btn-outline-secondary"
+                    onClick={() => setShowChangePassword(!showChangePassword)}
+                  >
+                    <i className="bi bi-key me-2"></i>
+                    {t('profile.changePassword')}
+                  </button>
                   <button
                     type="submit"
                     className="btn btn-primary"
@@ -276,84 +268,6 @@ const Profile = () => {
                   </button>
                 </div>
               </form>
-            </div>
-          </div>
-
-          {/* Account Information */}
-          <div className="card mb-4">
-            <div className="card-header">
-              <h5 className="card-title mb-0">{t('profile.accountInfo')}</h5>
-            </div>
-            <div className="card-body">
-              <div className="row">
-                <div className="col-md-6 mb-3">
-                  <label className="form-label">{t('profile.userType')}</label>
-                  <div className="form-control-plaintext">
-                    {profileData?.is_staff ? t('profile.platformAdmin') : t('profile.clinicUser')}
-                  </div>
-                </div>
-                {profileData?.is_staff && (
-                  <div className="col-md-6 mb-3">
-                    <label className="form-label">{t('profile.adminLevel')}</label>
-                    <div className="form-control-plaintext">
-                      {profileData?.is_superuser ? t('profile.superuser') : t('profile.staff')}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Show role and specialties for clinic users */}
-              {!profileData?.is_staff && teamMemberships.length > 0 && (
-                <div className="row">
-                  <div className="col-md-6 mb-3">
-                    <label className="form-label">{t('profile.currentRole')}</label>
-                    <div className="form-control-plaintext">
-                      {teamMemberships.map(membership => (
-                        <span key={membership.account_id} className="badge bg-primary me-2">
-                          {getRoleDisplay(membership.role)} at {membership.account_name}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="col-md-6 mb-3">
-                    <label className="form-label">{t('profile.assignedSpecialties')}</label>
-                    <div className="form-control-plaintext">
-                      {teamMemberships.some(m => m.specialty_name) ? (
-                        teamMemberships.map(membership => 
-                          membership.specialty_name && (
-                            <span key={`${membership.account_id}-${membership.specialty_name}`} className="badge bg-info me-2">
-                              {membership.specialty_name}
-                            </span>
-                          )
-                        )
-                      ) : (
-                        <span className="text-muted">{t('profile.noSpecialties')}</span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              <div className="row">
-                <div className="col-12">
-                  <button
-                    type="button"
-                    className="btn btn-outline-info me-3"
-                    onClick={() => setShowPermissionsModal(true)}
-                  >
-                    <i className="bi bi-shield-check me-2"></i>
-                    {t('profile.viewPermissions')}
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-outline-secondary"
-                    onClick={() => setShowChangePassword(!showChangePassword)}
-                  >
-                    <i className="bi bi-key me-2"></i>
-                    {t('profile.changePassword')}
-                  </button>
-                </div>
-              </div>
             </div>
           </div>
 
@@ -441,45 +355,93 @@ const Profile = () => {
             </div>
           )}
 
-          {/* Permissions Modal */}
-          {showPermissionsModal && (
-            <div className="modal show d-block" tabIndex="-1" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-              <div className="modal-dialog modal-lg">
-                <div className="modal-content">
-                  <div className="modal-header">
-                    <h5 className="modal-title">{t('profile.permissionsModal')}</h5>
-                    <button 
-                      type="button" 
-                      className="btn-close" 
-                      onClick={() => setShowPermissionsModal(false)}
-                    ></button>
-                  </div>
-                  <div className="modal-body">
-                    {userPermissions.permissions && userPermissions.permissions.length > 0 ? (
-                      <div className="row">
-                        {userPermissions.permissions.map((permission, index) => (
-                          <div key={index} className="col-md-6 mb-2">
-                            <div className="d-flex align-items-center">
-                              <i className="bi bi-check-circle text-success me-2"></i>
-                              <span>{t(`permissions.${permission}`, permission)}</span>
-                            </div>
-                          </div>
-                        ))}
+          {/* Account Information */}
+          <div className="card mb-4">
+            <div className="card-header">
+              <h5 className="card-title mb-0">{t('profile.accountInfo')}</h5>
+            </div>
+            <div className="card-body">
+              <div className="row">
+                {profileData?.is_staff && (
+                  <>
+                    <div className="col-md-6 mb-3">
+                      <label className="form-label">{t('profile.userType')}</label>
+                      <div className="form-control-plaintext">
+                        {profileData?.is_staff ? t('profile.platformAdmin') : t('profile.clinicUser')}
                       </div>
-                    ) : (
-                      <p className="text-muted">No tienes permisos asignados aún.</p>
-                    )}
+                    </div>
+                    <div className="col-md-6 mb-3">
+                      <label className="form-label">{t('profile.adminLevel')}</label>
+                      <div className="form-control-plaintext">
+                        {profileData?.is_superuser ? t('profile.superuser') : t('profile.staff')}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Show role and specialty from profileData for clinic users */}
+              {!profileData?.is_staff && (
+                <div className="row">
+                  <div className="col-md-6 mb-3">
+                    <strong>{t('profile.userType')}</strong>
+                    <span className="ms-2">
+                      <span className="badge bg-primary">
+                        {profileData.role_display || getRoleDisplay(profileData.role) || 'Usuario de Clínica'}
+                      </span>
+                    </span>
                   </div>
-                  <div className="modal-footer">
-                    <button 
-                      type="button" 
-                      className="btn btn-secondary" 
-                      onClick={() => setShowPermissionsModal(false)}
-                    >
-                      {t('common.close')}
-                    </button>
+                  <div className="col-md-6 mb-3">
+                    <strong>{t('profile.assignedSpecialty')}</strong>
+                    <span className="ms-2">
+                      {profileData.specialty ? (
+                        <span className="badge bg-info">
+                          {profileData.specialty.name}
+                        </span>
+                      ) : (
+                        <span className="badge bg-secondary">{t('profile.noSpecialty')}</span>
+                      )}
+                    </span>
                   </div>
                 </div>
+              )}
+
+              <div className="row">
+                <div className="col-12">
+                  <button
+                    type="button"
+                    className="btn btn-outline-info"
+                    onClick={() => setShowPermissionsModal(!showPermissionsModal)}
+                  >
+                    <i className="bi bi-shield-check me-2"></i>
+                    {t('profile.viewPermissions')}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Permissions Section */}
+          {showPermissionsModal && (
+            <div className="card mb-4">
+              <div className="card-header">
+                <h5 className="card-title mb-0">{t('profile.permissionsModal')}</h5>
+              </div>
+              <div className="card-body">
+                {userPermissions.permissions && userPermissions.permissions.length > 0 ? (
+                  <div className="row">
+                    {userPermissions.permissions.map((permission, index) => (
+                      <div key={index} className="col-md-6 mb-2">
+                        <div className="d-flex align-items-center">
+                          <i className="bi bi-check-circle text-success me-2"></i>
+                          <span>{t(`permissions.${permission}`, permission)}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-muted">{t('profile.noPermissions')}</p>
+                )}
               </div>
             </div>
           )}
