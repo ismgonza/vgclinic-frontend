@@ -14,6 +14,8 @@ const Profile = () => {
   const [success, setSuccess] = useState(false);
   const [profileData, setProfileData] = useState(null);
   const [userPermissions, setUserPermissions] = useState([]);
+  const [permissionCategories, setPermissionCategories] = useState({});
+  const [groupedPermissions, setGroupedPermissions] = useState({});
   const [showPermissionsModal, setShowPermissionsModal] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
   
@@ -49,8 +51,22 @@ const Profile = () => {
       try {
         const permissions = await permissionsService.getMyPermissions();
         setUserPermissions(permissions);
+
+        // Load available permissions with categories
+        const availablePerms = await permissionsService.getAvailablePermissions();
+        setPermissionCategories(availablePerms.categories || {});
+        
+        // Group user's permissions by category
+        const grouped = groupPermissionsByCategory(
+          permissions.permissions || [], 
+          availablePerms.permissions || [], 
+          availablePerms.categories || {}
+        );
+        setGroupedPermissions(grouped);
+
       } catch (err) {
         setUserPermissions([]);
+        setGroupedPermissions({});
       }
 
     } catch (err) {
@@ -58,6 +74,37 @@ const Profile = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Function to group user permissions by category
+  const groupPermissionsByCategory = (userPerms, allPermissions, categories) => {
+    const grouped = {};
+    
+    // Create a mapping from permission key to permission details
+    const permissionMap = {};
+    allPermissions.forEach(perm => {
+      permissionMap[perm.key] = perm;
+    });
+
+    // Group user's permissions by category
+    userPerms.forEach(permKey => {
+      const permission = permissionMap[permKey];
+      if (permission) {
+        const category = permission.category;
+        if (!grouped[category]) {
+          grouped[category] = {
+            name: categories[category] || category,
+            permissions: []
+          };
+        }
+        grouped[category].permissions.push({
+          key: permKey,
+          display: permission.display
+        });
+      }
+    });
+
+    return grouped;
   };
 
   const handleInputChange = (e) => {
@@ -421,20 +468,33 @@ const Profile = () => {
             </div>
           </div>
 
-          {/* Permissions Section */}
+          {/* Permissions Section - UPDATED with categories */}
           {showPermissionsModal && (
             <div className="card mb-4">
               <div className="card-header">
                 <h5 className="card-title mb-0">{t('profile.permissionsModal')}</h5>
               </div>
               <div className="card-body">
-                {userPermissions.permissions && userPermissions.permissions.length > 0 ? (
-                  <div className="row">
-                    {userPermissions.permissions.map((permission, index) => (
-                      <div key={index} className="col-md-6 mb-2">
-                        <div className="d-flex align-items-center">
-                          <i className="bi bi-check-circle text-success me-2"></i>
-                          <span>{t(`permissions.${permission}`, permission)}</span>
+                {Object.keys(groupedPermissions).length > 0 ? (
+                  <div>
+                    {Object.entries(groupedPermissions).map(([categoryKey, categoryData]) => (
+                      <div key={categoryKey} className="mb-4">
+                        {/* Category Header */}
+                        <h6 className="text-primary border-bottom pb-2 mb-3">
+                          {/* {categoryData.name} */}
+                          {t(`permissionCategories.${categoryKey}`, categoryData)}
+                        </h6>
+                        
+                        {/* Permissions in this category */}
+                        <div className="row">
+                          {categoryData.permissions.map((permission) => (
+                            <div key={permission.key} className="col-md-6 mb-2">
+                              <div className="d-flex align-items-center">
+                                <i className="bi bi-check-circle text-success me-2"></i>
+                                <span>{t(`permissions.${permission.key}`, permission)}</span>
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     ))}
