@@ -7,6 +7,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout/Layout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import Profile from './pages/Profile';
 import Accounts from './pages/platform/Accounts';
 import Users from './pages/platform/Users';
 import Services from './pages/platform/services/Services';
@@ -56,44 +57,29 @@ function App() {
 
             {/* Protected routes - for all authenticated users */}
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+
             {/* Platform administration routes - staff only */}
             <Route path="/platform/accounts" element={<ProtectedRoute><StaffRouteCheck><Accounts /></StaffRouteCheck></ProtectedRoute>} />
-            
             {/* Users route */}
             <Route path="/platform/users" element={<ProtectedRoute><StaffRouteCheck><Users /></StaffRouteCheck></ProtectedRoute>} />
-            
             {/* Services routes */}
             <Route path="/platform/services" element={<ProtectedRoute><StaffRouteCheck><Services /></StaffRouteCheck></ProtectedRoute>} />
-            
             <Route path="/platform/services/services" element={<ProtectedRoute><StaffRouteCheck><ServicesList /></StaffRouteCheck></ProtectedRoute>} />
-
             <Route path="/platform/services/features" element={<ProtectedRoute><StaffRouteCheck><Features /></StaffRouteCheck></ProtectedRoute>} />
-
             <Route path="/platform/services/plans" element={<ProtectedRoute><StaffRouteCheck><Plans /></StaffRouteCheck></ProtectedRoute>} />
-
             <Route path="/platform/contracts" element={<ProtectedRoute><StaffRouteCheck><Contracts /></StaffRouteCheck></ProtectedRoute>} />
 
             <Route path="/clinic/locations" element={<ProtectedRoute><Locations /></ProtectedRoute>} />
-
             <Route path="/clinic/catalog" element={<ProtectedRoute><Catalog /></ProtectedRoute>} />
-
             <Route path="/clinic/catalog/specialties" element={<ProtectedRoute><Specialties /></ProtectedRoute>} />
-
             <Route path="/clinic/catalog/items" element={<ProtectedRoute><CatalogItems /></ProtectedRoute>} />
-
             <Route path="/clinic/patients/edit/:id" element={<ProtectedRoute><Patients /></ProtectedRoute>} />
-
             <Route path="/clinic/patients/:id" element={<ProtectedRoute><PatientDetail /></ProtectedRoute>} />
-
             <Route path="/clinic/patients" element={<ProtectedRoute><Patients /></ProtectedRoute>} />
-
             <Route path="/clinic/treatments/:id" element={<ProtectedRoute><TreatmentDetail /></ProtectedRoute>} />
-
             <Route path="/clinic/treatments" element={<ProtectedRoute><Treatments /></ProtectedRoute>} />
-
             <Route path="/clinic/treatments/new" element={<ProtectedRoute><NewTreatment /></ProtectedRoute>} />
-
             <Route path="/clinic/team" element={<ProtectedRoute><Team /></ProtectedRoute>} />
             <Route path="/clinic/team/members" element={<ProtectedRoute><TeamMembers /></ProtectedRoute>} />
             <Route path="/clinic/team/invitations" element={<ProtectedRoute><TeamInvitations /></ProtectedRoute>} />

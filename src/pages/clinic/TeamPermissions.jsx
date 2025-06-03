@@ -108,7 +108,20 @@ const TeamPermissions = () => {
   };
 
   const getPermissionsByCategory = () => {
-    return PermissionsService.groupPermissionsByCategory(availablePermissions, categories);
+    const grouped = PermissionsService.groupPermissionsByCategory(availablePermissions, categories);
+    
+    // Translate category names using frontend translations
+    const translatedGrouped = {};
+    
+    Object.entries(grouped).forEach(([categoryKey, category]) => {
+      const translatedName = t(`permissionCategories.${categoryKey}`, category.name);
+      translatedGrouped[categoryKey] = {
+        ...category,
+        name: translatedName
+      };
+    });
+    
+    return translatedGrouped;
   };
 
   const getPermissionDisplay = (permissionKey) => {
